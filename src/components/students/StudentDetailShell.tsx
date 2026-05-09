@@ -1,0 +1,91 @@
+'use client';
+
+import Link from 'next/link';
+import { useParams, usePathname } from 'next/navigation';
+import type { CSSProperties } from 'react';
+import { useStudent } from '@/hooks/useStudents';
+
+interface StudentDetailShellProps {
+  children: React.ReactNode;
+}
+
+const headerStyle: CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 'var(--space-2)',
+};
+
+const metaStyle: CSSProperties = {
+  fontSize: 'var(--text-sm)',
+  color: 'var(--color-text-secondary)',
+};
+
+const tabNavStyle: CSSProperties = {
+  display: 'flex',
+  gap: 'var(--space-3)',
+  flexWrap: 'wrap',
+  borderBottom: '1px solid var(--color-border)',
+  paddingBottom: 'var(--space-2)',
+};
+
+const tabStyle = (active: boolean): CSSProperties => ({
+  padding: '8px 12px',
+  borderRadius: 'var(--radius-md)',
+  color: active ? '#fff' : 'var(--color-text-secondary)',
+  background: active ? 'var(--color-primary)' : 'transparent',
+  fontSize: 'var(--text-sm)',
+  fontWeight: active ? 'var(--font-semibold)' : 'var(--font-medium)',
+  textDecoration: 'none',
+});
+
+const getStudentId = (value: string | string[] | undefined) => {
+  if (typeof value === 'string') return value;
+  if (Array.isArray(value)) return value[0] ?? '';
+  return '';
+};
+
+export function StudentDetailShell({ children }: StudentDetailShellProps) {
+  const params = useParams();
+  const pathname = usePathname();
+  const studentId = getStudentId(params.studentId);
+  const student = useStudent(studentId);
+
+  const tabs = [
+    { label: 'Overview', href: `/students/${studentId}` },
+    { label: 'Profile', href: `/students/${studentId}/profile` },
+    { label: 'Documents', href: `/students/${studentId}/documents` },
+    { label: 'Tasks', href: `/students/${studentId}/tasks` },
+    { label: 'Roadmaps', href: `/students/${studentId}/roadmaps` },
+  ];
+
+  const name = student.data?.user.full_name ?? 'Student';
+  const email = student.data?.user.email ?? '—';
+  const group = student.data?.profile?.group_type ?? '—';
+  const year = student.data?.profile?.course_year ?? '—';
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
+      <div style={headerStyle}>
+        <div style={{ fontSize: 'var(--text-2xl)', fontWeight: 'var(--font-semibold)' }}>
+          {student.isLoading ? 'Loading student...' : name}
+        </div>
+        <div style={metaStyle}>
+          {email} · Group {group} · Year {year}
+        </div>
+      </div>
+
+      <nav style={tabNavStyle} aria-label="Student tabs">
+        {tabs.map((tab) => {
+          const active = pathname === tab.href;
+          return (
+            <Link key={tab.href} href={tab.href} style={tabStyle(active)}>
+              {tab.label}
+            </Link>
+          );
+        })}
+      </nav>
+
+      {children}
+    </div>
+  );
+}
