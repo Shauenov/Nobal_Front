@@ -53,3 +53,25 @@ export function useUniversitiesReport() {
     staleTime: 60 * 1000,
   });
 }
+
+// Compatibility aggregator expected by pages: returns combined data
+export function useReports() {
+  const overviewQ = useOverviewReport();
+  const studentsQ = useStudentsReport();
+  const universitiesQ = useUniversitiesReport();
+
+  return {
+    data: {
+      overview: overviewQ.data,
+      students: studentsQ.data,
+      universities: universitiesQ.data,
+    },
+    isLoading: overviewQ.isLoading || studentsQ.isLoading || universitiesQ.isLoading,
+    isError: overviewQ.isError || studentsQ.isError || universitiesQ.isError,
+    refetch: () => {
+      overviewQ.refetch();
+      studentsQ.refetch();
+      universitiesQ.refetch();
+    },
+  } as const;
+}

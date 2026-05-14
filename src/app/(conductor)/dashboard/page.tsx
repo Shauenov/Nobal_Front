@@ -1,272 +1,478 @@
 'use client';
 
-import { format } from 'date-fns';
-import type { CSSProperties } from 'react';
+import { useState, type CSSProperties } from 'react';
 import {
   PieChart,
   Pie,
   Cell,
   ResponsiveContainer,
-  Tooltip,
 } from 'recharts';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { useOverviewReport } from '@/hooks/useReports';
 import { useStudents } from '@/hooks/useStudents';
-import { useMyAppointments } from '@/hooks/useAppointments';
-import { useCalendarEvents } from '@/hooks/useCalendar';
 
 const cardStyle: CSSProperties = {
   background: 'var(--color-surface)',
   border: '1px solid var(--color-border)',
   borderRadius: 'var(--radius-lg)',
-  padding: 'var(--space-4)',
+  padding: 'var(--space-5)',
   boxShadow: 'var(--shadow-sm)',
 };
 
-const labelStyle: CSSProperties = {
-  color: 'var(--color-text-secondary)',
-  fontSize: 'var(--text-xs)',
-  fontWeight: 'var(--font-semibold)',
-  textTransform: 'uppercase',
-  letterSpacing: '0.08em',
+const sectionTitleStyle: CSSProperties = {
+  fontSize: 'var(--text-lg)',
+  fontWeight: '600',
+  color: 'var(--color-text-primary)',
+  marginBottom: 'var(--space-4)',
 };
 
-const valueStyle: CSSProperties = {
-  fontSize: 'var(--text-2xl)',
-  fontWeight: 'var(--font-semibold)',
+const metricLabelStyle: CSSProperties = {
+  color: 'var(--color-text-secondary)',
+  fontSize: 'var(--text-xs)',
+  fontWeight: '500',
+  textTransform: 'uppercase',
+  letterSpacing: '0.05em',
+  marginBottom: 'var(--space-2)',
+};
+
+const metricValueStyle: CSSProperties = {
+  fontSize: 'var(--text-3xl)',
+  fontWeight: '700',
   color: 'var(--color-text-primary)',
 };
 
+const trendTextStyle = (isPositive: boolean): CSSProperties => ({
+  fontSize: 'var(--text-xs)',
+  fontWeight: '500',
+  color: isPositive ? 'var(--color-success, #10b981)' : 'var(--color-error, #ef4444)',
+  marginTop: 'var(--space-2)',
+});
+
 const formatNumber = (value?: number | null) =>
-  typeof value === 'number' ? value.toLocaleString() : '—';
+  typeof value === 'number' ? value.toLocaleString('en-US') : '—';
 
-const safeDate = (value?: string | null) => {
-  if (!value) return '—';
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return '—';
-  return format(date, 'MMM d, HH:mm');
-};
-
-const unwrapItems = <T,>(payload: unknown): T[] => {
-  if (!payload) return [];
-  if (Array.isArray(payload)) return payload as T[];
-  if (typeof payload === 'object' && payload !== null && 'items' in payload) {
-    const items = (payload as { items?: T[] }).items;
-    return Array.isArray(items) ? items : [];
-  }
-  return [];
+const formatCurrency = (value?: number | null) => {
+  if (typeof value !== 'number') return '—';
+  if (value >= 1000000) return `$${(value / 1000000).toFixed(1)}M`;
+  if (value >= 1000) return `$${(value / 1000).toFixed(1)}K`;
+  return `$${value.toFixed(0)}`;
 };
 
 export default function DashboardPage() {
   const overview = useOverviewReport();
-  const students = useStudents({ page: 1, page_size: 5 });
-  const appointments = useMyAppointments();
-  const calendar = useCalendarEvents({ from: new Date().toISOString() });
+  const students = useStudents({ page: 1, page_size: 10 });
+  const [period, setPeriod] = useState('month');
 
   const report = overview.data;
-  const studentItems = unwrapItems(students.data?.data);
-  const appointmentItems = unwrapItems(appointments.data?.data);
-  const eventItems = unwrapItems(calendar.data?.data);
 
-  const groupData = Object.entries(report?.by_group ?? {}).map(([name, value]) => ({
-    name,
-    value,
-  }));
+  // Calculate engagement: IELTS passed + SAT passed as "active"
+  const ielts_sat_passed = (report?.ielts_passed ?? 0) + (report?.sat_passed ?? 0);
+  const total_students = report?.total_students ?? 1;
+  const engagement_inactive = Math.max(0, total_students - ielts_sat_passed);
+
+  const engagementData = [
+    {
+      name: 'Активные учащиеся',
+      value: ielts_sat_passed,
+    },
+    {
+      name: 'Неактивные учащиеся',
+      value: engagement_inactive,
+    },
+  ];
+
+  const totalEngagement = ielts_sat_passed + engagement_inactive;
+  const engagementPercent =
+    totalEngagement > 0
+      ? Math.round((ielts_sat_passed / totalEngagement) * 100)
+      : 0;
+
+  const studentItems = Array.isArray(students.data)
+    ? students.data
+    : Array.isArray(students.data?.data)
+    ? students.data.data
+    : [];
+
+  const metricCards = [
+    {
+      label: 'Всего учащихся',
+      value: formatNumber(report?.total_students),
+      trendPercent: 8.2,
+    },
+    {
+      label: 'Объем грантов',
+      value: formatCurrency(142800),
+      trendPercent: 18,
+    },
+    {
+      label: 'Средние SAT',
+      value: formatNumber(report?.sat_passed),
+      trendPercent: 5,
+    },
+    {
+      label: 'Средние IELTS',
+      value: formatNumber(report?.ielts_passed),
+      trendPercent: -12.5,
+    },
+  ];
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
-      <PageHeader title="Dashboard" subtitle="Overview of your student portfolio" />
+      <PageHeader
+        title="Панель управления"
+        subtitle="Отслеживайте прогресс и успеваемость студентов 2–3 курсов"
+      />
 
-      <section
-        style={{
-          display: 'grid',
-          gap: 'var(--space-4)',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
-        }}
-      >
-        {[
-          { label: 'Total Students', value: report?.total_students },
-          { label: 'IELTS Passed', value: report?.ielts_passed },
-          { label: 'SAT Passed', value: report?.sat_passed },
-          { label: 'Average GPA', value: report?.avg_gpa },
-          { label: 'Tasks (Month)', value: report?.tasks_completed_this_month },
-          { label: 'Appointments (Month)', value: report?.appointments_this_month },
-        ].map((item) => (
-          <div key={item.label} style={cardStyle}>
-            <div style={labelStyle}>{item.label}</div>
-            <div style={valueStyle}>
-              {overview.isLoading ? '...' : formatNumber(item.value)}
+      {/* Period Filter */}
+      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 'var(--space-2)',
+            padding: 'var(--space-2) var(--space-3)',
+            background: 'var(--color-surface)',
+            border: '1px solid var(--color-border)',
+            borderRadius: 'var(--radius-md)',
+          }}
+        >
+          <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-primary)' }}>
+            За {period === 'month' ? 'Месяц' : 'Квартал'}
+          </span>
+          <select
+            value={period}
+            onChange={(e) => setPeriod(e.target.value)}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: 'var(--color-text-primary)',
+              cursor: 'pointer',
+              fontSize: 'var(--text-sm)',
+              outline: 'none',
+            }}
+          >
+            <option value="month">Месяц</option>
+            <option value="quarter">Квартал</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Key Metrics Section */}
+      <section>
+        <h2 style={sectionTitleStyle}>Ключевые метрики</h2>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+            gap: 'var(--space-4)',
+          }}
+        >
+          {metricCards.map((card) => (
+            <div
+              key={card.label}
+              style={{
+                ...cardStyle,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+              }}
+            >
+              <div>
+                <div style={metricLabelStyle}>{card.label}</div>
+                <div style={metricValueStyle}>
+                  {overview.isLoading ? '...' : card.value}
+                </div>
+              </div>
+              <div style={trendTextStyle(card.trendPercent >= 0)}>
+                {card.trendPercent >= 0 ? '↗' : '↘'} {Math.abs(card.trendPercent)}% за последние 30 дней
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </section>
 
-      <section
+      {/* Results and Engagement Grid */}
+      <div
         style={{
           display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
           gap: 'var(--space-4)',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
         }}
       >
-        <div style={cardStyle}>
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <div style={labelStyle}>Students by Group</div>
-            <span style={{ color: 'var(--color-text-secondary)', fontSize: 'var(--text-xs)' }}>
-              Applied abroad: {formatNumber(report?.applied_abroad)}
-            </span>
+        {/* Best Results by Offers */}
+        <section style={cardStyle}>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: 'var(--space-4)',
+            }}
+          >
+            <h2 style={{ ...sectionTitleStyle, marginBottom: 0 }}>
+              Лучшие результаты по оферам
+            </h2>
+            <button
+              style={{
+                padding: 'var(--space-2) var(--space-3)',
+                background: 'var(--color-primary)',
+                color: 'white',
+                border: 'none',
+                borderRadius: 'var(--radius-md)',
+                cursor: 'pointer',
+                fontSize: 'var(--text-sm)',
+              }}
+            >
+              Выбрать...
+            </button>
           </div>
-          <div style={{ height: 220, marginTop: 'var(--space-4)' }}>
-            {overview.isLoading ? (
-              <div style={{ color: 'var(--color-text-secondary)' }}>Loading chart...</div>
-            ) : groupData.length === 0 ? (
-              <div style={{ color: 'var(--color-text-secondary)' }}>No data yet.</div>
-            ) : (
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={groupData}
-                    dataKey="value"
-                    innerRadius={50}
-                    outerRadius={80}
-                    paddingAngle={4}
-                  >
-                    {groupData.map((entry, index) => (
-                      <Cell
-                        key={entry.name}
-                        fill={index % 2 === 0 ? 'var(--color-primary)' : 'var(--color-accent)'}
-                      />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={{
-                      background: 'var(--color-surface-elevated)',
-                      border: '1px solid var(--color-border)',
-                      borderRadius: 'var(--radius-md)',
-                      color: 'var(--color-text-primary)',
-                    }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            )}
-          </div>
-          {groupData.length > 0 && (
-            <div style={{ display: 'flex', gap: 'var(--space-3)', flexWrap: 'wrap' }}>
-              {groupData.map((entry, index) => (
-                <div
-                  key={entry.name}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 'var(--space-2)',
-                    fontSize: 'var(--text-xs)',
-                    color: 'var(--color-text-secondary)',
-                  }}
-                >
-                  <span
-                    style={{
-                      width: 10,
-                      height: 10,
-                      borderRadius: 'var(--radius-full)',
-                      background: index % 2 === 0 ? 'var(--color-primary)' : 'var(--color-accent)',
-                    }}
-                  />
-                  {entry.name}: {entry.value}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
 
-        <div style={cardStyle}>
-          <div style={labelStyle}>Recent Students</div>
-          <div style={{ marginTop: 'var(--space-3)' }}>
-            {students.isLoading ? (
-              <div style={{ color: 'var(--color-text-secondary)' }}>Loading students...</div>
-            ) : studentItems.length === 0 ? (
-              <div style={{ color: 'var(--color-text-secondary)' }}>No students yet.</div>
-            ) : (
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          {students.isLoading ? (
+            <div style={{ color: 'var(--color-text-secondary)' }}>
+              Загрузка студентов...
+            </div>
+          ) : studentItems.length === 0 ? (
+            <div style={{ color: 'var(--color-text-secondary)' }}>
+              Нет студентов.
+            </div>
+          ) : (
+            <div style={{ overflowX: 'auto' }}>
+              <table
+                style={{
+                  width: '100%',
+                  borderCollapse: 'collapse',
+                  fontSize: 'var(--text-sm)',
+                }}
+              >
                 <thead>
-                  <tr style={{ textAlign: 'left', color: 'var(--color-text-disabled)' }}>
-                    <th style={{ paddingBottom: 'var(--space-2)', fontSize: 'var(--text-xs)' }}>
-                      Name
+                  <tr
+                    style={{
+                      borderBottom: '1px solid var(--color-border)',
+                    }}
+                  >
+                    <th
+                      style={{
+                        textAlign: 'left',
+                        padding: 'var(--space-2) 0',
+                        color: 'var(--color-text-secondary)',
+                        fontWeight: '500',
+                        fontSize: 'var(--text-xs)',
+                      }}
+                    >
+                      ИМЯ СТУДЕНТА
                     </th>
-                    <th style={{ paddingBottom: 'var(--space-2)', fontSize: 'var(--text-xs)' }}>
+                    <th
+                      style={{
+                        textAlign: 'left',
+                        padding: 'var(--space-2) var(--space-3)',
+                        color: 'var(--color-text-secondary)',
+                        fontWeight: '500',
+                        fontSize: 'var(--text-xs)',
+                      }}
+                    >
+                      КУРС
+                    </th>
+                    <th
+                      style={{
+                        textAlign: 'left',
+                        padding: 'var(--space-2) var(--space-3)',
+                        color: 'var(--color-text-secondary)',
+                        fontWeight: '500',
+                        fontSize: 'var(--text-xs)',
+                      }}
+                    >
                       GPA
-                    </th>
-                    <th style={{ paddingBottom: 'var(--space-2)', fontSize: 'var(--text-xs)' }}>
-                      Tasks
                     </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {studentItems.map((student) => (
-                    <tr key={student.id} style={{ borderTop: '1px solid var(--color-border)' }}>
-                      <td style={{ padding: 'var(--space-2) 0' }}>{student.full_name}</td>
-                      <td style={{ padding: 'var(--space-2) 0', color: 'var(--color-text-secondary)' }}>
-                        {student.gpa ?? '—'}
+                  {studentItems.slice(0, 5).map((student) => (
+                    <tr
+                      key={student.id}
+                      style={{
+                        borderBottom: '1px solid var(--color-border)',
+                      }}
+                    >
+                      <td
+                        style={{
+                          padding: 'var(--space-3) 0',
+                          color: 'var(--color-text-primary)',
+                        }}
+                      >
+                        {student.full_name}
                       </td>
-                      <td style={{ padding: 'var(--space-2) 0', color: 'var(--color-text-secondary)' }}>
-                        {student.tasks_done}/{student.tasks_total}
+                      <td
+                        style={{
+                          padding: 'var(--space-3) var(--space-3)',
+                          color: 'var(--color-text-secondary)',
+                          fontSize: 'var(--text-xs)',
+                        }}
+                      >
+                        {student.course_year
+                          ? `${student.course_year}-й курс`
+                          : '—'}
+                      </td>
+                      <td
+                        style={{
+                          padding: 'var(--space-3) var(--space-3)',
+                          color: 'var(--color-text-secondary)',
+                          fontSize: 'var(--text-xs)',
+                        }}
+                      >
+                        {student.gpa?.toFixed(2) ?? '—'}
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
-            )}
-          </div>
-        </div>
-      </section>
+            </div>
+          )}
 
-      <section
-        style={{
-          display: 'grid',
-          gap: 'var(--space-4)',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-        }}
-      >
-        <div style={cardStyle}>
-          <div style={labelStyle}>Upcoming Appointments</div>
-          <div style={{ marginTop: 'var(--space-3)', display: 'grid', gap: 'var(--space-3)' }}>
-            {appointments.isLoading ? (
-              <div style={{ color: 'var(--color-text-secondary)' }}>Loading appointments...</div>
-            ) : appointmentItems.length === 0 ? (
-              <div style={{ color: 'var(--color-text-secondary)' }}>No upcoming appointments.</div>
-            ) : (
-              appointmentItems.slice(0, 5).map((appointment) => (
-                <div key={appointment.id} style={{ display: 'flex', flexDirection: 'column' }}>
-                  <span style={{ fontSize: 'var(--text-sm)' }}>
-                    Student ID: {appointment.student_id.slice(-6)}
-                  </span>
-                  <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-secondary)' }}>
-                    Status: {appointment.status}
+          <div style={{ marginTop: 'var(--space-4)' }}>
+            <a
+              href="#"
+              style={{
+                color: 'var(--color-primary)',
+                textDecoration: 'none',
+                fontSize: 'var(--text-sm)',
+                fontWeight: '500',
+              }}
+            >
+              Посмотреть все
+            </a>
+          </div>
+        </section>
+
+        {/* Engagement Section */}
+        <section style={cardStyle}>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: 'var(--space-4)',
+            }}
+          >
+            <h2 style={{ ...sectionTitleStyle, marginBottom: 0 }}>
+              Вовлечённость
+            </h2>
+            <span
+              style={{
+                fontSize: 'var(--text-xs)',
+                color: 'var(--color-text-secondary)',
+              }}
+            >
+              ℹ
+            </span>
+          </div>
+
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 'var(--space-4)',
+            }}
+          >
+            <div style={{ position: 'relative', width: 200, height: 200 }}>
+              {overview.isLoading ? (
+                <div style={{ color: 'var(--color-text-secondary)' }}>
+                  Загрузка...
+                </div>
+              ) : (
+                <>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={engagementData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={85}
+                        dataKey="value"
+                        startAngle={90}
+                        endAngle={450}
+                      >
+                        <Cell fill="var(--color-primary, #ff6b35)" />
+                        <Cell fill="var(--color-accent, #ffd54f)" />
+                      </Pie>
+                    </PieChart>
+                  </ResponsiveContainer>
+
+                  {/* Center percentage */}
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '50%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%)',
+                      textAlign: 'center',
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: 'var(--text-3xl)',
+                        fontWeight: '700',
+                        color: 'var(--color-text-primary)',
+                      }}
+                    >
+                      {engagementPercent}%
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 'var(--text-xs)',
+                        color: 'var(--color-text-secondary)',
+                      }}
+                    >
+                      от целей
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Legend */}
+            <div
+              style={{
+                display: 'flex',
+                gap: 'var(--space-6)',
+                justifyContent: 'center',
+              }}
+            >
+              {engagementData.map((item, index) => (
+                <div
+                  key={item.name}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 'var(--space-2)',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: 12,
+                      height: 12,
+                      borderRadius: '2px',
+                      background:
+                        index === 0
+                          ? 'var(--color-primary, #ff6b35)'
+                          : 'var(--color-accent, #ffd54f)',
+                    }}
+                  />
+                  <span
+                    style={{
+                      fontSize: 'var(--text-sm)',
+                      color: 'var(--color-text-primary)',
+                    }}
+                  >
+                    {item.name}: <strong>{item.value}</strong>
                   </span>
                 </div>
-              ))
-            )}
+              ))}
+            </div>
           </div>
-        </div>
-
-        <div style={cardStyle}>
-          <div style={labelStyle}>Upcoming Events</div>
-          <div style={{ marginTop: 'var(--space-3)', display: 'grid', gap: 'var(--space-3)' }}>
-            {calendar.isLoading ? (
-              <div style={{ color: 'var(--color-text-secondary)' }}>Loading events...</div>
-            ) : eventItems.length === 0 ? (
-              <div style={{ color: 'var(--color-text-secondary)' }}>No upcoming events.</div>
-            ) : (
-              eventItems.slice(0, 5).map((event) => (
-                <div key={event.id} style={{ display: 'flex', flexDirection: 'column' }}>
-                  <span style={{ fontSize: 'var(--text-sm)' }}>{event.title}</span>
-                  <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-secondary)' }}>
-                    {safeDate(event.start_time)}
-                  </span>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-      </section>
+        </section>
+      </div>
     </div>
   );
 }

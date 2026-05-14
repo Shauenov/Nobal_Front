@@ -18,7 +18,7 @@ export function useNews(params: NewsListParams = {}) {
     queryKey: queryKeys.news(params as Record<string, unknown>),
     queryFn: async () => {
       const res = await apiClient.get<PaginatedNews>('/api/v1/news', { params });
-      return res.data;
+      return res.data.data; // return the array of news items for compatibility with pages
     },
   });
 }
@@ -85,6 +85,25 @@ export function useDeleteNews() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.news() });
       toast.success('News article deleted');
+    },
+    onError: (err) => {
+      toast.error(normalizeError(err).message);
+    },
+  });
+}
+
+// ── Toggle publish state ─────────────────────────────────────
+export function useToggleNewsPublished() {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, is_published }: { id: string; is_published: boolean }) => {
+      const res = await apiClient.put<ApiEnvelope<NewsOut>>(`/api/v1/news/${id}`, { is_published });
+      return res.data.data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.news() });
+      toast.success('Publish status updated');
     },
     onError: (err) => {
       toast.error(normalizeError(err).message);

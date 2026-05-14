@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import type { CSSProperties } from 'react';
+import type { RoadmapCreate } from '@/types/api';
 import { useCreateRoadmap } from '@/hooks/useRoadmaps';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { RoadmapForm } from '@/components/roadmaps/RoadmapForm';
@@ -18,7 +19,7 @@ export default function NewRoadmapPage() {
   const router = useRouter();
   const createRoadmap = useCreateRoadmap();
 
-  const handleSubmit = async (data: unknown) => {
+  const handleSubmit = async (data: RoadmapCreate) => {
     try {
       await createRoadmap.mutateAsync(data);
       toast.success('Roadmap created successfully');

@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import type { CSSProperties } from 'react';
 import { useConversations, useMessages, useSendMessage, useMarkRead } from '@/hooks/useMessages';
+import { useStudents } from '@/hooks/useStudents';
 import { ConversationList } from './ConversationList';
 import { MessageThread } from './MessageThread';
 import { MessageInput } from './MessageInput';
@@ -36,7 +37,15 @@ export function MessagesDashboard() {
   const [isBroadcastOpen, setIsBroadcastOpen] = useState(false);
 
   const { data: convosResponse, isLoading: isLoadingConvos } = useConversations();
+  const { data: studentsResponse } = useStudents({ page: 1, page_size: 100 });
   const conversations = useMemo(() => convosResponse ?? [], [convosResponse]);
+  const studentNameMap = useMemo(() => {
+    const map: Record<string, string> = {};
+    for (const student of studentsResponse?.data ?? []) {
+      map[student.id] = student.full_name;
+    }
+    return map;
+  }, [studentsResponse]);
   const activeConversation = useMemo(
     () => conversations.find((conversation) => conversation.id === activeConvoId),
     [conversations, activeConvoId],
@@ -49,7 +58,8 @@ export function MessagesDashboard() {
   const markRead = useMarkRead(activeConvoId ?? '');
 
   useEffect(() => {
-    if (activeConversation && activeConversation.unread_count > 0) {
+    const unread = (activeConversation as any)?.unread_count ?? (activeConversation as any)?.unread_messages ?? 0;
+    if (activeConversation && unread > 0) {
       markRead.mutate();
     }
   }, [activeConversation, markRead]);
@@ -91,6 +101,7 @@ export function MessagesDashboard() {
               conversations={conversations}
               activeConvoId={activeConvoId}
               onSelect={setActiveConvoId}
+              studentNameMap={studentNameMap}
             />
           )}
         </div>

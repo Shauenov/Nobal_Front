@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { useUIStore } from '@/stores/uiStore';
 import { useUnreadNotificationCount } from '@/hooks/useNotifications';
+import { Button } from '@/components/ui/Button';
 
 interface NavItem {
   label: string;
@@ -76,8 +77,8 @@ export function Sidebar() {
         top: 0,
         left: 0,
         zIndex: 'var(--z-sidebar)',
-        background: 'var(--color-surface)',
-        borderRight: '1px solid var(--color-border)',
+        background: 'var(--color-sidebar-bg)',
+        borderRight: '1px solid var(--color-sidebar-border)',
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
@@ -90,7 +91,7 @@ export function Sidebar() {
           display: 'flex',
           alignItems: 'center',
           padding: '0 var(--space-4)',
-          borderBottom: '1px solid var(--color-border)',
+          borderBottom: '1px solid var(--color-sidebar-border)',
           flexShrink: 0,
         }}
       >
@@ -116,7 +117,7 @@ export function Sidebar() {
               marginLeft: 'var(--space-3)',
               fontWeight: 'var(--font-semibold)',
               fontSize: 'var(--text-base)',
-              color: 'var(--color-text-primary)',
+              color: '#f8fafc',
               whiteSpace: 'nowrap',
               overflow: 'hidden',
             }}
@@ -145,7 +146,7 @@ export function Sidebar() {
                     padding: 'var(--space-2) var(--space-4)',
                     fontSize: 'var(--text-xs)',
                     fontWeight: 'var(--font-semibold)',
-                    color: 'var(--color-text-disabled)',
+                    color: 'var(--color-sidebar-text-muted)',
                     textTransform: 'uppercase',
                     letterSpacing: '0.08em',
                   }}
@@ -172,8 +173,8 @@ export function Sidebar() {
                       borderRadius: 'var(--radius-md)',
                       background: active ? 'var(--color-primary)' : 'transparent',
                       color: active
-                        ? '#fff'
-                        : 'var(--color-text-secondary)',
+                        ? '#ffffff'
+                        : 'var(--color-sidebar-text)',
                       transition: 'all var(--transition-fast)',
                       textDecoration: 'none',
                       fontSize: 'var(--text-sm)',
@@ -183,7 +184,9 @@ export function Sidebar() {
                       boxShadow: active ? 'var(--shadow-glow)' : 'none',
                     }}
                   >
-                    <Icon size={18} style={{ flexShrink: 0 }} />
+                    <span style={{ flexShrink: 0 }}>
+                      <Icon size={18} />
+                    </span>
                     {!sidebarCollapsed && (
                       <span style={{ whiteSpace: 'nowrap', flex: 1 }}>
                         {item.label}
@@ -218,23 +221,16 @@ export function Sidebar() {
       </nav>
 
       {/* Collapse button */}
-      <button
+      <Button
+        variant="secondary"
+        size="sm"
         onClick={toggleSidebar}
         style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
           margin: 'var(--space-3)',
-          padding: 'var(--space-2)',
-          borderRadius: 'var(--radius-md)',
-          background: 'var(--color-surface-hover)',
-          border: '1px solid var(--color-border)',
-          color: 'var(--color-text-secondary)',
-          cursor: 'pointer',
-          transition: 'all var(--transition-fast)',
-          fontSize: 'var(--text-sm)',
-          gap: 'var(--space-2)',
-        }}
+        width: 'calc(100% - var(--space-6))',
+          color: 'var(--color-sidebar-text)',
+        justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
+      }}
       >
         {sidebarCollapsed ? (
           <ChevronRight size={16} />
@@ -244,7 +240,7 @@ export function Sidebar() {
             <span>Collapse</span>
           </>
         )}
-      </button>
+      </Button>
     </aside>
   );
 }

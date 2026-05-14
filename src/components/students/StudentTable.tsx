@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { CSSProperties } from 'react';
+import { Badge } from '@/components/ui/Badge';
 import { StudentListItem } from '@/types/api';
 
 interface StudentTableProps {
@@ -21,16 +22,6 @@ const headerStyle: CSSProperties = {
   textTransform: 'uppercase',
   letterSpacing: '0.08em',
   paddingBottom: 'var(--space-2)',
-};
-
-const badgeStyle: CSSProperties = {
-  padding: '2px 8px',
-  borderRadius: 'var(--radius-full)',
-  fontSize: 'var(--text-xs)',
-  fontWeight: 'var(--font-semibold)',
-  display: 'inline-flex',
-  alignItems: 'center',
-  gap: 4,
 };
 
 const getInitials = (name: string) =>
@@ -107,26 +98,14 @@ export function StudentTable({ students, onDelete }: StudentTableProps) {
                 </td>
                 <td style={{ color: gpaColor(student.gpa) }}>{student.gpa ?? '—'}</td>
                 <td>
-                  <span
-                    style={{
-                      ...badgeStyle,
-                      background: student.ielts_passed ? 'var(--color-success-bg)' : 'var(--color-surface-hover)',
-                      color: student.ielts_passed ? 'var(--color-success)' : 'var(--color-text-secondary)',
-                    }}
-                  >
+                  <Badge variant={student.ielts_passed ? 'success' : 'neutral'}>
                     {student.ielts_passed ? 'Passed' : '—'}
-                  </span>
+                  </Badge>
                 </td>
                 <td>
-                  <span
-                    style={{
-                      ...badgeStyle,
-                      background: student.sat_passed ? 'var(--color-success-bg)' : 'var(--color-surface-hover)',
-                      color: student.sat_passed ? 'var(--color-success)' : 'var(--color-text-secondary)',
-                    }}
-                  >
+                  <Badge variant={student.sat_passed ? 'success' : 'neutral'}>
                     {student.sat_passed ? 'Passed' : '—'}
-                  </span>
+                  </Badge>
                 </td>
                 <td>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
@@ -153,15 +132,9 @@ export function StudentTable({ students, onDelete }: StudentTableProps) {
                 </td>
                 <td>
                   {student.unread_messages > 0 ? (
-                    <span
-                      style={{
-                        ...badgeStyle,
-                        background: 'var(--color-error-bg)',
-                        color: 'var(--color-error)',
-                      }}
-                    >
+                    <Badge variant="danger">
                       {student.unread_messages}
-                    </span>
+                    </Badge>
                   ) : (
                     <span style={{ color: 'var(--color-text-secondary)' }}>—</span>
                   )}

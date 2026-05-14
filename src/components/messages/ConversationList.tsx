@@ -6,6 +6,7 @@ interface ConversationListProps {
   conversations: ConversationOut[];
   activeConvoId?: string;
   onSelect: (id: string) => void;
+  studentNameMap?: Record<string, string>;
 }
 
 const listContainer: CSSProperties = {
@@ -27,12 +28,12 @@ const itemStyle = (isActive: boolean): CSSProperties => ({
   borderLeft: isActive ? '3px solid var(--color-primary)' : '3px solid transparent',
 });
 
-const getStudentId = (id: string) => {
-  // STUB: resolve student name from cache, returning ID for now
-  return id;
-};
-
-export function ConversationList({ conversations, activeConvoId, onSelect }: ConversationListProps) {
+export function ConversationList({
+  conversations,
+  activeConvoId,
+  onSelect,
+  studentNameMap = {},
+}: ConversationListProps) {
   if (conversations.length === 0) {
     return (
       <div style={{ padding: 'var(--space-4)', color: 'var(--color-text-secondary)', textAlign: 'center' }}>
@@ -45,7 +46,7 @@ export function ConversationList({ conversations, activeConvoId, onSelect }: Con
     <div style={listContainer}>
       {conversations.map((convo) => {
         const isActive = convo.id === activeConvoId;
-        const hasUnread = convo.unread_count > 0;
+        const hasUnread = ((convo as any).unread_count ?? (convo as any).unread_messages ?? 0) > 0;
 
         return (
           <div
@@ -55,7 +56,7 @@ export function ConversationList({ conversations, activeConvoId, onSelect }: Con
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div style={{ fontWeight: hasUnread ? 'var(--font-bold)' : 'var(--font-medium)', fontSize: 'var(--text-sm)' }}>
-                {getStudentId(convo.student_id)}
+                {studentNameMap[convo.student_id] ?? convo.student_id}
               </div>
               {convo.last_message_at && (
                 <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-secondary)' }}>
@@ -67,7 +68,7 @@ export function ConversationList({ conversations, activeConvoId, onSelect }: Con
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--color-primary)' }} />
                 <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-primary)' }}>
-                  {convo.unread_count} new messages
+                  {(convo as any).unread_count ?? (convo as any).unread_messages ?? 0} new messages
                 </div>
               </div>
             )}

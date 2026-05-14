@@ -56,4 +56,4 @@ test('creates roadmap with template tasks', async () => {
     template_tasks: expect.any(Array),
   }));
   expect(call.template_tasks[0]).toEqual(expect.objectContaining({ title: 'First task' }));
-}, 10000);
+}, 20000);

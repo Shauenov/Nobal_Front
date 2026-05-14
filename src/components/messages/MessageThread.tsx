@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 import type { CSSProperties } from 'react';
 import { MessageOut } from '@/types/api';
+import { useAuthStore } from '@/stores/authStore';
 import { format } from 'date-fns';
 
 interface MessageThreadProps {
@@ -42,6 +43,7 @@ const messageBubbleStyle = (isMine: boolean): CSSProperties => ({
 
 export function MessageThread({ messages, isLoading }: MessageThreadProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
+  const currentUserId = useAuthStore((state) => state.user?.id);
 
   useEffect(() => {
     // Auto-scroll to bottom when messages change
@@ -72,11 +74,7 @@ export function MessageThread({ messages, isLoading }: MessageThreadProps) {
   return (
     <div style={threadContainer}>
       {sortedMessages.map((msg) => {
-        // Conductor's message will be "mine" if sender_id === my_id. For now, assuming conductor is the sender if not student.
-        // The API returns sender_id. In a real app we'd compare sender_id with authStore.user.id
-        // STUB: For now, we will guess based on API role or simply alternating. 
-        // We'll pass a stub isMine assuming we have that data later.
-        const isMine = msg.sender_id === 'my-id'; // STUB: Replace with actual auth check
+        const isMine = currentUserId != null && msg.sender_id === currentUserId;
         return (
           <div key={msg.id} style={messageWrapperStyle(isMine)}>
             <div style={messageBubbleStyle(isMine)}>

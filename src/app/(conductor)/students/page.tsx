@@ -2,11 +2,15 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { Users } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { StudentFilters } from '@/components/students/StudentFilters';
 import { StudentTable } from '@/components/students/StudentTable';
 import { InviteModal } from '@/components/students/InviteModal';
 import { useDeleteStudent, useStudents } from '@/hooks/useStudents';
+import { Card } from '@/components/ui/Card';
+import { EmptyState } from '@/components/ui/EmptyState';
+import { Skeleton } from '@/components/ui/Skeleton';
 
 const parseBoolean = (value: string | null) => {
   if (value === 'true') return true;
@@ -52,8 +56,11 @@ export default function StudentsPage() {
 
   const queryParams = useMemo(
     () => ({
-      group_type: groupType || undefined,
-      course_year: courseYear ? Number(courseYear) : undefined,
+      group_type: groupType === 'D' || groupType === 'F' ? (groupType as 'D' | 'F') : undefined,
+      course_year:
+        courseYear && (Number(courseYear) === 2 || Number(courseYear) === 3)
+          ? (Number(courseYear) as 2 | 3)
+          : undefined,
       ielts_passed: parseBoolean(ieltsPassed),
       sat_passed: parseBoolean(satPassed),
       search: searchText || undefined,
@@ -106,23 +113,26 @@ export default function StudentsPage() {
         onInvite={() => setInviteOpen(true)}
       />
 
-      <div
-        style={{
-          background: 'var(--color-surface)',
-          border: '1px solid var(--color-border)',
-          borderRadius: 'var(--radius-lg)',
-          padding: 'var(--space-4)',
-          boxShadow: 'var(--shadow-sm)',
-        }}
-      >
+      <Card padding="md">
         {students.isLoading ? (
-          <div style={{ color: 'var(--color-text-secondary)' }}>Loading students...</div>
+          <div style={{ display: 'grid', gap: 'var(--space-3)' }}>
+            <Skeleton style={{ height: 20, width: '40%' }} />
+            <Skeleton style={{ height: 56, width: '100%' }} />
+            <Skeleton style={{ height: 56, width: '100%' }} />
+            <Skeleton style={{ height: 56, width: '100%' }} />
+          </div>
         ) : items.length === 0 ? (
-          <div style={{ color: 'var(--color-text-secondary)' }}>No students found.</div>
+          <EmptyState
+            title="No students found"
+            description="Try adjusting filters or invite your first student."
+            icon={<Users size={24} />}
+            actionLabel="Invite student"
+            onAction={() => setInviteOpen(true)}
+          />
         ) : (
           <StudentTable students={items} onDelete={handleDelete} />
         )}
-      </div>
+      </Card>
 
       <div
         style={{

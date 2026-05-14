@@ -25,6 +25,10 @@ vi.mock('@/hooks/useMessages', () => ({
   useMarkRead: () => ({ mutate: markRead }),
 }));
 
+vi.mock('@/hooks/useStudents', () => ({
+  useStudents: () => ({ data: { data: [] }, isLoading: false }),
+}));
+
 vi.mock('@/components/layout/PageHeader', () => ({
   PageHeader: ({ title }: { title: string }) => <h1>{title}</h1>,
 }));

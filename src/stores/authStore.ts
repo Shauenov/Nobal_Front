@@ -36,7 +36,7 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'nobal-auth',
-      partialState: (state: AuthState) => ({
+      partialize: (state: AuthState) => ({
         user: state.user,
         accessToken: state.accessToken,
         refreshToken: state.refreshToken,

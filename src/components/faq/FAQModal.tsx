@@ -17,6 +17,7 @@ const faqSchema = z.object({
 });
 
 type FAQFormValues = z.infer<typeof faqSchema>;
+type FAQFormInput = Omit<FAQFormValues, 'is_active'> & { is_active?: boolean };
 
 interface FAQModalProps {
   open: boolean;
@@ -92,7 +93,7 @@ export function FAQModal({ open, onClose, initialValues, defaultOrderIndex }: FA
     reset,
     control,
     formState: { errors },
-  } = useForm<FAQFormValues>({
+  } = useForm<FAQFormInput>({
     resolver: zodResolver(faqSchema),
     defaultValues: {
       question: '',

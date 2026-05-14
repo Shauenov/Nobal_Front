@@ -3,10 +3,11 @@
 import { useRouter, useParams } from 'next/navigation';
 import type { CSSProperties } from 'react';
 import { Suspense } from 'react';
-import { useRoadmap, useUpdateRoadmap } from '@/hooks/useRoadmaps';
+import { useRoadmap, useUpdateRoadmap, useAssignRoadmap } from '@/hooks/useRoadmaps';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { RoadmapForm } from '@/components/roadmaps/RoadmapForm';
 import { RoadmapAssignModal } from '@/components/roadmaps/RoadmapAssignModal';
+import type { AssignRequest, RoadmapUpdate } from '@/types/api';
 import { toast } from 'react-hot-toast';
 import { useState } from 'react';
 
@@ -47,6 +48,7 @@ function RoadmapDetailContent() {
   const roadmapId = params.roadmapId as string;
   const { data: detail, isLoading } = useRoadmap(roadmapId);
   const updateRoadmap = useUpdateRoadmap(roadmapId);
+  const assignRoadmap = useAssignRoadmap(roadmapId);
   const [activeTab, setActiveTab] = useState<'overview' | 'assign'>('overview');
   const [assignModalOpen, setAssignModalOpen] = useState(false);
 
@@ -60,7 +62,7 @@ function RoadmapDetailContent() {
 
   const { roadmap, template_tasks } = detail;
 
-  const handleUpdateRoadmap = async (data: unknown) => {
+  const handleUpdateRoadmap = async (data: RoadmapUpdate) => {
     try {
       await updateRoadmap.mutateAsync(data);
       toast.success('Roadmap updated successfully');
@@ -70,10 +72,9 @@ function RoadmapDetailContent() {
     }
   };
 
-  const handleAssignRoadmap = async () => {
+  const handleAssignRoadmap = async (data: AssignRequest) => {
     try {
-      // TODO: Call useAssignRoadmap hook when available
-      toast.success('Roadmap assigned successfully');
+      await assignRoadmap.mutateAsync(data);
       setAssignModalOpen(false);
     } catch {
       toast.error('Failed to assign roadmap');
@@ -141,6 +142,7 @@ function RoadmapDetailContent() {
         onClose={() => setAssignModalOpen(false)}
         templateTasks={template_tasks}
         onSubmit={handleAssignRoadmap}
+        isLoading={assignRoadmap.isPending}
       />
     </>
   );

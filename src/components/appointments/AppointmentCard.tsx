@@ -1,4 +1,6 @@
 import type { CSSProperties } from 'react';
+import { Badge } from '@/components/ui/Badge';
+import { Card } from '@/components/ui/Card';
 import { AppointmentOut } from '@/types/api';
 
 interface AppointmentCardProps {
@@ -8,38 +10,23 @@ interface AppointmentCardProps {
 }
 
 const cardStyle: CSSProperties = {
-  background: 'var(--color-surface)',
-  border: '1px solid var(--color-border)',
-  borderRadius: 'var(--radius-md)',
-  padding: 'var(--space-4)',
   display: 'flex',
   flexDirection: 'column',
   gap: 'var(--space-2)',
-  boxShadow: 'var(--shadow-sm)',
 };
 
-const badgeStyle = (color: string): CSSProperties => ({
-  display: 'inline-block',
-  padding: '2px 8px',
-  borderRadius: '12px',
-  fontSize: 'var(--text-xs)',
-  fontWeight: 'var(--font-medium)',
-  background: color,
-  color: '#fff',
-});
-
-const getStatusColor = (status: string) => {
+const getStatusVariant = (status: string) => {
   switch (status) {
     case 'pending':
-      return 'var(--color-warning)';
+      return 'warning';
     case 'confirmed':
-      return 'var(--color-primary)';
+      return 'info';
     case 'completed':
-      return 'var(--color-success)';
+      return 'success';
     case 'cancelled':
-      return 'var(--color-error)';
+      return 'danger';
     default:
-      return 'var(--color-text-secondary)';
+      return 'neutral';
   }
 };
 
@@ -58,7 +45,8 @@ export function AppointmentCard({ appointment, onComplete, onCancel }: Appointme
   const createdAt = new Date(appointment.created_at);
   
   return (
-    <div style={cardStyle}>
+    <Card padding="md" variant="default">
+      <div style={cardStyle}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
           <div style={{ fontWeight: 'var(--font-semibold)', fontSize: 'var(--text-sm)' }}>
@@ -69,9 +57,7 @@ export function AppointmentCard({ appointment, onComplete, onCancel }: Appointme
             {appointment.slot_id ? ` · Slot ${appointment.slot_id}` : ''}
           </div>
         </div>
-        <div style={badgeStyle(getStatusColor(appointment.status))}>
-          {appointment.status.toUpperCase()}
-        </div>
+        <Badge variant={getStatusVariant(appointment.status)}>{appointment.status.toUpperCase()}</Badge>
       </div>
 
       {appointment.notes && (
@@ -92,6 +78,7 @@ export function AppointmentCard({ appointment, onComplete, onCancel }: Appointme
           </button>
         )}
       </div>
-    </div>
+      </div>
+    </Card>
   );
 }

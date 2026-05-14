@@ -80,3 +80,14 @@ export function useDeleteCalendarEvent() {
     },
   });
 }
+
+// Compatibility wrapper expected by some pages
+export function useCalendar(params?: { from?: string; to?: string; event_type?: string }) {
+  const query = useCalendarEvents(params);
+  return {
+    data: query.data,
+    isLoading: query.isLoading,
+    isError: query.isError,
+    refetch: query.refetch,
+  } as const;
+}

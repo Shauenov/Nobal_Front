@@ -9,7 +9,7 @@ import { TaskBoard } from '@/components/tasks/TaskBoard';
 import { ViewToggle } from '@/components/tasks/ViewToggle';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { TaskModal } from '@/components/tasks/TaskModal';
-import type { TaskOut } from '@/types/api';
+import type { TaskOut, TaskStatus } from '@/types/api';
 
 const getStudentId = (value: string | string[] | undefined) => {
   if (typeof value === 'string') return value;
@@ -38,7 +38,7 @@ export default function StudentTasksPage() {
     setTaskModalOpen(true);
   };
 
-  const handleStatusChange = (taskId: string, newStatus: string) => {
+  const handleStatusChange = (taskId: string, newStatus: TaskStatus) => {
     patchTask.mutate({ taskId, data: { status: newStatus } });
   };
 

@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
-import { Space_Grotesk } from 'next/font/google';
+import { Inter } from 'next/font/google';
 import '@/styles/globals.css';
 import { Providers } from '@/components/providers/Providers';
 
-const spaceGrotesk = Space_Grotesk({
+const inter = Inter({
   subsets: ['latin', 'cyrillic'],
-  variable: '--font-space',
+  variable: '--font-inter',
   display: 'swap',
 });
 
@@ -25,7 +25,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={spaceGrotesk.variable}>
+    <html lang="en" className={inter.variable}>
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
       </head>

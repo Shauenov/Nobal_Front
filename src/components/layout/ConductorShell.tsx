@@ -2,6 +2,7 @@
 
 import { Sidebar } from './Sidebar';
 import { Topbar } from './Topbar';
+import { NotificationDrawer } from './NotificationDrawer';
 import { useUIStore } from '@/stores/uiStore';
 
 interface ConductorShellProps {
@@ -24,11 +25,13 @@ export function ConductorShell({ children }: ConductorShellProps) {
           minHeight: '100vh',
           display: 'flex',
           flexDirection: 'column',
+          background: 'var(--color-bg)',
         }}
       >
         <Topbar />
-        <main style={{ flex: 1, padding: 'var(--space-6)' }}>{children}</main>
+        <main style={{ flex: 1, padding: 'var(--space-8)' }}>{children}</main>
       </div>
+      <NotificationDrawer />
     </div>
   );
 }

@@ -44,7 +44,7 @@
     height: 6px;
   }
   ::-webkit-scrollbar-track {
-    background: var(--color-surface);
+    background: var(--color-bg);
   }
   ::-webkit-scrollbar-thumb {
     background: var(--color-border-light);
@@ -57,7 +57,7 @@
 
 @layer utilities {
   .glass {
-    background: rgba(30, 30, 46, 0.8);
+    background: rgba(255, 255, 255, 0.78);
     backdrop-filter: blur(12px);
     border: 1px solid var(--color-border);
   }
@@ -99,4 +99,9 @@
 @keyframes pulseSoft {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
+}
+
+@keyframes skeletonPulse {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
 }

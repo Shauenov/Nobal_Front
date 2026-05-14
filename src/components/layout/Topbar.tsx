@@ -6,6 +6,7 @@ import { useUnreadNotificationCount } from '@/hooks/useNotifications';
 import { useUIStore } from '@/stores/uiStore';
 import { useAuthStore } from '@/stores/authStore';
 import { useLogout } from '@/hooks/useAuth';
+import { Button } from '@/components/ui/Button';
 
 interface Crumb {
   label: string;
@@ -56,7 +57,7 @@ export function Topbar() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '0 var(--space-6)',
+        padding: '0 var(--space-8)',
         gap: 'var(--space-4)',
       }}
     >
@@ -84,20 +85,19 @@ export function Topbar() {
       </nav>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-        <button
+        <Button
+          variant="secondary"
+          size="sm"
           type="button"
           aria-label="Notifications"
           onClick={() => setNotificationDrawer(true)}
           style={{
             position: 'relative',
-            width: 36,
-            height: 36,
+            width: 40,
+            height: 40,
             borderRadius: 'var(--radius-full)',
-            border: '1px solid var(--color-border)',
-            background: 'var(--color-surface-hover)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+            padding: 0,
+            minHeight: 40,
           }}
         >
           <Bell size={18} color="var(--color-text-secondary)" />
@@ -124,17 +124,18 @@ export function Topbar() {
               {Math.min(unread.count, 99)}
             </span>
           )}
-        </button>
+        </Button>
 
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
             gap: 'var(--space-2)',
-            padding: '4px 8px',
+            padding: '6px 10px',
             borderRadius: 'var(--radius-full)',
-            background: 'var(--color-surface-hover)',
+            background: 'var(--color-surface)',
             border: '1px solid var(--color-border)',
+            boxShadow: 'var(--shadow-xs)',
           }}
         >
           <div
@@ -167,24 +168,18 @@ export function Topbar() {
           </span>
         </div>
 
-        <button
+        <Button
+          variant="secondary"
+          size="sm"
           type="button"
           onClick={() => logout.mutate()}
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 'var(--space-2)',
-            padding: '8px 12px',
-            borderRadius: 'var(--radius-md)',
-            background: 'transparent',
-            border: '1px solid var(--color-border)',
             color: 'var(--color-text-secondary)',
-            fontSize: 'var(--text-sm)',
           }}
+          leftIcon={<LogOut size={16} />}
         >
-          <LogOut size={16} />
-          <span>Sign out</span>
-        </button>
+          Sign out
+        </Button>
       </div>
     </header>
   );

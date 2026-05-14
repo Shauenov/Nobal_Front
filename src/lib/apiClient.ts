@@ -60,13 +60,15 @@ const processQueue = (error: unknown, token: string | null = null) => {
   failedQueue = [];
 };
 
-// ── Response interceptor — handle 401 auto-refresh ────────────
+// ── Response interceptor — handle 401 auto-refresh & error codes ───
 apiClient.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
+    const status = error.response?.status ?? 0;
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // Handle 401 Unauthorized — attempt token refresh
+    if (status === 401 && !originalRequest._retry) {
       const refreshToken = tokenStorage.getRefresh();
 
       if (!refreshToken) {
@@ -109,6 +111,34 @@ apiClient.interceptors.response.use(
       } finally {
         isRefreshing = false;
       }
+    }
+
+    // Handle 403 Forbidden — redirect to unauthorized page
+    if (status === 403) {
+      if (typeof window !== 'undefined') {
+        window.location.href = '/unauthorized';
+      }
+      return Promise.reject(normalizeError(error));
+    }
+
+    // Handle 404 Not Found — can be handled by page-level error boundaries
+    if (status === 404) {
+      return Promise.reject(normalizeError(error));
+    }
+
+    // Handle 422 Unprocessable Entity — validation errors
+    if (status === 422) {
+      return Promise.reject(normalizeError(error));
+    }
+
+    // Handle 500+ Server Errors — log and reject
+    if (status >= 500) {
+      console.error('[API Error 5xx]', {
+        status,
+        url: error.config?.url,
+        message: error.message,
+      });
+      return Promise.reject(normalizeError(error));
     }
 
     return Promise.reject(normalizeError(error));

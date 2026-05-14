@@ -10,12 +10,12 @@ import {
   useDraggable,
 } from '@dnd-kit/core';
 import type { CSSProperties } from 'react';
-import { TaskOut } from '@/types/api';
+import { TaskOut, TaskStatus } from '@/types/api';
 import { TaskCard } from './TaskCard';
 
 interface TaskBoardProps {
   tasks: TaskOut[];
-  onTaskStatusChange: (taskId: string, newStatus: string) => void;
+  onTaskStatusChange: (taskId: string, newStatus: TaskStatus) => void;
   onTaskClick?: (task: TaskOut) => void;
 }
 
@@ -95,7 +95,7 @@ export function TaskBoard({ tasks, onTaskStatusChange, onTaskClick }: TaskBoardP
 
     if (over && active.id !== over.id) {
       const activeTask = tasks.find((t) => t.id === active.id);
-      const newStatus = over.id as string;
+      const newStatus = over.id as TaskStatus;
       if (activeTask && activeTask.status !== newStatus) {
         onTaskStatusChange(activeTask.id, newStatus);
       }

@@ -145,3 +145,24 @@ export function useUpdateMe() {
     },
   });
 }
+
+// Compatibility wrapper for components expecting `useAuth()`
+export function useAuth() {
+  const { user, isAuthenticated, setSession, clearSession, updateUser } = useAuthStore();
+
+  return {
+    user,
+    isAuthenticated,
+    setSession,
+    clearSession,
+    updateUser,
+    // convenience: existing hooks for actions
+    login: useLogin,
+    logout: useLogout,
+    me: useMe,
+    updateMe: useUpdateMe,
+    forgotPassword: useForgotPassword,
+    resetPassword: useResetPassword,
+    changePassword: useChangePassword,
+  } as const;
+}
