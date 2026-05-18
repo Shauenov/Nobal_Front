@@ -1,8 +1,20 @@
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import type { UniversityOut } from '@/types/api';
 import { UniversityCard } from '../UniversityCard';
+
+vi.mock('next/link', () => ({
+  default: ({ children, href }: { children: React.ReactNode; href: string }) => (
+    <a href={href}>{children}</a>
+  ),
+}));
+
+vi.mock('next/image', () => ({
+  default: ({ alt, src }: { alt: string; src: string }) => (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img alt={alt} src={src} />
+  ),
+}));
 
 const mockUniversity: UniversityOut = {
   id: 'uni-1',
@@ -11,114 +23,65 @@ const mockUniversity: UniversityOut = {
   city: 'New York',
   qs_ranking: 45,
   acceptance_rate: 0.25,
+  international_pct: 0.4,
   language_of_instr: 'English',
   is_published: true,
   created_at: '2026-05-09T00:00:00Z',
   updated_at: '2026-05-09T00:00:00Z',
 };
 
-vi.mock('next/link', () => ({
-  default: ({ children, href }: { children: React.ReactNode; href: string }) => (
-    <a href={href}>{children}</a>
-  ),
-}));
-
 describe('UniversityCard', () => {
-  it('renders university information', () => {
-    render(
-      <UniversityCard
-        university={mockUniversity}
-        programCount={3}
-      />
-    );
+  it('renders university name', () => {
+    render(<UniversityCard university={mockUniversity} />);
 
     expect(screen.getByText('Test University')).toBeInTheDocument();
-    expect(screen.getByText('New York, USA')).toBeInTheDocument();
-    expect(screen.getByText('#45')).toBeInTheDocument();
-    expect(screen.getByText('25.0%')).toBeInTheDocument();
-    expect(screen.getByText('English')).toBeInTheDocument();
-    expect(screen.getByText('3')).toBeInTheDocument();
   });
 
-  it('shows published badge when is_published is true', () => {
-    render(
-      <UniversityCard
-        university={{ ...mockUniversity, is_published: true }}
-      />
-    );
+  it('renders location from city and country', () => {
+    render(<UniversityCard university={mockUniversity} />);
 
-    expect(screen.getByText('✓ Published')).toBeInTheDocument();
+    expect(screen.getByText(/New York, USA/)).toBeInTheDocument();
   });
 
-  it('shows draft badge when is_published is false', () => {
-    render(
-      <UniversityCard
-        university={{ ...mockUniversity, is_published: false }}
-      />
-    );
+  it('renders QS ranking badge', () => {
+    render(<UniversityCard university={mockUniversity} />);
 
-    expect(screen.getByText('○ Draft')).toBeInTheDocument();
+    expect(screen.getByText(/Рейтинг #45/)).toBeInTheDocument();
   });
 
-  it('calls onTogglePublished when published button is clicked', async () => {
-    const onTogglePublished = vi.fn();
-    const user = userEvent.setup();
+  it('renders acceptance rate progress section', () => {
+    render(<UniversityCard university={mockUniversity} />);
 
-    render(
-      <UniversityCard
-        university={mockUniversity}
-        onTogglePublished={onTogglePublished}
-      />
-    );
-
-    const publishButton = screen.getByRole('button', { name: /Published/i });
-    await user.click(publishButton);
-
-    expect(onTogglePublished).toHaveBeenCalledWith(false);
+    expect(screen.getByText('Уровень поступления')).toBeInTheDocument();
+    expect(screen.getByText('25%')).toBeInTheDocument();
   });
 
-  it('calls onDelete when delete button is clicked', async () => {
-    const onDelete = vi.fn();
-    const user = userEvent.setup();
+  it('renders popularity progress section when international_pct provided', () => {
+    render(<UniversityCard university={mockUniversity} />);
 
-    render(
-      <UniversityCard
-        university={mockUniversity}
-        onDelete={onDelete}
-      />
-    );
-
-    const deleteButton = screen.getByRole('button', { name: 'Delete' });
-    await user.click(deleteButton);
-
-    expect(onDelete).toHaveBeenCalled();
+    expect(screen.getByText('Популярность')).toBeInTheDocument();
+    expect(screen.getByText('40%')).toBeInTheDocument();
   });
 
-  it('has view button linking to detail page', () => {
-    render(
-      <UniversityCard university={mockUniversity} />
-    );
+  it('hides ranking badge when qs_ranking is null', () => {
+    render(<UniversityCard university={{ ...mockUniversity, qs_ranking: null }} />);
 
-    const viewLinks = screen.getAllByRole('link');
-    // Last link is the View button
-    const viewButton = viewLinks[viewLinks.length - 1];
-    expect(viewButton).toHaveAttribute('href', '/universities/uni-1');
+    expect(screen.queryByText(/Рейтинг/)).not.toBeInTheDocument();
   });
 
-  it('hides optional metrics when not provided', () => {
-    render(
-      <UniversityCard
-        university={{
-          ...mockUniversity,
-          qs_ranking: null,
-          acceptance_rate: null,
-          language_of_instr: null,
-        }}
-      />
-    );
+  it('hides acceptance rate section when acceptance_rate is null', () => {
+    render(<UniversityCard university={{ ...mockUniversity, acceptance_rate: null }} />);
 
-    expect(screen.queryByText('#45')).not.toBeInTheDocument();
-    expect(screen.queryByText('25.0%')).not.toBeInTheDocument();
-    expect(screen.queryByText('English')).not.toBeInTheDocument();
+    expect(screen.queryByText('Уровень поступления')).not.toBeInTheDocument();
+  });
+
+  it('has action links for applications and management', () => {
+    render(<UniversityCard university={mockUniversity} />);
+
+    const applicationsLink = screen.getByRole('link', { name: /Список заявок/ });
+    expect(applicationsLink).toHaveAttribute('href', '/universities/uni-1?tab=applications');
+
+    const manageLink = screen.getByRole('link', { name: /Управлять/ });
+    expect(manageLink).toHaveAttribute('href', '/universities/uni-1');
   });
 });

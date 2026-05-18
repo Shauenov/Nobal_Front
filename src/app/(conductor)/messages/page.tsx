@@ -1,10 +1,7 @@
-import { PageStub } from '@/components/layout/PageStub';
+import { MessagesDashboard } from '@/components/messages/MessagesDashboard';
 
 export default function MessagesPage() {
   return (
-    <PageStub
-      title="Messages"
-      description="Conversations and broadcasts will live here."
-    />
+    <MessagesDashboard />
   );
 }

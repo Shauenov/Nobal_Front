@@ -115,9 +115,20 @@ apiClient.interceptors.response.use(
 
     // Handle 403 Forbidden — redirect to unauthorized page
     if (status === 403) {
-      if (typeof window !== 'undefined') {
-        window.location.href = '/unauthorized';
+      // Allow callers to opt-out of automatic redirect by setting
+      // request header `x-skip-unauthorized-redirect`.
+      const skipRedirect = Boolean(
+        (originalRequest.headers as Record<string, string | undefined> | undefined)?.[
+          'x-skip-unauthorized-redirect'
+        ]
+      );
+
+      if (!skipRedirect) {
+        if (typeof window !== 'undefined') {
+          window.location.href = '/unauthorized';
+        }
       }
+
       return Promise.reject(normalizeError(error));
     }
 

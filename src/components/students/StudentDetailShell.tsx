@@ -1,9 +1,11 @@
 'use client';
 
 import Link from 'next/link';
+import { useEffect } from 'react';
 import { useParams, usePathname } from 'next/navigation';
 import type { CSSProperties } from 'react';
 import { useStudent } from '@/hooks/useStudents';
+import { useUIStore } from '@/stores/uiStore';
 
 interface StudentDetailShellProps {
   children: React.ReactNode;
@@ -49,6 +51,17 @@ export function StudentDetailShell({ children }: StudentDetailShellProps) {
   const pathname = usePathname();
   const studentId = getStudentId(params.studentId);
   const student = useStudent(studentId);
+  const { setPageTitle } = useUIStore();
+
+  const studentName = student.data?.user.full_name ?? null;
+  // Only override the breadcrumb on the overview tab where the UUID is the
+  // last crumb. Sub-pages (profile, documents, …) already have a readable
+  // segment as the last crumb so we leave pageTitle null for them.
+  const isOverview = pathname === `/students/${studentId}`;
+  useEffect(() => {
+    if (isOverview && studentName) setPageTitle(studentName);
+    return () => setPageTitle(null);
+  }, [isOverview, studentName, setPageTitle]);
 
   const tabs = [
     { label: 'Overview', href: `/students/${studentId}` },

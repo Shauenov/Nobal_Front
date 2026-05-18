@@ -35,20 +35,84 @@
   },
   "dashboard": {
     "title": "Панель управления",
-    "subtitle": "Добро пожаловать на панель управления",
-    "totalStudents": "Всего студентов",
-    "ieltsPassedCount": "IELTS сдали",
-    "satPassedCount": "SAT сдали",
-    "averageGPA": "Средний GPA",
-    "tasksCompletedThisMonth": "Задач завершено в этом месяце",
-    "appointmentsThisMonth": "Встреч в этом месяце",
+    "subtitle": "Отслеживайте прогресс и успеваемость студентов 2–3 курсов",
+    "keyMetrics": "Ключевые метрики",
+    "totalStudents": "Всего учащихся",
+    "grantVolume": "Объем грантов",
+    "avgSat": "Средние SAT",
+    "avgIelts": "Средние IELTS",
+    "bestResultsByOffers": "Лучшие результаты по оферам",
+    "select": "Выбрать...",
     "viewAll": "Посмотреть все",
-    "engagement": "Вовлеченность студентов",
-    "studentResults": "Результаты студентов",
-    "selectPeriod": "Период",
+    "engagement": "Вовлечённость",
+    "activeStudents": "Активные учащиеся",
+    "inactiveStudents": "Неактивные учащиеся",
+    "ofGoals": "от целей",
+    "noStudents": "Нет студентов.",
+    "loadingStudents": "Загрузка студентов...",
+    "loading": "Загрузка...",
     "month": "Месяц",
     "quarter": "Квартал",
-    "noData": "Нет данных"
+    "forPeriod": "За",
+    "studentName": "ИМЯ СТУДЕНТА",
+    "course": "КУРС",
+    "last30Days": "за последние 30 дней",
+    "courseYear": "{year}-й курс"
+  },
+  "students": {
+    "title": "Студенты",
+    "subtitle": "Мониторинг и отслеживание действий студентов в процессе поступления",
+    "inviteStudent": "Пригласить студента",
+    "searchPlaceholder": "Поиск по имени или email",
+    "filters": {
+      "group": "Группа",
+      "courseYear": "Курс",
+      "ielts": "IELTS",
+      "sat": "SAT",
+      "all": "Все",
+      "passed": "Сдал",
+      "notPassed": "Не сдал"
+    },
+    "table": {
+      "student": "Студент",
+      "email": "Email",
+      "group": "Группа",
+      "gpa": "GPA",
+      "ielts": "IELTS",
+      "sat": "SAT",
+      "tasks": "Задачи",
+      "unread": "Непрочитанные",
+      "actions": "Действия",
+      "year": "{n} курс",
+      "view": "Открыть",
+      "delete": "Удалить"
+    },
+    "empty": {
+      "title": "Студенты не найдены",
+      "description": "Попробуйте изменить фильтры или пригласите первого студента.",
+      "action": "Пригласить студента"
+    },
+    "deleteConfirm": "Удалить этого студента?",
+    "pagination": {
+      "pageOf": "Страница {page} из {total}",
+      "previous": "Назад",
+      "next": "Вперёд"
+    },
+    "invite": {
+      "title": "Пригласить студента",
+      "subtitle": "Создайте аккаунт и отправьте данные студенту.",
+      "email": "Email",
+      "fullName": "Полное имя",
+      "password": "Временный пароль",
+      "cancel": "Отменить",
+      "submit": "Пригласить",
+      "submitting": "Приглашаем...",
+      "errors": {
+        "emailInvalid": "Введите корректный email",
+        "nameRequired": "Введите имя студента",
+        "passwordShort": "Пароль должен быть не короче 8 символов"
+      }
+    }
   },
   "news": {
     "title": "Новости",

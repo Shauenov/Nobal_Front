@@ -3,7 +3,8 @@
 import type { CSSProperties } from 'react';
 import { useState } from 'react';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth, useChangePassword } from '@/hooks/useAuth';
+import { ImageUpload } from '@/components/ui/ImageUpload';
 
 const containerStyle: CSSProperties = {
   display: 'flex',
@@ -85,13 +86,25 @@ const infoBoxStyle: CSSProperties = {
 };
 
 export default function SettingsPage() {
-  const { user } = useAuth();
+  const { user, updateMe, uploadAvatar } = useAuth();
   const [fullName, setFullName] = useState(user?.full_name || '');
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPasswords, setShowPasswords] = useState(false);
   const [passwordError, setPasswordError] = useState('');
+
+  const updateMeMutation = updateMe();
+  const uploadAvatarMutation = uploadAvatar();
+  const changePasswordMutation = useChangePassword();
+
+  const handleUpdateProfile = () => {
+    updateMeMutation.mutate({ full_name: fullName });
+  };
+
+  const handleAvatarUpload = async (file: File) => {
+    await uploadAvatarMutation.mutateAsync(file);
+  };
 
   const handleChangePassword = () => {
     setPasswordError('');
@@ -107,11 +120,20 @@ export default function SettingsPage() {
       setPasswordError('Пароли не совпадают');
       return;
     }
-    // TODO: Call API to change password
-    setPasswordError('Пароль успешно изменён');
-    setOldPassword('');
-    setNewPassword('');
-    setConfirmPassword('');
+    changePasswordMutation.mutate(
+      { old_password: oldPassword, new_password: newPassword },
+      {
+        onSuccess: () => {
+          setOldPassword('');
+          setNewPassword('');
+          setConfirmPassword('');
+        },
+        onError: (err) => {
+          const msg = (err as { message?: string })?.message ?? 'Ошибка при смене пароля';
+          setPasswordError(msg);
+        },
+      },
+    );
   };
 
   return (
@@ -125,6 +147,15 @@ export default function SettingsPage() {
       <div style={sectionStyle}>
         <h2 style={sectionTitleStyle}>Профиль</h2>
         
+        <div style={{ marginBottom: 'var(--space-6)', maxWidth: '200px' }}>
+          <ImageUpload
+            currentImageUrl={user?.avatar_url}
+            onUpload={handleAvatarUpload}
+            isUploading={uploadAvatarMutation.isPending}
+            label="Аватар профиля"
+          />
+        </div>
+
         <div style={infoBoxStyle}>
           Email: {user?.email}
         </div>
@@ -141,8 +172,12 @@ export default function SettingsPage() {
         </div>
 
         <div style={buttonGroupStyle}>
-          <button style={buttonPrimaryStyle}>
-            Сохранить профиль
+          <button
+            style={buttonPrimaryStyle}
+            onClick={handleUpdateProfile}
+            disabled={updateMeMutation.isPending}
+          >
+            {updateMeMutation.isPending ? 'Сохранение...' : 'Сохранить профиль'}
           </button>
         </div>
       </div>
@@ -202,8 +237,12 @@ export default function SettingsPage() {
         )}
 
         <div style={buttonGroupStyle}>
-          <button style={buttonPrimaryStyle} onClick={handleChangePassword}>
-            Изменить пароль
+          <button
+            style={buttonPrimaryStyle}
+            onClick={handleChangePassword}
+            disabled={changePasswordMutation.isPending}
+          >
+            {changePasswordMutation.isPending ? 'Сохранение...' : 'Изменить пароль'}
           </button>
         </div>
       </div>

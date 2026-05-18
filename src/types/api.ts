@@ -85,6 +85,7 @@ export interface UserBrief {
   email: string;
   full_name: string;
   role: string;
+  avatar_url?: string | null;
 }
 
 export interface TokenResponse {
@@ -177,6 +178,13 @@ export interface ProfileOut {
   target_country?: string | null;
   target_major?: string | null;
   notes?: string | null;
+  phone?: string | null;
+  gender?: 'male' | 'female' | 'other' | null;
+  birth_date?: string | null;
+  school_name?: string | null;
+  degree_level?: 'bachelor' | 'master' | 'phd' | null;
+  target_countries?: string[];
+  budget_max?: number | null;
 }
 
 export interface ProfileUpdate {
@@ -194,13 +202,26 @@ export interface ProfileUpdate {
   target_country?: string | null;
   target_major?: string | null;
   notes?: string | null;
+  phone?: string | null;
+  gender?: 'male' | 'female' | 'other' | null;
+  birth_date?: string | null;
+  school_name?: string | null;
+  degree_level?: 'bachelor' | 'master' | 'phd' | null;
+  target_countries?: string[] | null;
+  budget_max?: number | null;
 }
 
 // ── Documents ─────────────────────────────────────────────────
+export type DocumentCategory = 'personal' | 'education' | 'financial' | 'other';
+export type DocumentStatus = 'active' | 'pending' | 'expired' | 'needs_update';
+
 export interface DocumentOut {
   id: string;
   student_id: string;
   doc_type: string;
+  category: DocumentCategory;
+  status: DocumentStatus;
+  expires_at: string | null;
   url: string;
   content_type: string;
   size: number;
@@ -210,6 +231,8 @@ export interface DocumentOut {
 export interface DocumentUploadResponse {
   id: string;
   doc_type: string;
+  category: string;
+  status: string;
   url: string;
 }
 
@@ -228,6 +251,7 @@ export type DocType = typeof DOC_TYPES[number];
 // ── Tasks ─────────────────────────────────────────────────────
 export type TaskStatus = 'todo' | 'in_progress' | 'done';
 export type TaskPriority = 'low' | 'medium' | 'high';
+export type TaskType = 'deadline' | 'assignment';
 
 export interface TaskOut {
   id: string;
@@ -237,7 +261,12 @@ export interface TaskOut {
   description: string | null;
   status: TaskStatus;
   priority: TaskPriority;
+  task_type: TaskType;
   deadline: string | null;
+  time_from: string | null;
+  time_to: string | null;
+  location: string | null;
+  reminder_minutes: number | null;
   completed_at: string | null;
   is_conductor_task: boolean;
   student_roadmap_id: string | null;
@@ -249,7 +278,12 @@ export interface TaskCreate {
   title: string;
   description?: string | null;
   priority?: TaskPriority;
+  task_type?: TaskType;
   deadline?: string | null;
+  time_from?: string | null;
+  time_to?: string | null;
+  location?: string | null;
+  reminder_minutes?: number | null;
   student_roadmap_id?: string | null;
 }
 
@@ -257,7 +291,20 @@ export interface TaskUpdate {
   title?: string | null;
   description?: string | null;
   priority?: TaskPriority | null;
+  task_type?: TaskType | null;
   deadline?: string | null;
+  time_from?: string | null;
+  time_to?: string | null;
+  location?: string | null;
+  reminder_minutes?: number | null;
+}
+
+export interface TaskStatsOut {
+  total: number;
+  completed: number;
+  overdue: number;
+  in_progress: number;
+  todo: number;
 }
 
 export interface TaskStatusUpdate {
@@ -275,6 +322,7 @@ export interface TaskListParams {
 
 // ── Appointments ──────────────────────────────────────────────
 export type AppointmentStatus = 'pending' | 'confirmed' | 'completed' | 'cancelled';
+export type ConsultationType = 'video' | 'audio' | 'chat';
 
 export interface SlotOut {
   id: string;
@@ -301,6 +349,7 @@ export interface AppointmentOut {
   student_id: string;
   conductor_id: string;
   status: AppointmentStatus;
+  consultation_type: ConsultationType;
   notes: string | null;
   cancelled_at: string | null;
   cancel_reason: string | null;
@@ -310,6 +359,7 @@ export interface AppointmentOut {
 
 export interface BookRequest {
   slot_id: string;
+  consultation_type?: ConsultationType;
   notes?: string | null;
 }
 
@@ -336,6 +386,10 @@ export interface MessageOut {
   is_read: boolean;
   read_at?: string | null;
   created_at: string;
+  // Image fields (optional)
+  image_url?: string | null;
+  image_content_type?: string | null;
+  image_size?: number | null;
 }
 
 export interface SendMessageRequest {
@@ -343,13 +397,15 @@ export interface SendMessageRequest {
 }
 
 export interface BroadcastRequest {
-  body: string;
+  body?: string | null;
   filter_group?: string | null;
   ielts_passed?: boolean | null;
 }
 
 export interface BroadcastResult {
   sent: number;
+  // Optional list of created message IDs so frontend can update UI without extra fetch
+  message_ids?: string[];
 }
 
 // ── Universities ──────────────────────────────────────────────
@@ -461,8 +517,8 @@ export interface UniversityListParams {
 export interface RoadmapOut {
   id: string;
   title: string;
-  description?: string | null;
-  target_type?: string | null;
+  description: string | null;
+  target_type: string | null;
   is_public: boolean;
   created_by: string;
   created_at: string;
@@ -591,14 +647,14 @@ export interface CalendarEventOut {
   id: string;
   user_id: string;
   title: string;
-  description?: string | null;
+  description: string | null;
   event_type: CalendarEventType;
   start_time: string;
-  end_time?: string | null;
+  end_time: string | null;
   all_day: boolean;
   color: string;
-  source_id?: string | null;
-  source_type?: string | null;
+  source_id: string | null;
+  source_type: string | null;
   created_at: string;
 }
 
@@ -698,17 +754,39 @@ export interface NotificationOut {
   id: string;
   user_id: string;
   title: string;
-  body?: string | null;
+  body: string | null;
   type: string;
   is_read: boolean;
-  read_at?: string | null;
-  source_id?: string | null;
-  source_type?: string | null;
+  read_at: string | null;
+  source_id: string | null;
+  source_type: string | null;
   created_at: string;
 }
 
 export interface UnreadCountOut {
   count: number;
+}
+
+export interface NotificationSettingsOut {
+  push_enabled: boolean;
+  email_enabled: boolean;
+  deadline_alerts: boolean;
+  roadmap_changes: boolean;
+  new_messages: boolean;
+  task_updates: boolean;
+  security_alerts: boolean;
+  app_updates: boolean;
+}
+
+export interface NotificationSettingsUpdate {
+  push_enabled?: boolean | null;
+  email_enabled?: boolean | null;
+  deadline_alerts?: boolean | null;
+  roadmap_changes?: boolean | null;
+  new_messages?: boolean | null;
+  task_updates?: boolean | null;
+  security_alerts?: boolean | null;
+  app_updates?: boolean | null;
 }
 
 // ── Reports ───────────────────────────────────────────────────
@@ -721,6 +799,17 @@ export interface OverviewReport {
   tasks_completed_this_month: number;
   appointments_this_month: number;
   applied_abroad: number;
+  total_budget_usd: number;
+}
+
+export interface TaskHistoryItem {
+  id: string;
+  task_id: string;
+  changed_by: string | null;
+  event_type: 'created' | 'status_changed' | 'updated' | 'deleted';
+  old_value: string | null;
+  new_value: string | null;
+  created_at: string;
 }
 
 export interface StudentProgressItem {
@@ -739,4 +828,44 @@ export interface StudentProgressItem {
 export interface UniversityStats {
   by_target_country: Record<string, number>;
   by_target_major: Record<string, number>;
+}
+
+// ── Enrollments ───────────────────────────────────────────────
+export type EnrollmentStatus =
+  | 'selected'
+  | 'applying'
+  | 'submitted'
+  | 'accepted'
+  | 'rejected';
+
+export interface EnrollmentOut {
+  id: string;
+  student_id: string;
+  university_id: string;
+  status: EnrollmentStatus;
+  progress: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface StudentBriefForEnrollment {
+  id: string;
+  full_name: string;
+  avatar_url: string | null;
+}
+
+export interface EnrollmentWithStudentOut {
+  id: string;
+  student_id: string;
+  student: StudentBriefForEnrollment;
+  university_id: string;
+  status: EnrollmentStatus;
+  progress: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface EnrollmentUpdateRequest {
+  status?: EnrollmentStatus | null;
+  progress?: number | null;
 }

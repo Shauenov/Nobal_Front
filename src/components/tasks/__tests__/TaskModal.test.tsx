@@ -11,6 +11,7 @@ vi.mock('@/hooks/useTasks', () => ({
   useCreateTask: () => ({ mutateAsync: createTask, isPending: false }),
   useUpdateTask: () => ({ mutateAsync: updateTask, isPending: false }),
   useDeleteTask: () => ({ mutate: deleteTask, isPending: false }),
+  useTaskHistory: () => ({ data: [], isLoading: false }),
 }));
 
 describe('TaskModal', () => {
@@ -28,11 +29,11 @@ describe('TaskModal', () => {
 
     render(<TaskModal open onClose={onClose} studentId="student-1" />);
 
-    await user.type(screen.getByLabelText('Title'), 'Prepare transcript');
-    await user.type(screen.getByLabelText('Description'), 'Collect and scan the transcript.');
-    await user.selectOptions(screen.getByLabelText('Priority'), 'high');
-    await user.type(screen.getByLabelText('Deadline'), '2026-06-01T10:30');
-    await user.click(screen.getByRole('button', { name: 'Create Task' }));
+    await user.type(screen.getByLabelText('Название'), 'Prepare transcript');
+    await user.type(screen.getByLabelText('Описание'), 'Collect and scan the transcript.');
+    await user.selectOptions(screen.getByLabelText('Приоритет'), 'high');
+    await user.type(screen.getByLabelText('Дедлайн'), '2026-06-01T10:30');
+    await user.click(screen.getByRole('button', { name: 'Создать задание' }));
     const expectedDeadline = new Date('2026-06-01T10:30').toISOString();
 
     await waitFor(() => {
@@ -43,7 +44,7 @@ describe('TaskModal', () => {
         deadline: expectedDeadline,
       });
       expect(onClose).toHaveBeenCalledTimes(1);
-    }, 10000);
+    }, { timeout: 10000 });
   });
 
   it('deletes an existing task', async () => {
@@ -53,7 +54,7 @@ describe('TaskModal', () => {
     const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
     deleteTask.mockImplementation((_id: string, options?: { onSuccess?: () => void }) => {
       options?.onSuccess?.();
-    }, 10000);
+    });
 
     render(
       <TaskModal
@@ -68,7 +69,12 @@ describe('TaskModal', () => {
           description: 'Send the scanned copies',
           status: 'todo',
           priority: 'medium',
+          task_type: 'assignment',
           deadline: null,
+          time_from: null,
+          time_to: null,
+          location: null,
+          reminder_minutes: null,
           completed_at: null,
           is_conductor_task: true,
           student_roadmap_id: null,
@@ -78,10 +84,10 @@ describe('TaskModal', () => {
       />,
     );
 
-    await user.click(screen.getByRole('button', { name: 'Delete' }));
+    await user.click(screen.getByRole('button', { name: 'Удалить' }));
 
     await waitFor(() => {
-      expect(confirmSpy).toHaveBeenCalledWith('Delete this task?');
+      expect(confirmSpy).toHaveBeenCalledWith('Удалить задание?');
       expect(deleteTask).toHaveBeenCalledWith('task-1', expect.any(Object));
       expect(onClose).toHaveBeenCalledTimes(1);
     });

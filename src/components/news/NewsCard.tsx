@@ -1,10 +1,12 @@
 'use client';
 
+import { useRef } from 'react';
 import type { CSSProperties } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import type { NewsOut } from '@/types/api';
 import { format } from 'date-fns';
+import { useUploadNewsCover } from '@/hooks/useNews';
 
 interface NewsCardProps {
   news: NewsOut;
@@ -131,21 +133,70 @@ const publishedButtonStyle: CSSProperties = {
 };
 
 export function NewsCard({ news, onTogglePublish, onAddToCalendar }: NewsCardProps) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const uploadCover = useUploadNewsCover(news.id);
+
+  const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    await uploadCover.mutateAsync(file);
+  };
+
   return (
     <div style={cardStyle}>
       {/* Image Section */}
       <div style={imageContainerStyle}>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          style={{ display: 'none' }}
+          onChange={handleCoverUpload}
+        />
         {news.cover_url ? (
-          <Image
-            src={news.cover_url}
-            alt={news.title}
-            fill
-            style={{
-              objectFit: 'cover',
-            }}
-          />
+          <>
+            <Image
+              src={news.cover_url}
+              alt={news.title}
+              fill
+              style={{ objectFit: 'cover', opacity: uploadCover.isPending ? 0.5 : 1 }}
+            />
+            {/* Replace cover button */}
+            <button
+              onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
+              disabled={uploadCover.isPending}
+              style={{
+                position: 'absolute',
+                bottom: '8px',
+                right: '8px',
+                padding: '4px 8px',
+                borderRadius: 'var(--radius-sm)',
+                border: 'none',
+                background: 'rgba(0,0,0,0.6)',
+                color: '#fff',
+                fontSize: '11px',
+                cursor: 'pointer',
+                backdropFilter: 'blur(4px)',
+              }}
+            >
+              {uploadCover.isPending ? '⏳' : '📷 Сменить'}
+            </button>
+          </>
         ) : (
-          <div style={emptyImageStyle}>📰</div>
+          <div
+            style={{ ...emptyImageStyle, cursor: 'pointer', flexDirection: 'column', gap: '8px' }}
+            onClick={() => fileInputRef.current?.click()}
+            title="Загрузить обложку"
+          >
+            {uploadCover.isPending ? (
+              <span style={{ fontSize: '24px' }}>⏳</span>
+            ) : (
+              <>
+                <span style={{ fontSize: '36px' }}>📰</span>
+                <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>Загрузить обложку</span>
+              </>
+            )}
+          </div>
         )}
       </div>
 

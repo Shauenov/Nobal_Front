@@ -1,17 +1,12 @@
-import type { CSSProperties } from 'react';
+'use client';
+
+import { useMemo, type CSSProperties } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useTranslations } from 'next-intl';
 import { useInviteStudent } from '@/hooks/useStudents';
 import type { ApiError, InviteStudentRequest } from '@/types/api';
-
-const inviteSchema = z.object({
-  email: z.string().email('Enter a valid email'),
-  full_name: z.string().min(2, 'Enter the student name'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
-});
-
-type InviteValues = z.infer<typeof inviteSchema>;
 
 interface InviteModalProps {
   open: boolean;
@@ -61,6 +56,19 @@ const errorStyle: CSSProperties = {
 
 export function InviteModal({ open, onClose }: InviteModalProps) {
   const invite = useInviteStudent();
+  const t = useTranslations('students.invite');
+
+  const inviteSchema = useMemo(
+    () =>
+      z.object({
+        email: z.string().email(t('errors.emailInvalid')),
+        full_name: z.string().min(2, t('errors.nameRequired')),
+        password: z.string().min(8, t('errors.passwordShort')),
+      }),
+    [t]
+  );
+
+  type InviteValues = z.infer<typeof inviteSchema>;
 
   const {
     register,
@@ -88,16 +96,16 @@ export function InviteModal({ open, onClose }: InviteModalProps) {
     <div style={overlayStyle} role="dialog" aria-modal="true">
       <div style={modalStyle}>
         <div style={{ marginBottom: 'var(--space-4)' }}>
-          <h2 style={{ margin: 0, fontSize: 'var(--text-xl)' }}>Invite student</h2>
+          <h2 style={{ margin: 0, fontSize: 'var(--text-xl)' }}>{t('title')}</h2>
           <p style={{ margin: 'var(--space-2) 0 0', color: 'var(--color-text-secondary)' }}>
-            Create an account and send credentials to the student.
+            {t('subtitle')}
           </p>
         </div>
 
         <form onSubmit={onSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
             <label style={labelStyle} htmlFor="invite-email">
-              Email
+              {t('email')}
             </label>
             <input id="invite-email" type="email" style={inputStyle} {...register('email')} />
             {errors.email && <span style={errorStyle}>{errors.email.message}</span>}
@@ -105,7 +113,7 @@ export function InviteModal({ open, onClose }: InviteModalProps) {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
             <label style={labelStyle} htmlFor="invite-name">
-              Full name
+              {t('fullName')}
             </label>
             <input id="invite-name" style={inputStyle} {...register('full_name')} />
             {errors.full_name && <span style={errorStyle}>{errors.full_name.message}</span>}
@@ -113,7 +121,7 @@ export function InviteModal({ open, onClose }: InviteModalProps) {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
             <label style={labelStyle} htmlFor="invite-password">
-              Temporary password
+              {t('password')}
             </label>
             <input id="invite-password" type="password" style={inputStyle} {...register('password')} />
             {errors.password && <span style={errorStyle}>{errors.password.message}</span>}
@@ -131,7 +139,7 @@ export function InviteModal({ open, onClose }: InviteModalProps) {
                 color: 'var(--color-text-secondary)',
               }}
             >
-              Cancel
+              {t('cancel')}
             </button>
             <button
               type="submit"
@@ -146,7 +154,7 @@ export function InviteModal({ open, onClose }: InviteModalProps) {
                 opacity: invite.isPending ? 0.7 : 1,
               }}
             >
-              {invite.isPending ? 'Inviting...' : 'Invite'}
+              {invite.isPending ? t('submitting') : t('submit')}
             </button>
           </div>
         </form>

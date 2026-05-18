@@ -128,3 +128,33 @@ export function useAddNewsToCalendar(newsId: string) {
     },
   });
 }
+
+// ── Upload News Cover ─────────────────────────────────────────
+export function useUploadNewsCover(newsId: string) {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (file: File) => {
+      const formData = new FormData();
+      formData.append('file', file);
+      const res = await apiClient.post<ApiEnvelope<NewsOut>>(
+        `/api/v1/news/${newsId}/cover`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+      return res.data.data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.newsItem(newsId) });
+      qc.invalidateQueries({ queryKey: queryKeys.news() });
+      toast.success('News cover uploaded successfully');
+    },
+    onError: (err) => {
+      toast.error(normalizeError(err).message);
+    },
+  });
+}

@@ -1,4 +1,4 @@
-# Nobal EduConductor — Frontend Technical Specification
+# Nobal Education — Frontend Technical Specification
 **Conductor Dashboard (Web Application)**
 Version 1.0 | May 2026
 

@@ -10,6 +10,10 @@ vi.mock('@/hooks/useMessages', () => ({
     mutateAsync: mockBroadcast,
     isPending: false,
   }),
+  useBroadcastImage: () => ({
+    mutateAsync: vi.fn(),
+    isPending: false,
+  }),
 }));
 
 describe('BroadcastModal', () => {

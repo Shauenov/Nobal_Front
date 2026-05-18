@@ -9,6 +9,7 @@ const appointment: AppointmentOut = {
   student_id: 'student-1',
   conductor_id: 'conductor-1',
   status: 'confirmed',
+  consultation_type: 'video',
   notes: 'Bring passport copies',
   cancelled_at: null,
   cancel_reason: null,
@@ -23,9 +24,11 @@ describe('AppointmentCard', () => {
 
     render(<AppointmentCard appointment={appointment} onComplete={onComplete} onCancel={onCancel} />);
 
-    expect(screen.getByText('Student ID: student-1')).toBeInTheDocument();
+    // studentName not passed → falls back to truncated ID display
+    expect(screen.getByText(/Student student-/)).toBeInTheDocument();
     expect(screen.getByText('CONFIRMED')).toBeInTheDocument();
-    expect(screen.getByText(/Slot slot-1/)).toBeInTheDocument();
+    // consultation_type appears in the subtitle
+    expect(screen.getByText(/video/i)).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'Complete' }));
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));

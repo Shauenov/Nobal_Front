@@ -5,70 +5,65 @@ import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard,
   Users,
-  CheckSquare,
-  Calendar,
-  MessageSquare,
   GraduationCap,
-  Map,
-  Newspaper,
+  MessageSquare,
   CalendarDays,
-  HelpCircle,
-  Award,
-  BarChart3,
+  Newspaper,
   Settings,
-  ChevronLeft,
-  ChevronRight,
+  LogOut,
 } from 'lucide-react';
 import { useUIStore } from '@/stores/uiStore';
 import { useUnreadNotificationCount } from '@/hooks/useNotifications';
-import { Button } from '@/components/ui/Button';
+import { useLogout } from '@/hooks/useAuth';
 
 interface NavItem {
   label: string;
   href: string;
-  icon: React.ComponentType<{ size?: number; className?: string }>;
-  badge?: number;
-  section?: string;
+  icon: React.ComponentType<{ size?: number }>;
 }
 
-const navItems: NavItem[] = [
-  // Main
-  { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard, section: 'main' },
-  { label: 'Students', href: '/students', icon: Users, section: 'main' },
-  { label: 'Tasks', href: '/tasks', icon: CheckSquare, section: 'main' },
-  { label: 'Appointments', href: '/appointments', icon: Calendar, section: 'main' },
-  { label: 'Messages', href: '/messages', icon: MessageSquare, section: 'main' },
-  // Content
-  { label: 'Universities', href: '/universities', icon: GraduationCap, section: 'content' },
-  { label: 'Roadmaps', href: '/roadmaps', icon: Map, section: 'content' },
-  { label: 'News', href: '/news', icon: Newspaper, section: 'content' },
-  { label: 'Calendar', href: '/calendar', icon: CalendarDays, section: 'content' },
-  { label: 'Alumni', href: '/alumni', icon: Award, section: 'content' },
-  { label: 'FAQ', href: '/faq', icon: HelpCircle, section: 'content' },
-  // Analytics
-  { label: 'Reports', href: '/reports', icon: BarChart3, section: 'analytics' },
-  // Settings
-  { label: 'Settings', href: '/settings', icon: Settings, section: 'settings' },
-];
-
-const SECTIONS = [
-  { id: 'main', label: 'Workspace' },
-  { id: 'content', label: 'Content' },
-  { id: 'analytics', label: 'Analytics' },
-  { id: 'settings', label: 'System' },
+const mainNav: NavItem[] = [
+  { label: 'Панель Управления', href: '/dashboard', icon: LayoutDashboard },
+  { label: 'Студенты', href: '/students', icon: Users },
+  { label: 'Каталог вузов', href: '/universities', icon: GraduationCap },
+  { label: 'Личные сообщения', href: '/messages', icon: MessageSquare },
+  { label: 'Записи', href: '/appointments', icon: CalendarDays },
+  { label: 'Новости', href: '/news', icon: Newspaper },
 ];
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { sidebarCollapsed, toggleSidebar } = useUIStore();
+  const { sidebarCollapsed } = useUIStore();
   const { data: unreadData } = useUnreadNotificationCount();
+  const logout = useLogout();
 
   const isActive = (href: string) =>
     href === '/dashboard' ? pathname === href : pathname.startsWith(href);
 
+  const linkStyle = (active: boolean): React.CSSProperties => ({
+    display: 'flex',
+    alignItems: 'center',
+    gap: 12,
+    padding: sidebarCollapsed ? '10px 0' : '10px 16px',
+    margin: '1px 8px',
+    borderRadius: 8,
+    background: active ? 'rgba(255,255,255,0.12)' : 'transparent',
+    color: active ? '#fff' : 'rgba(255,255,255,0.55)',
+    transition: 'all 150ms ease',
+    textDecoration: 'none',
+    fontSize: '0.875rem',
+    fontWeight: active ? 600 : 400,
+    justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
+    position: 'relative',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    cursor: 'pointer',
+    border: 'none',
+    background2: active ? 'rgba(255,255,255,0.12)' : 'transparent',
+  });
+
   return (
     <aside
-      className="sidebar"
       style={{
         width: sidebarCollapsed ? 'var(--sidebar-collapsed)' : 'var(--sidebar-width)',
         transition: 'width var(--transition-base)',
@@ -76,9 +71,8 @@ export function Sidebar() {
         position: 'fixed',
         top: 0,
         left: 0,
-        zIndex: 'var(--z-sidebar)',
-        background: 'var(--color-sidebar-bg)',
-        borderRight: '1px solid var(--color-sidebar-border)',
+        zIndex: 'var(--z-sidebar)' as React.CSSProperties['zIndex'],
+        background: '#0f1724',
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
@@ -90,23 +84,27 @@ export function Sidebar() {
           height: 'var(--topbar-height)',
           display: 'flex',
           alignItems: 'center',
-          padding: '0 var(--space-4)',
-          borderBottom: '1px solid var(--color-sidebar-border)',
+          padding: sidebarCollapsed ? '0' : '0 20px',
+          justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
+          gap: 10,
+          borderBottom: '1px solid rgba(255,255,255,0.06)',
           flexShrink: 0,
         }}
       >
-        <div className="gradient-primary"
+        <div
           style={{
-            width: 32,
-            height: 32,
-            borderRadius: 'var(--radius-md)',
+            width: 34,
+            height: 34,
+            borderRadius: 8,
+            background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             flexShrink: 0,
-            fontWeight: 'var(--font-bold)',
+            fontWeight: 700,
             color: '#fff',
-            fontSize: 'var(--text-sm)',
+            fontSize: '0.9rem',
+            boxShadow: '0 2px 8px rgba(37,99,235,0.4)',
           }}
         >
           N
@@ -114,133 +112,104 @@ export function Sidebar() {
         {!sidebarCollapsed && (
           <span
             style={{
-              marginLeft: 'var(--space-3)',
-              fontWeight: 'var(--font-semibold)',
-              fontSize: 'var(--text-base)',
-              color: '#f8fafc',
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
+              fontWeight: 600,
+              fontSize: '0.95rem',
+              color: '#fff',
+              letterSpacing: '-0.01em',
             }}
           >
-            EduConductor
+            Nobal Education
           </span>
         )}
       </div>
 
-      {/* Nav */}
+      {/* Main nav */}
       <nav
         style={{
           flex: 1,
           overflowY: 'auto',
           overflowX: 'hidden',
-          padding: 'var(--space-3) 0',
+          padding: '12px 0',
         }}
       >
-        {SECTIONS.map((section) => {
-          const items = navItems.filter((n) => n.section === section.id);
+        {mainNav.map((item) => {
+          const active = isActive(item.href);
+          const Icon = item.icon;
           return (
-            <div key={section.id} style={{ marginBottom: 'var(--space-2)' }}>
+            <Link
+              key={item.href}
+              href={item.href}
+              title={sidebarCollapsed ? item.label : undefined}
+              style={linkStyle(active)}
+            >
+              <span style={{ flexShrink: 0, opacity: active ? 1 : 0.7 }}>
+                <Icon size={18} />
+              </span>
               {!sidebarCollapsed && (
-                <div
+                <span style={{ flex: 1 }}>{item.label}</span>
+              )}
+              {/* Unread badge for messages */}
+              {item.href === '/messages' && unreadData && unreadData.count > 0 && (
+                <span
                   style={{
-                    padding: 'var(--space-2) var(--space-4)',
-                    fontSize: 'var(--text-xs)',
-                    fontWeight: 'var(--font-semibold)',
-                    color: 'var(--color-sidebar-text-muted)',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.08em',
+                    background: '#ef4444',
+                    color: '#fff',
+                    borderRadius: 9999,
+                    fontSize: '10px',
+                    fontWeight: 700,
+                    minWidth: 18,
+                    height: 18,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '0 4px',
                   }}
                 >
-                  {section.label}
-                </div>
+                  {Math.min(unreadData.count, 99)}
+                </span>
               )}
-              {items.map((item) => {
-                const active = isActive(item.href);
-                const Icon = item.icon;
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    title={sidebarCollapsed ? item.label : undefined}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 'var(--space-3)',
-                      padding: sidebarCollapsed
-                        ? 'var(--space-3) 0'
-                        : 'var(--space-2) var(--space-4)',
-                      margin: '2px var(--space-2)',
-                      borderRadius: 'var(--radius-md)',
-                      background: active ? 'var(--color-primary)' : 'transparent',
-                      color: active
-                        ? '#ffffff'
-                        : 'var(--color-sidebar-text)',
-                      transition: 'all var(--transition-fast)',
-                      textDecoration: 'none',
-                      fontSize: 'var(--text-sm)',
-                      fontWeight: active ? 'var(--font-semibold)' : 'var(--font-normal)',
-                      position: 'relative',
-                      justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
-                      boxShadow: active ? 'var(--shadow-glow)' : 'none',
-                    }}
-                  >
-                    <span style={{ flexShrink: 0 }}>
-                      <Icon size={18} />
-                    </span>
-                    {!sidebarCollapsed && (
-                      <span style={{ whiteSpace: 'nowrap', flex: 1 }}>
-                        {item.label}
-                      </span>
-                    )}
-                    {/* Unread badge for messages */}
-                    {item.href === '/messages' && unreadData && unreadData.count > 0 && (
-                      <span
-                        style={{
-                          background: active ? 'rgba(255,255,255,0.3)' : 'var(--color-error)',
-                          color: '#fff',
-                          borderRadius: 'var(--radius-full)',
-                          fontSize: '10px',
-                          fontWeight: 'var(--font-bold)',
-                          minWidth: 18,
-                          height: 18,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          padding: '0 4px',
-                        }}
-                      >
-                        {Math.min(unreadData.count, 99)}
-                      </span>
-                    )}
-                  </Link>
-                );
-              })}
-            </div>
+            </Link>
           );
         })}
       </nav>
 
-      {/* Collapse button */}
-      <Button
-        variant="secondary"
-        size="sm"
-        onClick={toggleSidebar}
+      {/* Bottom: Settings + Logout */}
+      <div
         style={{
-          margin: 'var(--space-3)',
-        width: 'calc(100% - var(--space-6))',
-          color: 'var(--color-sidebar-text)',
-        justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
-      }}
+          padding: '8px 0 12px',
+          borderTop: '1px solid rgba(255,255,255,0.06)',
+        }}
       >
-        {sidebarCollapsed ? (
-          <ChevronRight size={16} />
-        ) : (
-          <>
-            <ChevronLeft size={16} />
-            <span>Collapse</span>
-          </>
-        )}
-      </Button>
+        <Link
+          href="/settings"
+          title={sidebarCollapsed ? 'Настройки' : undefined}
+          style={linkStyle(pathname.startsWith('/settings'))}
+        >
+          <span style={{ flexShrink: 0, opacity: pathname.startsWith('/settings') ? 1 : 0.7 }}>
+            <Settings size={18} />
+          </span>
+          {!sidebarCollapsed && <span>Настройки</span>}
+        </Link>
+
+        <button
+          onClick={() => logout.mutate()}
+          title={sidebarCollapsed ? 'Выйти' : undefined}
+          style={{
+            ...linkStyle(false),
+            width: '100%',
+            border: 'none',
+            background: 'transparent',
+            textAlign: 'left',
+            cursor: 'pointer',
+            color: 'rgba(255,255,255,0.45)',
+          }}
+        >
+          <span style={{ flexShrink: 0, opacity: 0.7 }}>
+            <LogOut size={18} />
+          </span>
+          {!sidebarCollapsed && <span>Выйти</span>}
+        </button>
+      </div>
     </aside>
   );
 }

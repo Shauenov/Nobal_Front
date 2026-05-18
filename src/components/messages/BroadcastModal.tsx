@@ -1,10 +1,11 @@
 'use client';
 
 import type { CSSProperties } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useBroadcast } from '@/hooks/useMessages';
+import { useBroadcast, useBroadcastImage } from '@/hooks/useMessages';
+import { useState } from 'react';
 
 interface BroadcastModalProps {
   isOpen: boolean;
@@ -12,7 +13,7 @@ interface BroadcastModalProps {
 }
 
 const broadcastSchema = z.object({
-  body: z.string().min(1, 'Message is required').max(2000, 'Message must not exceed 2000 characters'),
+  body: z.string().max(2000, 'Message must not exceed 2000 characters').optional().nullable(),
   filter_group: z.string().optional().nullable(),
   ielts_passed: z.boolean().optional().nullable(),
 });
@@ -79,10 +80,13 @@ const checkboxStyle: CSSProperties = {
 
 export function BroadcastModal({ isOpen, onClose }: BroadcastModalProps) {
   const broadcast = useBroadcast();
+  const broadcastImage = useBroadcastImage();
+  const [file, setFile] = useState<File | null>(null);
   const {
     register,
     handleSubmit,
-    formState: { errors, isValid },
+    control,
+    formState: { errors },
     reset,
   } = useForm<BroadcastFormData>({
     resolver: zodResolver(broadcastSchema),
@@ -94,19 +98,32 @@ export function BroadcastModal({ isOpen, onClose }: BroadcastModalProps) {
     },
   });
 
+  const bodyValue = useWatch({ control, name: 'body' });
+  const isSubmittable = !!(bodyValue?.trim()) || !!file;
+  const isPending = broadcast.isPending || broadcastImage.isPending;
+
   if (!isOpen) return null;
 
   const onSubmit = async (data: BroadcastFormData) => {
     try {
-      await broadcast.mutateAsync({
-        body: data.body.trim(),
-        filter_group: data.filter_group || undefined,
-        ielts_passed: data.ielts_passed,
-      });
+      const body = data.body?.trim() || undefined;
+      if (!body && !file) {
+        // require either body or image
+        // simple client-side error
+        alert('Please provide a message body or attach an image.');
+        return;
+      }
+
+      if (file) {
+        await broadcastImage.mutateAsync({ image: file, body, filter_group: data.filter_group || undefined, ielts_passed: data.ielts_passed });
+      } else {
+        await broadcast.mutateAsync({ body, filter_group: data.filter_group || undefined, ielts_passed: data.ielts_passed });
+      }
       reset();
+      setFile(null);
       onClose();
     } catch (error) {
-      // Error already handled by useBroadcast's onError
+      // Error already handled by hooks
       console.error(error);
     }
   };
@@ -136,6 +153,13 @@ export function BroadcastModal({ isOpen, onClose }: BroadcastModalProps) {
               placeholder="Write your broadcast message here..."
             />
             {errors.body && <div style={errorStyle}>{errors.body.message}</div>}
+          </div>
+
+          {/* Image attachment */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+            <label style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)' }}>Attach Image (optional)</label>
+            <input type="file" accept="image/*" onChange={(e) => setFile(e.target.files ? e.target.files[0] : null)} />
+            {file && <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>Selected: {file.name} ({Math.round(file.size / 1024)} KB)</div>}
           </div>
 
           {/* Filter by Group */}
@@ -175,16 +199,16 @@ export function BroadcastModal({ isOpen, onClose }: BroadcastModalProps) {
               type="button"
               style={buttonStyle('ghost')}
               onClick={onClose}
-              disabled={broadcast.isPending}
+              disabled={isPending}
             >
               Cancel
             </button>
             <button
               type="submit"
-              style={buttonStyle('primary', !isValid || broadcast.isPending)}
-              disabled={!isValid || broadcast.isPending}
+              style={buttonStyle('primary', !isSubmittable || isPending)}
+              disabled={!isSubmittable || isPending}
             >
-              {broadcast.isPending ? 'Sending...' : 'Send Broadcast'}
+              {isPending ? 'Sending...' : 'Send Broadcast'}
             </button>
           </div>
         </form>

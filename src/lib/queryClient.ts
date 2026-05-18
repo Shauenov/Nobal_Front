@@ -45,6 +45,7 @@ export const queryKeys = {
 
   // Messages
   conversations: ['conversations'] as const,
+  myConversation: ['conversations', 'my'] as const,
   messages: (convoId: string, params?: Record<string, unknown>) =>
     params ? ['messages', convoId, params] : ['messages', convoId],
 
@@ -70,6 +71,13 @@ export const queryKeys = {
   // FAQ
   faqs: ['faqs'] as const,
 
+  // Enrollments
+  studentEnrollments: (studentId: string) => ['enrollments', 'student', studentId] as const,
+  universityEnrollments: (universityId: string, params?: Record<string, unknown>) =>
+    params
+      ? ['enrollments', 'university', universityId, params]
+      : ['enrollments', 'university', universityId],
+
   // Alumni
   alumni: ['alumni'] as const,
   alumniItem: (id: string) => ['alumni', id] as const,
@@ -78,6 +86,7 @@ export const queryKeys = {
   notifications: (params?: Record<string, unknown>) =>
     params ? ['notifications', params] : ['notifications'],
   notificationsUnreadCount: ['notifications', 'unread-count'] as const,
+  notificationSettings: ['notification-settings'] as const,
 
   // Reports
   reportsOverview: ['reports', 'overview'] as const,

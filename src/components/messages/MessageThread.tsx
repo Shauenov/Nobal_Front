@@ -4,7 +4,9 @@ import { useEffect, useRef } from 'react';
 import type { CSSProperties } from 'react';
 import { MessageOut } from '@/types/api';
 import { useAuthStore } from '@/stores/authStore';
-import { format } from 'date-fns';
+import { format, formatDistanceToNow, formatRelative, isYesterday, differenceInCalendarDays } from 'date-fns';
+import { ru } from 'date-fns/locale';
+import { normalizeImageUrl } from '@/lib/imageUrl';
 
 interface MessageThreadProps {
   messages: MessageOut[];
@@ -78,11 +80,55 @@ export function MessageThread({ messages, isLoading }: MessageThreadProps) {
         return (
           <div key={msg.id} style={messageWrapperStyle(isMine)}>
             <div style={messageBubbleStyle(isMine)}>
-              {msg.body}
+              {msg.image_url ? (
+                (() => {
+                  const src = normalizeImageUrl(msg.image_url) || msg.image_url;
+                  return (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                      <a href={src} target="_blank" rel="noreferrer" style={{ display: 'inline-block' }}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={src} alt={msg.sender_name ?? 'image'} style={{ maxWidth: '320px', width: '100%', height: 'auto', borderRadius: 8 }} />
+                      </a>
+                      {msg.body && msg.body.trim() !== '[Image]' && (
+                        <div>{msg.body}</div>
+                      )}
+                    </div>
+                  );
+                })()
+              ) : (
+                msg.body
+              )}
             </div>
-            <div style={{ fontSize: '10px', color: 'var(--color-text-secondary)', padding: '0 4px' }}>
-              {format(new Date(msg.created_at), 'HH:mm')}
-            </div>
+              <div style={{ fontSize: '10px', color: 'var(--color-text-secondary)', padding: '0 4px' }}>
+                {(() => {
+                  const dateObj = new Date(msg.created_at);
+                  const now = new Date();
+                  // Today -> relative like "2 часа назад"
+                  if (differenceInCalendarDays(now, dateObj) === 0) {
+                    return (
+                      <time title={dateObj.toLocaleString()}>
+                        {formatDistanceToNow(dateObj, { addSuffix: true, locale: ru })}
+                      </time>
+                    );
+                  }
+
+                  // Yesterday -> show localized "вчера в HH:mm" (formatRelative handles locale)
+                  if (isYesterday(dateObj)) {
+                    return (
+                      <time title={dateObj.toLocaleString()}>
+                        {formatRelative(dateObj, now, { locale: ru })}
+                      </time>
+                    );
+                  }
+
+                  // Older -> exact date
+                  return (
+                    <time title={dateObj.toLocaleString()}>
+                      {format(dateObj, 'dd.MM.yyyy HH:mm', { locale: ru })}
+                    </time>
+                  );
+                })()}
+              </div>
           </div>
         );
       })}

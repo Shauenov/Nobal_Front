@@ -11,6 +11,16 @@ vi.mock('next/navigation', () => ({
   useSearchParams: () => searchParams,
 }));
 
+vi.mock('next-intl', () => ({
+  useTranslations: () => (key: string, values?: Record<string, unknown>) => {
+    if (!values) return key;
+    return Object.entries(values).reduce(
+      (acc, [k, v]) => acc.replace(`{${k}}`, String(v)),
+      key
+    );
+  },
+}));
+
 vi.mock('@/hooks/useStudents', () => ({
   useDeleteStudent: () => ({ mutate: vi.fn() }),
   useStudents: () => ({
@@ -46,9 +56,9 @@ vi.mock('@/components/layout/PageHeader', () => ({
   ),
 }));
 
-vi.mock('@/components/students/StudentTable', () => ({
-  StudentTable: ({ students }: { students: Array<{ full_name: string }> }) => (
-    <div data-testid="student-table">{students[0]?.full_name}</div>
+vi.mock('@/components/students/StudentGrid', () => ({
+  StudentGrid: ({ students }: { students: Array<{ full_name: string }> }) => (
+    <div data-testid="student-grid">{students[0]?.full_name}</div>
   ),
 }));
 
@@ -74,7 +84,7 @@ describe('StudentsPage', () => {
     });
     replace.mockClear();
 
-    fireEvent.change(screen.getByPlaceholderText('Search by name or email'), {
+    fireEvent.change(screen.getByPlaceholderText('searchPlaceholder'), {
       target: { value: 'Annabelle' },
     });
 

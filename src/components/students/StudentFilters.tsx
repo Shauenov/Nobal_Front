@@ -1,4 +1,7 @@
+'use client';
+
 import type { ChangeEvent, CSSProperties } from 'react';
+import { useTranslations } from 'next-intl';
 
 interface StudentFiltersProps {
   groupType: string;
@@ -48,6 +51,7 @@ export function StudentFilters({
   onSearchChange,
   onInvite,
 }: StudentFiltersProps) {
+  const t = useTranslations('students');
   const handleChange = (key: string) => (event: ChangeEvent<HTMLSelectElement>) => {
     onFilterChange(key, event.target.value);
   };
@@ -62,46 +66,46 @@ export function StudentFilters({
       }}
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-        <label style={labelStyle}>Group</label>
+        <label style={labelStyle}>{t('filters.group')}</label>
         <select style={selectStyle} value={groupType} onChange={handleChange('group_type')}>
-          <option value="">All</option>
+          <option value="">{t('filters.all')}</option>
           <option value="D">D</option>
           <option value="F">F</option>
         </select>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-        <label style={labelStyle}>Course Year</label>
+        <label style={labelStyle}>{t('filters.courseYear')}</label>
         <select style={selectStyle} value={courseYear} onChange={handleChange('course_year')}>
-          <option value="">All</option>
+          <option value="">{t('filters.all')}</option>
           <option value="2">2</option>
           <option value="3">3</option>
         </select>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-        <label style={labelStyle}>IELTS</label>
+        <label style={labelStyle}>{t('filters.ielts')}</label>
         <select style={selectStyle} value={ieltsPassed} onChange={handleChange('ielts_passed')}>
-          <option value="">All</option>
-          <option value="true">Passed</option>
-          <option value="false">Not passed</option>
+          <option value="">{t('filters.all')}</option>
+          <option value="true">{t('filters.passed')}</option>
+          <option value="false">{t('filters.notPassed')}</option>
         </select>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-        <label style={labelStyle}>SAT</label>
+        <label style={labelStyle}>{t('filters.sat')}</label>
         <select style={selectStyle} value={satPassed} onChange={handleChange('sat_passed')}>
-          <option value="">All</option>
-          <option value="true">Passed</option>
-          <option value="false">Not passed</option>
+          <option value="">{t('filters.all')}</option>
+          <option value="true">{t('filters.passed')}</option>
+          <option value="false">{t('filters.notPassed')}</option>
         </select>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', gridColumn: 'span 2' }}>
-        <label style={labelStyle}>Search</label>
+        <label style={labelStyle}>{t('searchPlaceholder')}</label>
         <input
           style={inputStyle}
-          placeholder="Search by name or email"
+          placeholder={t('searchPlaceholder')}
           value={search}
           onChange={(event) => onSearchChange(event.target.value)}
         />
@@ -121,7 +125,7 @@ export function StudentFilters({
             fontWeight: 'var(--font-semibold)',
           }}
         >
-          Invite Student
+          {t('inviteStudent')}
         </button>
       </div>
     </div>

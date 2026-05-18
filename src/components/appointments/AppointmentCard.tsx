@@ -5,6 +5,7 @@ import { AppointmentOut } from '@/types/api';
 
 interface AppointmentCardProps {
   appointment: AppointmentOut;
+  studentName?: string;
   onComplete?: (id: string) => void;
   onCancel?: (id: string) => void;
 }
@@ -41,7 +42,7 @@ const buttonStyle = (variant: 'primary' | 'danger'): CSSProperties => ({
   color: '#fff',
 });
 
-export function AppointmentCard({ appointment, onComplete, onCancel }: AppointmentCardProps) {
+export function AppointmentCard({ appointment, studentName, onComplete, onCancel }: AppointmentCardProps) {
   const createdAt = new Date(appointment.created_at);
   
   return (
@@ -50,11 +51,11 @@ export function AppointmentCard({ appointment, onComplete, onCancel }: Appointme
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
           <div style={{ fontWeight: 'var(--font-semibold)', fontSize: 'var(--text-sm)' }}>
-            Student ID: {appointment.student_id} {/* STUB: resolve student name from cache */}
+            {studentName ?? `Student ${appointment.student_id.slice(0, 8)}…`}
           </div>
           <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-secondary)', marginTop: '2px' }}>
             Created {createdAt.toLocaleString()}
-            {appointment.slot_id ? ` · Slot ${appointment.slot_id}` : ''}
+            {appointment.consultation_type ? ` · ${appointment.consultation_type}` : ''}
           </div>
         </div>
         <Badge variant={getStatusVariant(appointment.status)}>{appointment.status.toUpperCase()}</Badge>

@@ -96,3 +96,33 @@ export function useDeleteAlumni() {
     },
   });
 }
+
+// ── Upload Alumni Photo ───────────────────────────────────────
+export function useUploadAlumniPhoto(id: string) {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (file: File) => {
+      const formData = new FormData();
+      formData.append('file', file);
+      const res = await apiClient.post<ApiEnvelope<AlumniOut>>(
+        `/api/v1/alumni/${id}/photo`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+      return res.data.data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.alumniItem(id) });
+      qc.invalidateQueries({ queryKey: queryKeys.alumni });
+      toast.success('Alumni photo uploaded successfully');
+    },
+    onError: (err) => {
+      toast.error(normalizeError(err).message);
+    },
+  });
+}

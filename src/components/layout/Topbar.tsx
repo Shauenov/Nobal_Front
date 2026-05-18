@@ -13,10 +13,14 @@ interface Crumb {
   href: string;
 }
 
-const formatSegment = (segment: string) =>
-  segment
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+const formatSegment = (segment: string) => {
+  if (UUID_RE.test(segment)) return '…'; // will be overridden by pageTitle
+  return segment
     .replace(/-/g, ' ')
     .replace(/\b\w/g, (char) => char.toUpperCase());
+};
 
 const buildCrumbs = (pathname: string): Crumb[] => {
   const segments = pathname.split('/').filter(Boolean);
@@ -39,9 +43,14 @@ const getInitials = (name?: string | null) => {
 
 export function Topbar() {
   const pathname = usePathname();
-  const crumbs = buildCrumbs(pathname);
+  const rawCrumbs = buildCrumbs(pathname);
   const { data: unread } = useUnreadNotificationCount();
-  const { setNotificationDrawer } = useUIStore();
+  const { setNotificationDrawer, pageTitle } = useUIStore();
+
+  // Replace the last crumb label with the page-level override when set
+  const crumbs = pageTitle
+    ? rawCrumbs.map((c, i) => (i === rawCrumbs.length - 1 ? { ...c, label: pageTitle } : c))
+    : rawCrumbs;
   const { user } = useAuthStore();
   const logout = useLogout();
 

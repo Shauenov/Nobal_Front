@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, type CSSProperties } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   PieChart,
   Pie,
@@ -59,6 +60,7 @@ const formatCurrency = (value?: number | null) => {
 };
 
 export default function DashboardPage() {
+  const t = useTranslations('dashboard');
   const overview = useOverviewReport();
   const students = useStudents({ page: 1, page_size: 10 });
   const [period, setPeriod] = useState('month');
@@ -72,11 +74,11 @@ export default function DashboardPage() {
 
   const engagementData = [
     {
-      name: 'Активные учащиеся',
+      name: t('activeStudents'),
       value: ielts_sat_passed,
     },
     {
-      name: 'Неактивные учащиеся',
+      name: t('inactiveStudents'),
       value: engagement_inactive,
     },
   ];
@@ -95,22 +97,22 @@ export default function DashboardPage() {
 
   const metricCards = [
     {
-      label: 'Всего учащихся',
+      label: t('totalStudents'),
       value: formatNumber(report?.total_students),
       trendPercent: 8.2,
     },
     {
-      label: 'Объем грантов',
-      value: formatCurrency(142800),
+      label: t('grantVolume'),
+      value: formatCurrency(report?.total_budget_usd),
       trendPercent: 18,
     },
     {
-      label: 'Средние SAT',
+      label: t('avgSat'),
       value: formatNumber(report?.sat_passed),
       trendPercent: 5,
     },
     {
-      label: 'Средние IELTS',
+      label: t('avgIelts'),
       value: formatNumber(report?.ielts_passed),
       trendPercent: -12.5,
     },
@@ -119,8 +121,8 @@ export default function DashboardPage() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
       <PageHeader
-        title="Панель управления"
-        subtitle="Отслеживайте прогресс и успеваемость студентов 2–3 курсов"
+        title={t('title')}
+        subtitle={t('subtitle')}
       />
 
       {/* Period Filter */}
@@ -137,7 +139,7 @@ export default function DashboardPage() {
           }}
         >
           <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-primary)' }}>
-            За {period === 'month' ? 'Месяц' : 'Квартал'}
+            {t('forPeriod')} {period === 'month' ? t('month') : t('quarter')}
           </span>
           <select
             value={period}
@@ -151,15 +153,15 @@ export default function DashboardPage() {
               outline: 'none',
             }}
           >
-            <option value="month">Месяц</option>
-            <option value="quarter">Квартал</option>
+            <option value="month">{t('month')}</option>
+            <option value="quarter">{t('quarter')}</option>
           </select>
         </div>
       </div>
 
       {/* Key Metrics Section */}
       <section>
-        <h2 style={sectionTitleStyle}>Ключевые метрики</h2>
+        <h2 style={sectionTitleStyle}>{t('keyMetrics')}</h2>
         <div
           style={{
             display: 'grid',
@@ -184,7 +186,7 @@ export default function DashboardPage() {
                 </div>
               </div>
               <div style={trendTextStyle(card.trendPercent >= 0)}>
-                {card.trendPercent >= 0 ? '↗' : '↘'} {Math.abs(card.trendPercent)}% за последние 30 дней
+                {card.trendPercent >= 0 ? '↗' : '↘'} {Math.abs(card.trendPercent)}% {t('last30Days')}
               </div>
             </div>
           ))}
@@ -210,7 +212,7 @@ export default function DashboardPage() {
             }}
           >
             <h2 style={{ ...sectionTitleStyle, marginBottom: 0 }}>
-              Лучшие результаты по оферам
+              {t('bestResultsByOffers')}
             </h2>
             <button
               style={{
@@ -223,17 +225,17 @@ export default function DashboardPage() {
                 fontSize: 'var(--text-sm)',
               }}
             >
-              Выбрать...
+              {t('select')}
             </button>
           </div>
 
           {students.isLoading ? (
             <div style={{ color: 'var(--color-text-secondary)' }}>
-              Загрузка студентов...
+              {t('loadingStudents')}
             </div>
           ) : studentItems.length === 0 ? (
             <div style={{ color: 'var(--color-text-secondary)' }}>
-              Нет студентов.
+              {t('noStudents')}
             </div>
           ) : (
             <div style={{ overflowX: 'auto' }}>
@@ -259,7 +261,7 @@ export default function DashboardPage() {
                         fontSize: 'var(--text-xs)',
                       }}
                     >
-                      ИМЯ СТУДЕНТА
+                      {t('studentName')}
                     </th>
                     <th
                       style={{
@@ -270,7 +272,7 @@ export default function DashboardPage() {
                         fontSize: 'var(--text-xs)',
                       }}
                     >
-                      КУРС
+                      {t('course')}
                     </th>
                     <th
                       style={{
@@ -309,7 +311,7 @@ export default function DashboardPage() {
                         }}
                       >
                         {student.course_year
-                          ? `${student.course_year}-й курс`
+                          ? t('courseYear', { year: student.course_year })
                           : '—'}
                       </td>
                       <td
@@ -338,7 +340,7 @@ export default function DashboardPage() {
                 fontWeight: '500',
               }}
             >
-              Посмотреть все
+              {t('viewAll')}
             </a>
           </div>
         </section>
@@ -354,7 +356,7 @@ export default function DashboardPage() {
             }}
           >
             <h2 style={{ ...sectionTitleStyle, marginBottom: 0 }}>
-              Вовлечённость
+              {t('engagement')}
             </h2>
             <span
               style={{
@@ -377,7 +379,7 @@ export default function DashboardPage() {
             <div style={{ position: 'relative', width: 200, height: 200 }}>
               {overview.isLoading ? (
                 <div style={{ color: 'var(--color-text-secondary)' }}>
-                  Загрузка...
+                  {t('loading')}
                 </div>
               ) : (
                 <>
@@ -424,7 +426,7 @@ export default function DashboardPage() {
                         color: 'var(--color-text-secondary)',
                       }}
                     >
-                      от целей
+                      {t('ofGoals')}
                     </div>
                   </div>
                 </>

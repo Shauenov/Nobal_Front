@@ -13,24 +13,28 @@ import {
 } from '@/types/api';
 
 // ── List my appointments ──────────────────────────────────────
-export function useMyAppointments() {
+export function useMyAppointments(enabled = true) {
   return useQuery({
     queryKey: queryKeys.myAppointments,
     queryFn: async () => {
-      const res = await apiClient.get<ApiEnvelope<AppointmentOut[]>>('/api/v1/appointments/my');
+      const res = await apiClient.get<ApiEnvelope<AppointmentOut[]>>('/api/v1/appointments/my', {
+        headers: { 'x-skip-unauthorized-redirect': '1' },
+      });
       return res.data.data;
     },
+    enabled,
   });
 }
 
 // ── List all appointments ─────────────────────────────────────
-export function useAppointments() {
+export function useAppointments(enabled = true) {
   return useQuery({
     queryKey: queryKeys.appointments,
     queryFn: async () => {
       const res = await apiClient.get<ApiEnvelope<AppointmentOut[]>>('/api/v1/appointments');
       return res.data.data;
     },
+    enabled,
   });
 }
 

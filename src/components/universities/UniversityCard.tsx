@@ -7,228 +7,259 @@ import type { UniversityOut } from '@/types/api';
 
 interface UniversityCardProps {
   university: UniversityOut;
-  programCount?: number;
   onTogglePublished?: (published: boolean) => void;
   onDelete?: () => void;
   isLoading?: boolean;
 }
 
-const cardStyle: CSSProperties = {
-  background: 'var(--color-surface)',
-  border: '1px solid var(--color-border)',
-  borderRadius: 'var(--radius-lg)',
-  padding: 'var(--space-4)',
-  display: 'flex',
-  flexDirection: 'column',
-  gap: 'var(--space-3)',
-  transition: 'all 0.2s ease',
-  cursor: 'pointer',
-};
+function ProgressBar({ pct, color }: { pct: number; color: string }) {
+  return (
+    <div
+      style={{
+        height: 6,
+        borderRadius: 9999,
+        background: '#e8ecf0',
+        overflow: 'hidden',
+        flex: 1,
+      }}
+    >
+      <div
+        style={{
+          width: `${Math.min(100, Math.max(0, pct))}%`,
+          height: '100%',
+          background: color,
+          borderRadius: 9999,
+          transition: 'width 400ms ease',
+        }}
+      />
+    </div>
+  );
+}
 
-const headerStyle: CSSProperties = {
-  display: 'flex',
-  gap: 'var(--space-3)',
-  alignItems: 'flex-start',
-};
+export function UniversityCard({ university }: UniversityCardProps) {
+  const location = [university.city, university.country].filter(Boolean).join(', ');
+  const acceptancePct = university.acceptance_rate != null ? Math.round(university.acceptance_rate * 100) : null;
+  const popularityPct = university.international_pct != null ? Math.round(university.international_pct * 100) : null;
 
-const logoStyle: CSSProperties = {
-  width: '64px',
-  height: '64px',
-  borderRadius: 'var(--radius-md)',
-  background: 'var(--color-surface-hover)',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  flexShrink: 0,
-  fontSize: '32px',
-};
-
-const infoStyle: CSSProperties = {
-  flex: 1,
-  minWidth: 0,
-};
-
-const nameStyle: CSSProperties = {
-  fontSize: 'var(--text-base)',
-  fontWeight: 'var(--font-semibold)',
-  color: 'var(--color-text-primary)',
-  marginBottom: '4px',
-  wordBreak: 'break-word',
-};
-
-const locationStyle: CSSProperties = {
-  fontSize: 'var(--text-sm)',
-  color: 'var(--color-text-secondary)',
-};
-
-const metricsStyle: CSSProperties = {
-  display: 'grid',
-  gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
-  gap: 'var(--space-2)',
-};
-
-const metricItemStyle: CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '2px',
-};
-
-const metricLabelStyle: CSSProperties = {
-  fontSize: 'var(--text-xs)',
-  color: 'var(--color-text-secondary)',
-  fontWeight: 'var(--font-medium)',
-};
-
-const metricValueStyle: CSSProperties = {
-  fontSize: 'var(--text-sm)',
-  fontWeight: 'var(--font-semibold)',
-  color: 'var(--color-text-primary)',
-};
-
-const badgeStyle = (variant: 'primary' | 'secondary'): CSSProperties => ({
-  display: 'inline-flex',
-  alignItems: 'center',
-  gap: '4px',
-  padding: '2px 8px',
-  borderRadius: 'var(--radius-sm)',
-  fontSize: 'var(--text-xs)',
-  fontWeight: 'var(--font-medium)',
-  background: variant === 'primary' ? 'var(--color-primary-light)' : 'var(--color-surface-hover)',
-  color: variant === 'primary' ? 'var(--color-primary)' : 'var(--color-text-secondary)',
-});
-
-const footerStyle: CSSProperties = {
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  paddingTop: 'var(--space-2)',
-  borderTop: '1px solid var(--color-border)',
-};
-
-const buttonGroupStyle: CSSProperties = {
-  display: 'flex',
-  gap: 'var(--space-2)',
-};
-
-const buttonStyle = (variant: 'primary' | 'ghost', disabled?: boolean): CSSProperties => ({
-  padding: '6px 12px',
-  borderRadius: 'var(--radius-sm)',
-  fontSize: 'var(--text-xs)',
-  fontWeight: 'var(--font-medium)',
-  cursor: disabled ? 'not-allowed' : 'pointer',
-  border: 'none',
-  background: variant === 'primary' ? 'var(--color-primary)' : 'transparent',
-  color: variant === 'primary' ? '#fff' : 'var(--color-text-primary)',
-  opacity: disabled ? 0.6 : 1,
-});
-
-const toggleButtonStyle = (isPublished: boolean): CSSProperties => ({
-  padding: '6px 12px',
-  borderRadius: 'var(--radius-sm)',
-  fontSize: 'var(--text-xs)',
-  fontWeight: 'var(--font-medium)',
-  cursor: 'pointer',
-  border: '1px solid var(--color-border)',
-  background: isPublished ? 'var(--color-success-light)' : 'var(--color-surface-hover)',
-  color: isPublished ? 'var(--color-success)' : 'var(--color-text-secondary)',
-});
-
-export function UniversityCard({
-  university,
-  programCount = 0,
-  onTogglePublished,
-  onDelete,
-  isLoading = false,
-}: UniversityCardProps) {
-  const location = [university.city, university.country].filter(Boolean).join(', ') || university.country;
+  const cardStyle: CSSProperties = {
+    background: '#fff',
+    borderRadius: 16,
+    overflow: 'hidden',
+    border: '1px solid #e8ecf0',
+    boxShadow: '0 2px 8px rgba(15,23,42,0.06)',
+    display: 'flex',
+    flexDirection: 'column',
+    transition: 'box-shadow 150ms ease',
+    position: 'relative',
+  };
 
   return (
     <div style={cardStyle}>
-      <div style={headerStyle}>
-        <div style={logoStyle}>
-          {university.logo_url ? (
-            <Image
-              src={university.logo_url}
-              alt={university.name}
-              width={64}
-              height={64}
-              style={{ objectFit: 'cover', borderRadius: 'var(--radius-md)' }}
-            />
-          ) : (
-            <span>🏫</span>
-          )}
-        </div>
+      {/* Cover image */}
+      <div
+        style={{
+          height: 160,
+          background: 'linear-gradient(135deg, #1e3a5f 0%, #2d5a8e 100%)',
+          position: 'relative',
+          overflow: 'hidden',
+          flexShrink: 0,
+        }}
+      >
+        {university.cover_image_url && (
+          <Image
+            src={university.cover_image_url}
+            alt={university.name}
+            fill
+            style={{ objectFit: 'cover' }}
+          />
+        )}
 
-        <div style={infoStyle}>
-          <Link href={`/universities/${university.id}`} style={{ textDecoration: 'none' }}>
-            <div style={nameStyle} onMouseOver={(e) => (e.currentTarget.style.color = 'var(--color-primary)')}>
+        {/* Dark gradient overlay */}
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.55) 100%)',
+          }}
+        />
+
+        {/* University name overlay on cover */}
+        <div
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            padding: '8px 14px 10px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 10,
+          }}
+        >
+          {/* Logo */}
+          <div
+            style={{
+              width: 42,
+              height: 42,
+              borderRadius: 10,
+              background: '#fff',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+              overflow: 'hidden',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+            }}
+          >
+            {university.logo_url ? (
+              <Image
+                src={university.logo_url}
+                alt={university.name}
+                width={42}
+                height={42}
+                style={{ objectFit: 'contain' }}
+              />
+            ) : (
+              <span style={{ fontSize: '1.2rem' }}>🏫</span>
+            )}
+          </div>
+          <div style={{ minWidth: 0 }}>
+            <div
+              style={{
+                fontWeight: 700,
+                fontSize: '0.9rem',
+                color: '#fff',
+                lineHeight: 1.2,
+                textShadow: '0 1px 3px rgba(0,0,0,0.4)',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
               {university.name}
             </div>
-          </Link>
-          <div style={locationStyle}>{location}</div>
+            {location && (
+              <div
+                style={{
+                  fontSize: '0.72rem',
+                  color: 'rgba(255,255,255,0.8)',
+                  marginTop: 2,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                📍 {location}
+              </div>
+            )}
+          </div>
         </div>
+
+        {/* Rating badge */}
+        {university.qs_ranking != null && (
+          <div
+            style={{
+              position: 'absolute',
+              top: 10,
+              right: 10,
+              background: 'rgba(0,0,0,0.55)',
+              backdropFilter: 'blur(4px)',
+              color: '#fff',
+              borderRadius: 8,
+              padding: '3px 10px',
+              fontSize: '0.72rem',
+              fontWeight: 600,
+            }}
+          >
+            ★ Рейтинг #{university.qs_ranking}
+          </div>
+        )}
       </div>
 
-      <div style={metricsStyle}>
-        {university.qs_ranking !== null && university.qs_ranking !== undefined && (
-          <div style={metricItemStyle}>
-            <div style={metricLabelStyle}>QS Ranking</div>
-            <div style={metricValueStyle}>#{university.qs_ranking}</div>
+      {/* Body */}
+      <div style={{ padding: '14px 16px 6px', display: 'flex', flexDirection: 'column', gap: 8, flex: 1 }}>
+        {/* Acceptance rate */}
+        {acceptancePct != null && (
+          <div>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                fontSize: '0.75rem',
+                color: '#64748b',
+                marginBottom: 5,
+              }}
+            >
+              <span>Уровень поступления</span>
+              <span style={{ fontWeight: 600, color: '#1e293b' }}>{acceptancePct}%</span>
+            </div>
+            <ProgressBar pct={acceptancePct} color="#2563eb" />
           </div>
         )}
-        {university.acceptance_rate !== null && university.acceptance_rate !== undefined && (
-          <div style={metricItemStyle}>
-            <div style={metricLabelStyle}>Acceptance</div>
-            <div style={metricValueStyle}>{(university.acceptance_rate * 100).toFixed(1)}%</div>
-          </div>
-        )}
-        {university.language_of_instr && (
-          <div style={metricItemStyle}>
-            <div style={metricLabelStyle}>Language</div>
-            <div style={metricValueStyle}>{university.language_of_instr}</div>
-          </div>
-        )}
-        {programCount > 0 && (
-          <div style={metricItemStyle}>
-            <div style={metricLabelStyle}>Programs</div>
-            <div style={metricValueStyle}>{programCount}</div>
+
+        {/* Popularity / international */}
+        {popularityPct != null && (
+          <div>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                fontSize: '0.75rem',
+                color: '#64748b',
+                marginBottom: 5,
+              }}
+            >
+              <span>Популярность</span>
+              <span style={{ fontWeight: 600, color: '#1e293b' }}>{popularityPct}%</span>
+            </div>
+            <ProgressBar pct={popularityPct} color="#10b981" />
           </div>
         )}
       </div>
 
-      <div style={footerStyle}>
-        <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center' }}>
-          <div style={badgeStyle(university.is_published ? 'primary' : 'secondary')}>
-            {university.is_published ? '✓ Published' : '○ Draft'}
-          </div>
-        </div>
-
-        <div style={buttonGroupStyle}>
-          {onTogglePublished && (
-            <button
-              style={toggleButtonStyle(university.is_published)}
-              onClick={() => onTogglePublished(!university.is_published)}
-              disabled={isLoading}
-              title={university.is_published ? 'Unpublish' : 'Publish'}
-            >
-              {university.is_published ? 'Published' : 'Draft'}
-            </button>
-          )}
-          {onDelete && (
-            <button
-              style={buttonStyle('ghost', isLoading)}
-              onClick={onDelete}
-              disabled={isLoading}
-            >
-              Delete
-            </button>
-          )}
-          <Link href={`/universities/${university.id}`} style={{ textDecoration: 'none' }}>
-            <button style={buttonStyle('primary', isLoading)}>
-              View
-            </button>
-          </Link>
-        </div>
+      {/* Action buttons */}
+      <div
+        style={{
+          padding: '10px 14px 14px',
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: 8,
+        }}
+      >
+        <Link
+          href={`/universities/${university.id}?tab=applications`}
+          style={{
+            padding: '8px 0',
+            borderRadius: 8,
+            border: '1px solid #e2e8f0',
+            background: '#fff',
+            color: '#1e293b',
+            fontSize: '0.78rem',
+            fontWeight: 600,
+            textAlign: 'center',
+            textDecoration: 'none',
+            transition: 'all 150ms ease',
+          }}
+        >
+          Список заявок
+        </Link>
+        <Link
+          href={`/universities/${university.id}`}
+          style={{
+            padding: '8px 0',
+            borderRadius: 8,
+            border: 'none',
+            background: '#2563eb',
+            color: '#fff',
+            fontSize: '0.78rem',
+            fontWeight: 600,
+            textAlign: 'center',
+            textDecoration: 'none',
+            transition: 'all 150ms ease',
+          }}
+        >
+          Управлять
+        </Link>
       </div>
     </div>
   );

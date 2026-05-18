@@ -146,6 +146,33 @@ export function useUpdateMe() {
   });
 }
 
+// ── Upload Avatar ───────────────────────────────────────────────
+export function useUploadAvatar() {
+  const qc = useQueryClient();
+  const { updateUser } = useAuthStore();
+
+  return useMutation({
+    mutationFn: async (file: File) => {
+      const formData = new FormData();
+      formData.append('file', file);
+      const res = await apiClient.post<ApiEnvelope<UserOut>>('/api/v1/users/me/avatar', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      return res.data.data;
+    },
+    onSuccess: (data) => {
+      qc.setQueryData(queryKeys.me, data);
+      updateUser({ avatar_url: data.avatar_url });
+      toast.success('Avatar uploaded successfully');
+    },
+    onError: (err) => {
+      toast.error(normalizeError(err).message);
+    },
+  });
+}
+
 // Compatibility wrapper for components expecting `useAuth()`
 export function useAuth() {
   const { user, isAuthenticated, setSession, clearSession, updateUser } = useAuthStore();
@@ -161,6 +188,7 @@ export function useAuth() {
     logout: useLogout,
     me: useMe,
     updateMe: useUpdateMe,
+    uploadAvatar: useUploadAvatar,
     forgotPassword: useForgotPassword,
     resetPassword: useResetPassword,
     changePassword: useChangePassword,

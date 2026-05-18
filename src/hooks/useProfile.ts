@@ -5,6 +5,8 @@ import { queryKeys } from '@/lib/queryClient';
 import {
   ApiEnvelope,
   DocumentOut,
+  NotificationSettingsOut,
+  NotificationSettingsUpdate,
   ProfileOut,
   ProfileUpdate,
 } from '@/types/api';
@@ -96,6 +98,41 @@ export function useDeleteDocument(studentId: string) {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.studentDocuments(studentId) });
       toast.success('Document deleted');
+    },
+    onError: (err) => {
+      toast.error(normalizeError(err).message);
+    },
+  });
+}
+
+// ── Get notification settings ─────────────────────────────────
+export function useNotificationSettings() {
+  return useQuery({
+    queryKey: queryKeys.notificationSettings,
+    queryFn: async () => {
+      const res = await apiClient.get<ApiEnvelope<NotificationSettingsOut>>(
+        '/api/v1/users/me/notification-settings'
+      );
+      return res.data.data;
+    },
+  });
+}
+
+// ── Update notification settings ──────────────────────────────
+export function useUpdateNotificationSettings() {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: NotificationSettingsUpdate) => {
+      const res = await apiClient.put<ApiEnvelope<NotificationSettingsOut>>(
+        '/api/v1/users/me/notification-settings',
+        data
+      );
+      return res.data.data;
+    },
+    onSuccess: (data) => {
+      qc.setQueryData(queryKeys.notificationSettings, data);
+      toast.success('Notification settings updated');
     },
     onError: (err) => {
       toast.error(normalizeError(err).message);

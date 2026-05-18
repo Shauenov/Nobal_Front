@@ -12,6 +12,30 @@ import {
   SendMessageRequest,
 } from '@/types/api';
 
+type MessageQueryParams = {
+  limit?: number;
+  offset?: number;
+  page?: number;
+  page_size?: number;
+};
+
+function toMessageQueryParams(params: MessageQueryParams) {
+  if (params.limit != null || params.offset != null) {
+    return {
+      limit: params.limit ?? 50,
+      offset: params.offset ?? 0,
+    };
+  }
+
+  const pageSize = params.page_size ?? 50;
+  const page = params.page ?? 1;
+
+  return {
+    limit: pageSize,
+    offset: Math.max(0, (page - 1) * pageSize),
+  };
+}
+
 // ── List conversations ────────────────────────────────────────
 export function useConversations() {
   return useQuery({
@@ -44,17 +68,29 @@ export function useGetOrCreateConversation() {
   });
 }
 
+export function useMyConversation() {
+  return useQuery({
+    queryKey: queryKeys.myConversation,
+    queryFn: async () => {
+      const res = await apiClient.get<ApiEnvelope<ConversationOut>>('/api/v1/messages/conversations/my');
+      return res.data.data;
+    },
+  });
+}
+
 // ── Get messages ──────────────────────────────────────────────
 export function useMessages(
   convoId: string,
-  params: { page?: number; page_size?: number } = {}
+  params: MessageQueryParams = {}
 ) {
+  const queryParams = toMessageQueryParams(params);
+
   return useQuery({
-    queryKey: queryKeys.messages(convoId, params as Record<string, unknown>),
+    queryKey: queryKeys.messages(convoId, queryParams),
     queryFn: async () => {
       const res = await apiClient.get<PaginatedEnvelope<MessageOut>>(
         `/api/v1/messages/conversations/${convoId}/messages`,
-        { params }
+        { params: queryParams }
       );
       return res.data;
     },
@@ -80,6 +116,35 @@ export function useSendMessage(convoId: string) {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.messages(convoId) });
       qc.invalidateQueries({ queryKey: queryKeys.conversations });
+      qc.invalidateQueries({ queryKey: queryKeys.myConversation });
+    },
+    onError: (err) => {
+      toast.error(normalizeError(err).message);
+    },
+  });
+}
+
+// Send image message (multipart/form-data)
+export function useSendImageMessage(convoId: string) {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: { image: File; body?: string | null }) => {
+      const form = new FormData();
+      form.append('image', data.image);
+      if (data.body) form.append('body', data.body);
+
+      const res = await apiClient.post<ApiEnvelope<MessageOut>>(
+        `/api/v1/messages/conversations/${convoId}/messages/image`,
+        form,
+        { headers: { 'Content-Type': 'multipart/form-data' } }
+      );
+      return res.data.data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.messages(convoId) });
+      qc.invalidateQueries({ queryKey: queryKeys.conversations });
+      qc.invalidateQueries({ queryKey: queryKeys.myConversation });
     },
     onError: (err) => {
       toast.error(normalizeError(err).message);
@@ -97,6 +162,7 @@ export function useMarkRead(convoId: string) {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.conversations });
+      qc.invalidateQueries({ queryKey: queryKeys.myConversation });
     },
   });
 }
@@ -108,6 +174,32 @@ export function useBroadcast() {
       const res = await apiClient.post<ApiEnvelope<BroadcastResult>>(
         '/api/v1/messages/broadcast',
         data
+      );
+      return res.data.data;
+    },
+    onSuccess: (data) => {
+      toast.success(`Message sent to ${data.sent} student(s)`);
+    },
+    onError: (err) => {
+      toast.error(normalizeError(err).message);
+    },
+  });
+}
+
+// Broadcast with image support (multipart)
+export function useBroadcastImage() {
+  return useMutation({
+    mutationFn: async (data: { image?: File; body?: string | null; filter_group?: string | null; ielts_passed?: boolean | null }) => {
+      const form = new FormData();
+      if (data.image) form.append('image', data.image);
+      if (data.body) form.append('body', data.body);
+      if (data.filter_group) form.append('filter_group', data.filter_group);
+      if (data.ielts_passed != null) form.append('ielts_passed', String(data.ielts_passed));
+
+      const res = await apiClient.post<ApiEnvelope<BroadcastResult>>(
+        '/api/v1/messages/broadcast/image',
+        form,
+        { headers: { 'Content-Type': 'multipart/form-data' } }
       );
       return res.data.data;
     },

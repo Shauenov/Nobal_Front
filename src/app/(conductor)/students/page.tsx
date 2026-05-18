@@ -2,10 +2,11 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { Users } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { StudentFilters } from '@/components/students/StudentFilters';
-import { StudentTable } from '@/components/students/StudentTable';
+import { StudentGrid } from '@/components/students/StudentGrid';
 import { InviteModal } from '@/components/students/InviteModal';
 import { useDeleteStudent, useStudents } from '@/hooks/useStudents';
 import { Card } from '@/components/ui/Card';
@@ -29,6 +30,7 @@ export default function StudentsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const deleteStudent = useDeleteStudent();
+  const t = useTranslations('students');
 
   const [inviteOpen, setInviteOpen] = useState(false);
   const [searchText, setSearchText] = useState(searchParams.get('search') ?? '');
@@ -73,7 +75,7 @@ export default function StudentsPage() {
   const students = useStudents(queryParams);
   const items = students.data?.data ?? [];
   const meta = students.data?.meta;
-  const totalPages = meta ? Math.ceil(meta.total / meta.page_size) : 1;
+  const totalPages = meta ? Math.max(1, Math.ceil(meta.total / meta.page_size)) : 1;
 
   const setParam = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -93,14 +95,14 @@ export default function StudentsPage() {
   };
 
   const handleDelete = (id: string) => {
-    if (window.confirm('Delete this student?')) {
+    if (window.confirm(t('deleteConfirm'))) {
       deleteStudent.mutate(id);
     }
   };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
-      <PageHeader title="Students" subtitle="Manage your student roster" />
+      <PageHeader title={t('title')} subtitle={t('subtitle')} />
 
       <StudentFilters
         groupType={groupType}
@@ -123,14 +125,14 @@ export default function StudentsPage() {
           </div>
         ) : items.length === 0 ? (
           <EmptyState
-            title="No students found"
-            description="Try adjusting filters or invite your first student."
+            title={t('empty.title')}
+            description={t('empty.description')}
             icon={<Users size={24} />}
-            actionLabel="Invite student"
+            actionLabel={t('empty.action')}
             onAction={() => setInviteOpen(true)}
           />
         ) : (
-          <StudentTable students={items} onDelete={handleDelete} />
+          <StudentGrid students={items} onDelete={handleDelete} />
         )}
       </Card>
 
@@ -144,7 +146,7 @@ export default function StudentsPage() {
         }}
       >
         <span>
-          Page {meta?.page ?? 1} of {totalPages}
+          {t('pagination.pageOf', { page: meta?.page ?? 1, total: totalPages })}
         </span>
         <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
           <button
@@ -160,7 +162,7 @@ export default function StudentsPage() {
               opacity: page <= 1 ? 0.5 : 1,
             }}
           >
-            Previous
+            {t('pagination.previous')}
           </button>
           <button
             type="button"
@@ -175,7 +177,7 @@ export default function StudentsPage() {
               opacity: page >= totalPages ? 0.5 : 1,
             }}
           >
-            Next
+            {t('pagination.next')}
           </button>
         </div>
       </div>

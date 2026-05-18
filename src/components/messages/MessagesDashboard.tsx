@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import type { CSSProperties } from 'react';
-import { useConversations, useMessages, useSendMessage, useMarkRead } from '@/hooks/useMessages';
+import { useConversations, useMessages, useSendMessage, useSendImageMessage, useMarkRead } from '@/hooks/useMessages';
 import { useStudents } from '@/hooks/useStudents';
 import { ConversationList } from './ConversationList';
 import { MessageThread } from './MessageThread';
@@ -32,9 +32,20 @@ const mainAreaStyle: CSSProperties = {
   flexDirection: 'column',
 };
 
-export function MessagesDashboard() {
-  const [activeConvoId, setActiveConvoId] = useState<string | undefined>();
+interface MessagesDashboardProps {
+  initialConvoId?: string;
+}
+
+export function MessagesDashboard({ initialConvoId }: MessagesDashboardProps) {
+  const [activeConvoId, setActiveConvoId] = useState<string | undefined>(initialConvoId);
+  const [syncedConvoId, setSyncedConvoId] = useState(initialConvoId);
   const [isBroadcastOpen, setIsBroadcastOpen] = useState(false);
+
+  // Sync initialConvoId into activeConvoId when it changes (render-phase derived state)
+  if (syncedConvoId !== initialConvoId) {
+    setSyncedConvoId(initialConvoId);
+    if (initialConvoId) setActiveConvoId(initialConvoId);
+  }
 
   const { data: convosResponse, isLoading: isLoadingConvos } = useConversations();
   const { data: studentsResponse } = useStudents({ page: 1, page_size: 100 });
@@ -51,22 +62,35 @@ export function MessagesDashboard() {
     [conversations, activeConvoId],
   );
 
-  const { data: messagesResponse, isLoading: isLoadingMessages } = useMessages(activeConvoId ?? '', { page_size: 100 });
+  const { data: messagesResponse, isLoading: isLoadingMessages } = useMessages(activeConvoId ?? '', { limit: 100 });
   const messages = messagesResponse?.data ?? [];
 
   const sendMessage = useSendMessage(activeConvoId ?? '');
+  const sendImage = useSendImageMessage(activeConvoId ?? '');
   const markRead = useMarkRead(activeConvoId ?? '');
 
   useEffect(() => {
-    const unread = (activeConversation as any)?.unread_count ?? (activeConversation as any)?.unread_messages ?? 0;
+    const unread = activeConversation
+      ? ('unread_count' in activeConversation && typeof activeConversation.unread_count === 'number'
+        ? activeConversation.unread_count
+        : 'unread_messages' in activeConversation && typeof activeConversation.unread_messages === 'number'
+          ? activeConversation.unread_messages
+          : 0)
+      : 0;
     if (activeConversation && unread > 0) {
       markRead.mutate();
     }
   }, [activeConversation, markRead]);
 
+
   const handleSend = (text: string) => {
     if (!activeConvoId) return;
     sendMessage.mutate({ body: text });
+  };
+
+  const handleSendImage = (file: File, body?: string | null) => {
+    if (!activeConvoId) return;
+    sendImage.mutate({ image: file, body });
   };
 
   return (
@@ -109,7 +133,7 @@ export function MessagesDashboard() {
           {activeConvoId ? (
             <>
               <MessageThread messages={messages} isLoading={isLoadingMessages} />
-              <MessageInput onSend={handleSend} disabled={sendMessage.isPending} />
+              <MessageInput onSend={handleSend} onSendImage={handleSendImage} disabled={sendMessage.isPending || sendImage.isPending} />
             </>
           ) : (
             <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-text-secondary)' }}>

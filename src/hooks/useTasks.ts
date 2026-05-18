@@ -6,8 +6,10 @@ import {
   ApiEnvelope,
   PaginatedTasks,
   TaskCreate,
+  TaskHistoryItem,
   TaskListParams,
   TaskOut,
+  TaskStatsOut,
   TaskStatusUpdate,
   TaskUpdate,
 } from '@/types/api';
@@ -128,6 +130,36 @@ export function usePatchTaskStatus(studentId: string) {
       qc.invalidateQueries({ queryKey: queryKeys.studentTasks(studentId) });
       qc.invalidateQueries({ queryKey: queryKeys.reportsOverview });
     },
+  });
+}
+
+// ── Task history ─────────────────────────────────────────────
+export function useTaskHistory(taskId: string | null) {
+  return useQuery({
+    queryKey: ['tasks', 'history', taskId],
+    queryFn: async () => {
+      const res = await apiClient.get<ApiEnvelope<TaskHistoryItem[]>>(
+        `/api/v1/tasks/${taskId}/history`
+      );
+      return res.data.data;
+    },
+    enabled: !!taskId,
+    staleTime: 30_000,
+  });
+}
+
+// ── Task stats ────────────────────────────────────────────────
+export function useStudentTaskStats(studentId: string, month?: string) {
+  return useQuery({
+    queryKey: ['tasks', 'stats', studentId, month],
+    queryFn: async () => {
+      const res = await apiClient.get<ApiEnvelope<TaskStatsOut>>(
+        `/api/v1/students/${studentId}/tasks/stats`,
+        { params: month ? { month } : undefined }
+      );
+      return res.data.data;
+    },
+    enabled: !!studentId,
   });
 }
 

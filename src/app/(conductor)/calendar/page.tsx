@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { useCalendar } from '@/hooks/useCalendar';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths } from 'date-fns';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, getDay } from 'date-fns';
 import { ru } from 'date-fns/locale';
 
 const pageContainerStyle: CSSProperties = {
@@ -92,6 +92,9 @@ export default function CalendarPage() {
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(currentDate);
   const daysInMonth = eachDayOfInterval({ start: monthStart, end: monthEnd });
+  // Leading empty cells so the first day lands on the correct weekday column
+  // (Monday-first grid: Mon=0, Tue=1, … Sun=6)
+  const leadingEmpty = (getDay(monthStart) + 6) % 7;
 
   const handlePrevMonth = () => setCurrentDate(subMonths(currentDate, 1));
   const handleNextMonth = () => setCurrentDate(addMonths(currentDate, 1));
@@ -127,14 +130,18 @@ export default function CalendarPage() {
           </div>
         ))}
 
+        {/* Leading empty cells */}
+        {Array.from({ length: leadingEmpty }).map((_, i) => (
+          <div key={`empty-${i}`} />
+        ))}
+
         {/* Days */}
         {daysInMonth.map((date) => {
-          const isCurrentMonth = date.getMonth() === currentDate.getMonth();
           const isToday = isSameDay(date, new Date());
           const dayEvents = events?.filter((e) => isSameDay(new Date(e.start_time), date)) || [];
 
           return (
-            <div key={date.toISOString()} style={dayStyle(isCurrentMonth, isToday)}>
+            <div key={date.toISOString()} style={dayStyle(true, isToday)}>
               <div style={dayNumberStyle}>
                 {format(date, 'd')}
               </div>

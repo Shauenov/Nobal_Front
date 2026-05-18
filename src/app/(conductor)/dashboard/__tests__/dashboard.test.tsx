@@ -6,6 +6,43 @@ import { queryClient } from '@/lib/queryClient';
 import * as reportsHook from '@/hooks/useReports';
 import * as studentsHook from '@/hooks/useStudents';
 
+// Translate keys → Russian so existing assertions stay unchanged
+vi.mock('next-intl', () => ({
+  useTranslations: () => (key: string, params?: Record<string, unknown>) => {
+    const map: Record<string, string> = {
+      title: 'Панель управления',
+      subtitle: 'Отслеживайте прогресс и успеваемость студентов 2–3 курсов',
+      keyMetrics: 'Ключевые метрики',
+      totalStudents: 'Всего учащихся',
+      grantVolume: 'Объем грантов',
+      avgSat: 'Средние SAT',
+      avgIelts: 'Средние IELTS',
+      bestResultsByOffers: 'Лучшие результаты по оферам',
+      select: 'Выбрать...',
+      viewAll: 'Посмотреть все',
+      engagement: 'Вовлечённость',
+      activeStudents: 'Активные учащиеся',
+      inactiveStudents: 'Неактивные учащиеся',
+      ofGoals: 'от целей',
+      noStudents: 'Нет студентов.',
+      loadingStudents: 'Загрузка студентов...',
+      loading: 'Загрузка...',
+      month: 'Месяц',
+      quarter: 'Квартал',
+      forPeriod: 'За',
+      studentName: 'ИМЯ СТУДЕНТА',
+      course: 'КУРС',
+      last30Days: 'за последние 30 дней',
+      courseYear: '{year}-й курс',
+    };
+    const template = map[key] ?? key;
+    if (params) {
+      return template.replace(/\{(\w+)\}/g, (_, k) => String(params[k] ?? k));
+    }
+    return template;
+  },
+}));
+
 // Mock the hooks
 vi.mock('@/hooks/useReports');
 vi.mock('@/hooks/useStudents');

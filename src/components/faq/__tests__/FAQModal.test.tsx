@@ -42,7 +42,7 @@ describe('FAQModal', () => {
         order_index: 4,
       });
       expect(onClose).toHaveBeenCalledTimes(1);
-    }, 10000);
+    }, { timeout: 10000 });
   });
 
   it('updates an existing FAQ', async () => {
@@ -86,6 +86,6 @@ describe('FAQModal', () => {
         },
       });
       expect(onClose).toHaveBeenCalledTimes(1);
-    }, 10000);
+    }, { timeout: 10000 });
   });
 });

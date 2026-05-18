@@ -35,20 +35,84 @@
   },
   "dashboard": {
     "title": "Dashboard",
-    "subtitle": "Welcome to the conductor dashboard",
+    "subtitle": "Track progress and performance of 2nd–3rd year students",
+    "keyMetrics": "Key Metrics",
     "totalStudents": "Total Students",
-    "ieltsPassedCount": "IELTS Passed",
-    "satPassedCount": "SAT Passed",
-    "averageGPA": "Average GPA",
-    "tasksCompletedThisMonth": "Tasks Completed This Month",
-    "appointmentsThisMonth": "Appointments This Month",
-    "viewAll": "View all",
-    "engagement": "Student Engagement",
-    "studentResults": "Student Results",
-    "selectPeriod": "Period",
+    "grantVolume": "Grant Volume",
+    "avgSat": "Average SAT",
+    "avgIelts": "Average IELTS",
+    "bestResultsByOffers": "Best Results by Offers",
+    "select": "Select...",
+    "viewAll": "View All",
+    "engagement": "Engagement",
+    "activeStudents": "Active Students",
+    "inactiveStudents": "Inactive Students",
+    "ofGoals": "of goals",
+    "noStudents": "No students.",
+    "loadingStudents": "Loading students...",
+    "loading": "Loading...",
     "month": "Month",
     "quarter": "Quarter",
-    "noData": "No data available"
+    "forPeriod": "For",
+    "studentName": "STUDENT NAME",
+    "course": "COURSE",
+    "last30Days": "in the last 30 days",
+    "courseYear": "Year {year}"
+  },
+  "students": {
+    "title": "Students",
+    "subtitle": "Monitor and track student admission progress",
+    "inviteStudent": "Invite Student",
+    "searchPlaceholder": "Search by name or email",
+    "filters": {
+      "group": "Group",
+      "courseYear": "Course Year",
+      "ielts": "IELTS",
+      "sat": "SAT",
+      "all": "All",
+      "passed": "Passed",
+      "notPassed": "Not passed"
+    },
+    "table": {
+      "student": "Student",
+      "email": "Email",
+      "group": "Group",
+      "gpa": "GPA",
+      "ielts": "IELTS",
+      "sat": "SAT",
+      "tasks": "Tasks",
+      "unread": "Unread",
+      "actions": "Actions",
+      "year": "Year {n}",
+      "view": "View",
+      "delete": "Delete"
+    },
+    "empty": {
+      "title": "No students found",
+      "description": "Try adjusting filters or invite your first student.",
+      "action": "Invite student"
+    },
+    "deleteConfirm": "Delete this student?",
+    "pagination": {
+      "pageOf": "Page {page} of {total}",
+      "previous": "Previous",
+      "next": "Next"
+    },
+    "invite": {
+      "title": "Invite student",
+      "subtitle": "Create an account and send credentials to the student.",
+      "email": "Email",
+      "fullName": "Full name",
+      "password": "Temporary password",
+      "cancel": "Cancel",
+      "submit": "Invite",
+      "submitting": "Inviting...",
+      "errors": {
+        "emailInvalid": "Enter a valid email",
+        "nameRequired": "Enter the student name",
+        "passwordShort": "Password must be at least 8 characters"
+      }
+    }
   },
   "news": {
     "title": "News",

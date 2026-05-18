@@ -3,183 +3,213 @@
 import { useState, useMemo } from 'react';
 import type { CSSProperties } from 'react';
 import Link from 'next/link';
-import { useUniversities, useUpdateUniversity, useDeleteUniversity } from '@/hooks/useUniversities';
+import { useUniversities, useDeleteUniversity } from '@/hooks/useUniversities';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { UniversityCard } from '@/components/universities/UniversityCard';
-import { UniversityFilters } from '@/components/universities/UniversityFilters';
-import type { UniversityListParams } from '@/types/api';
 
-const layoutStyle: CSSProperties = {
-  display: 'flex',
-  gap: 'var(--space-6)',
-};
+const TABS = [
+  { id: 'all', label: 'Все' },
+  { id: 'kz', label: 'В Казахстане' },
+  { id: 'abroad', label: 'Заграницей' },
+] as const;
 
-const sidebarStyle: CSSProperties = {
-  width: '280px',
-  flexShrink: 0,
-};
-
-const mainStyle: CSSProperties = {
-  flex: 1,
-  minWidth: 0,
-};
-
-const headerActionsStyle: CSSProperties = {
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  marginBottom: 'var(--space-4)',
-};
-
-const gridStyle: CSSProperties = {
-  display: 'grid',
-  gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
-  gap: 'var(--space-4)',
-};
-
-const buttonStyle: CSSProperties = {
-  padding: '10px 16px',
-  borderRadius: 'var(--radius-md)',
-  fontSize: 'var(--text-sm)',
-  fontWeight: 'var(--font-medium)',
-  cursor: 'pointer',
-  border: 'none',
-  background: 'var(--color-primary)',
-  color: '#fff',
-};
-
-const emptyStateStyle: CSSProperties = {
-  textAlign: 'center',
-  padding: 'var(--space-8)',
-  color: 'var(--color-text-secondary)',
-};
-
-const paginationStyle: CSSProperties = {
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  gap: 'var(--space-2)',
-  marginTop: 'var(--space-6)',
-};
-
-const pageButtonStyle = (isActive: boolean, disabled?: boolean): CSSProperties => ({
-  padding: '8px 12px',
-  borderRadius: 'var(--radius-sm)',
-  border: isActive ? 'none' : '1px solid var(--color-border)',
-  background: isActive ? 'var(--color-primary)' : 'var(--color-surface)',
-  color: isActive ? '#fff' : 'var(--color-text-primary)',
-  cursor: disabled ? 'not-allowed' : 'pointer',
-  fontSize: 'var(--text-sm)',
-  opacity: disabled ? 0.5 : 1,
-});
+type TabId = (typeof TABS)[number]['id'];
 
 export default function UniversitiesPage() {
-  const [params, setParams] = useState<UniversityListParams>({ page: 1, page_size: 10 });
+  const [activeTab, setActiveTab] = useState<TabId>('all');
+  const [page, setPage] = useState(1);
 
-  const { data: response, isLoading } = useUniversities(params);
-  const updateUniversity = useUpdateUniversity('');
+  const { data: response, isLoading } = useUniversities({
+    page,
+    page_size: 12,
+    country: activeTab === 'kz' ? 'Kazakhstan' : undefined,
+  });
   const deleteUniversity = useDeleteUniversity();
 
-  const universities = useMemo(() => response?.data ?? [], [response?.data]);
-  const meta = useMemo(() => response?.meta, [response?.meta]);
+  const universities = useMemo(() => {
+    const all = response?.data ?? [];
+    if (activeTab === 'abroad') return all.filter((u) => u.country !== 'Kazakhstan');
+    return all;
+  }, [response?.data, activeTab]);
 
-  const handleParamsChange = (newParams: UniversityListParams) => {
-    setParams(newParams);
+  const meta = response?.meta;
+
+  const handleDelete = (id: string) => {
+    if (confirm('Удалить университет?')) deleteUniversity.mutate(id);
   };
 
-  const handleTogglePublished = (universityId: string, isPublished: boolean) => {
-    const university = universities.find((u) => u.id === universityId);
-    if (university) {
-      updateUniversity.mutate({ is_published: isPublished });
-    }
+  /* ── Styles ── */
+  const tabBarStyle: CSSProperties = {
+    display: 'flex',
+    gap: 4,
+    background: '#f1f5f9',
+    borderRadius: 10,
+    padding: 4,
+    width: 'fit-content',
   };
 
-  const handleDeleteUniversity = (universityId: string) => {
-    if (confirm('Are you sure you want to delete this university?')) {
-      deleteUniversity.mutate(universityId);
-    }
+  const tabStyle = (active: boolean): CSSProperties => ({
+    padding: '7px 18px',
+    borderRadius: 8,
+    border: 'none',
+    background: active ? '#fff' : 'transparent',
+    color: active ? '#1e293b' : '#64748b',
+    fontSize: '0.875rem',
+    fontWeight: active ? 600 : 400,
+    cursor: 'pointer',
+    boxShadow: active ? '0 1px 4px rgba(0,0,0,0.08)' : 'none',
+    transition: 'all 150ms ease',
+  });
+
+  const gridStyle: CSSProperties = {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+    gap: 20,
   };
+
+  const pageButtonStyle = (active: boolean, disabled?: boolean): CSSProperties => ({
+    padding: '7px 12px',
+    borderRadius: 8,
+    border: active ? 'none' : '1px solid #e2e8f0',
+    background: active ? '#2563eb' : '#fff',
+    color: active ? '#fff' : '#475569',
+    cursor: disabled ? 'not-allowed' : 'pointer',
+    fontSize: '0.875rem',
+    opacity: disabled ? 0.4 : 1,
+  });
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-      <PageHeader title="Universities" subtitle="Manage university profiles and programs." />
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+      <PageHeader
+        title="Каталог вузов"
+        subtitle="Управление и редактирование каталога университетов."
+        action={
+          <Link href="/universities/new" style={{ textDecoration: 'none' }}>
+            <button
+              style={{
+                padding: '9px 18px',
+                borderRadius: 8,
+                border: 'none',
+                background: '#2563eb',
+                color: '#fff',
+                fontSize: '0.875rem',
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+            >
+              + Добавить университет
+            </button>
+          </Link>
+        }
+      />
 
-      <div style={headerActionsStyle}>
-        <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)' }}>
-          {meta ? `${meta.total} universities` : 'Loading...'}
+      {/* Tabs + count row */}
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: 12,
+        }}
+      >
+        <div style={tabBarStyle}>
+          {TABS.map((tab) => (
+            <button
+              key={tab.id}
+              style={tabStyle(activeTab === tab.id)}
+              onClick={() => {
+                setActiveTab(tab.id);
+                setPage(1);
+              }}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
-        <Link href="/universities/new" style={{ textDecoration: 'none' }}>
-          <button style={buttonStyle}>+ New University</button>
-        </Link>
+        <span style={{ fontSize: '0.85rem', color: '#64748b' }}>
+          {meta ? `${meta.total} университетов` : ''}
+        </span>
       </div>
 
-      <div style={layoutStyle}>
-        <div style={sidebarStyle}>
-          <UniversityFilters params={params} onParamsChange={handleParamsChange} />
+      {/* Grid */}
+      {isLoading ? (
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+            gap: 20,
+          }}
+        >
+          {[...Array(6)].map((_, i) => (
+            <div
+              key={i}
+              style={{
+                height: 340,
+                borderRadius: 16,
+                background: '#f1f5f9',
+                animation: 'pulse 1.5s ease-in-out infinite',
+              }}
+            />
+          ))}
         </div>
+      ) : universities.length === 0 ? (
+        <div
+          style={{
+            textAlign: 'center',
+            padding: '64px 24px',
+            color: '#94a3b8',
+          }}
+        >
+          <div style={{ fontSize: '3rem', marginBottom: 12 }}>🏫</div>
+          <div style={{ fontWeight: 600, color: '#475569', fontSize: '1rem' }}>
+            Нет университетов
+          </div>
+          <div style={{ fontSize: '0.875rem', marginTop: 4 }}>
+            Добавьте первый университет, нажав кнопку выше.
+          </div>
+        </div>
+      ) : (
+        <>
+          <div style={gridStyle}>
+            {universities.map((u) => (
+              <UniversityCard
+                key={u.id}
+                university={u}
+                onDelete={() => handleDelete(u.id)}
+                isLoading={deleteUniversity.isPending}
+              />
+            ))}
+          </div>
 
-        <div style={mainStyle}>
-          {isLoading ? (
-            <div style={emptyStateStyle}>Loading universities...</div>
-          ) : universities.length === 0 ? (
-            <div style={emptyStateStyle}>
-              <div style={{ fontSize: 'var(--text-base)', fontWeight: 'var(--font-semibold)', marginBottom: 'var(--space-2)' }}>
-                No universities found
-              </div>
-              <div>Try adjusting your filters or create a new university.</div>
-            </div>
-          ) : (
-            <>
-              <div style={gridStyle}>
-                {universities.map((university) => (
-                  <UniversityCard
-                    key={university.id}
-                    university={university}
-                    onTogglePublished={(isPublished) => handleTogglePublished(university.id, isPublished)}
-                    onDelete={() => handleDeleteUniversity(university.id)}
-                    isLoading={deleteUniversity.isPending}
-                  />
+          {/* Pagination */}
+          {meta && meta.total > meta.page_size && (
+            <div style={{ display: 'flex', justifyContent: 'center', gap: 6, marginTop: 8 }}>
+              <button
+                style={pageButtonStyle(false, page <= 1)}
+                onClick={() => setPage(Math.max(1, page - 1))}
+                disabled={page <= 1}
+              >
+                ← Назад
+              </button>
+              {Array.from({ length: Math.ceil(meta.total / meta.page_size) }, (_, i) => i + 1)
+                .filter((p) => Math.abs(p - page) <= 2)
+                .map((p) => (
+                  <button key={p} style={pageButtonStyle(p === page)} onClick={() => setPage(p)}>
+                    {p}
+                  </button>
                 ))}
-              </div>
-
-              {meta && meta.total > meta.page_size && (
-                <div style={paginationStyle}>
-                  <button
-                    style={pageButtonStyle(false, (meta.page || 1) <= 1)}
-                    onClick={() => setParams({ ...params, page: Math.max(1, (meta.page || 1) - 1) })}
-                    disabled={(meta.page || 1) <= 1}
-                  >
-                    ← Previous
-                  </button>
-
-                  {Array.from({ length: Math.ceil(meta.total / meta.page_size) })
-                    .slice(Math.max(0, (meta.page || 1) - 2), Math.min((meta.page || 1) + 2, Math.ceil(meta.total / meta.page_size)))
-                    .map((_, i) => {
-                      const pageNum = (meta.page || 1) - 2 + i;
-                      return (
-                        <button
-                          key={pageNum}
-                          style={pageButtonStyle(pageNum === (meta.page || 1))}
-                          onClick={() => setParams({ ...params, page: pageNum })}
-                        >
-                          {pageNum}
-                        </button>
-                      );
-                    })}
-
-                  <button
-                    style={pageButtonStyle(false, (meta.page || 1) >= Math.ceil(meta.total / meta.page_size))}
-                    onClick={() => setParams({ ...params, page: (meta.page || 1) + 1 })}
-                    disabled={(meta.page || 1) >= Math.ceil(meta.total / meta.page_size)}
-                  >
-                    Next →
-                  </button>
-                </div>
-              )}
-            </>
+              <button
+                style={pageButtonStyle(false, page >= Math.ceil(meta.total / meta.page_size))}
+                onClick={() => setPage(page + 1)}
+                disabled={page >= Math.ceil(meta.total / meta.page_size)}
+              >
+                Вперёд →
+              </button>
+            </div>
           )}
-        </div>
-      </div>
+        </>
+      )}
     </div>
   );
 }

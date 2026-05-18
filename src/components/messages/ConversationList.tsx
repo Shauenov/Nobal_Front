@@ -9,6 +9,18 @@ interface ConversationListProps {
   studentNameMap?: Record<string, string>;
 }
 
+function getUnreadCount(conversation: ConversationOut) {
+  if ('unread_count' in conversation && typeof conversation.unread_count === 'number') {
+    return conversation.unread_count;
+  }
+
+  if ('unread_messages' in conversation && typeof conversation.unread_messages === 'number') {
+    return conversation.unread_messages;
+  }
+
+  return 0;
+}
+
 const listContainer: CSSProperties = {
   display: 'flex',
   flexDirection: 'column',
@@ -46,7 +58,8 @@ export function ConversationList({
     <div style={listContainer}>
       {conversations.map((convo) => {
         const isActive = convo.id === activeConvoId;
-        const hasUnread = ((convo as any).unread_count ?? (convo as any).unread_messages ?? 0) > 0;
+        const unreadCount = getUnreadCount(convo);
+        const hasUnread = unreadCount > 0;
 
         return (
           <div
@@ -68,7 +81,7 @@ export function ConversationList({
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--color-primary)' }} />
                 <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-primary)' }}>
-                  {(convo as any).unread_count ?? (convo as any).unread_messages ?? 0} new messages
+                  {unreadCount} new messages
                 </div>
               </div>
             )}

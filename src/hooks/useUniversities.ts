@@ -162,3 +162,63 @@ export function useDeleteProgram(universityId: string) {
     },
   });
 }
+
+// ── Upload Logo ───────────────────────────────────────────────
+export function useUploadLogo(universityId: string) {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (file: File) => {
+      const formData = new FormData();
+      formData.append('file', file);
+      const res = await apiClient.post<ApiEnvelope<UniversityOut>>(
+        `/api/v1/universities/${universityId}/logo`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+      return res.data.data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.university(universityId) });
+      qc.invalidateQueries({ queryKey: queryKeys.universities() });
+      toast.success('Logo uploaded successfully');
+    },
+    onError: (err) => {
+      toast.error(normalizeError(err).message);
+    },
+  });
+}
+
+// ── Upload Cover ──────────────────────────────────────────────
+export function useUploadCover(universityId: string) {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (file: File) => {
+      const formData = new FormData();
+      formData.append('file', file);
+      const res = await apiClient.post<ApiEnvelope<UniversityOut>>(
+        `/api/v1/universities/${universityId}/cover`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+      return res.data.data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.university(universityId) });
+      qc.invalidateQueries({ queryKey: queryKeys.universities() });
+      toast.success('Cover uploaded successfully');
+    },
+    onError: (err) => {
+      toast.error(normalizeError(err).message);
+    },
+  });
+}

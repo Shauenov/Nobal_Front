@@ -22,6 +22,7 @@ vi.mock('@/hooks/useMessages', () => ({
   useConversations: () => ({ data: conversations, isLoading: false }),
   useMessages: () => ({ data: { data: [] }, isLoading: false }),
   useSendMessage: () => ({ mutate: sendMessage, isPending: false }),
+  useSendImageMessage: () => ({ mutate: vi.fn(), isPending: false }),
   useMarkRead: () => ({ mutate: markRead }),
 }));
 

@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { Send } from 'lucide-react';
 
 interface MessageInputProps {
   onSend: (text: string) => void;
+  onSendImage?: (file: File, body?: string | null) => void;
   disabled?: boolean;
 }
 
@@ -46,11 +47,32 @@ const buttonStyle: CSSProperties = {
   width: '40px',
 };
 
-export function MessageInput({ onSend, disabled }: MessageInputProps) {
+export function MessageInput({ onSend, onSendImage, disabled }: MessageInputProps) {
   const [text, setText] = useState('');
+  const [file, setFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const canSend = !disabled && (!!file || text.trim().length > 0);
+
+  // Revoke stale object URLs when previewUrl changes or component unmounts
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
 
   const handleSend = () => {
-    if (text.trim() && !disabled) {
+    if (disabled) return;
+
+    if (file && typeof onSendImage === 'function') {
+      onSendImage(file, text.trim() || undefined);
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+      setFile(null);
+      setPreviewUrl(null);
+      setText('');
+      return;
+    }
+
+    if (text.trim()) {
       onSend(text.trim());
       setText('');
     }
@@ -65,6 +87,22 @@ export function MessageInput({ onSend, disabled }: MessageInputProps) {
 
   return (
     <div style={containerStyle}>
+      <input
+        type="file"
+        accept="image/*"
+        id="message-image-input"
+        style={{ display: 'none' }}
+        onChange={(e) => {
+          const f = e.target.files?.[0] ?? null;
+          if (f) {
+            if (previewUrl) URL.revokeObjectURL(previewUrl);
+            setFile(f);
+            setPreviewUrl(URL.createObjectURL(f));
+          }
+          // Allow selecting the same file again later
+          e.currentTarget.value = '';
+        }}
+      />
       <textarea
         style={textareaStyle}
         value={text}
@@ -74,10 +112,21 @@ export function MessageInput({ onSend, disabled }: MessageInputProps) {
         disabled={disabled}
         rows={text.split('\n').length > 1 ? Math.min(text.split('\n').length, 5) : 1}
       />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'center' }}>
+        <label htmlFor="message-image-input" style={{ cursor: 'pointer', color: 'var(--color-text-secondary)', fontSize: '12px' }}>
+          Attach
+        </label>
+        {previewUrl && (
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={previewUrl} alt="preview" style={{ width: 56, height: 56, objectFit: 'cover', borderRadius: 6 }} />
+          </>
+        )}
+      </div>
       <button 
-        style={{ ...buttonStyle, opacity: disabled || !text.trim() ? 0.5 : 1 }}
+        style={{ ...buttonStyle, opacity: canSend ? 1 : 0.5 }}
         onClick={handleSend}
-        disabled={disabled || !text.trim()}
+        disabled={!canSend}
         aria-label="Send message"
       >
         <Send size={18} />
