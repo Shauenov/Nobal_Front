@@ -136,7 +136,7 @@ export default function UniversityDetailPage() {
   );
 
   const handleCreateProgram = useCallback(async () => {
-    const name = prompt('Program name:');
+    const name = prompt('Название программы:');
     if (!name) return;
 
     try {
@@ -151,7 +151,7 @@ export default function UniversityDetailPage() {
 
   const handleDeleteProgram = useCallback(
     (programId: string) => {
-      if (confirm('Delete this program?')) {
+      if (confirm('Удалить эту программу?')) {
         deleteProgram.mutate(programId);
       }
     },
@@ -159,7 +159,7 @@ export default function UniversityDetailPage() {
   );
 
   if (isLoading || !university) {
-    return <div>Loading...</div>;
+    return <div>Загрузка...</div>;
   }
 
   return (
@@ -174,19 +174,19 @@ export default function UniversityDetailPage() {
           style={tabButtonStyle(activeTab === 'overview')}
           onClick={() => setActiveTab('overview')}
         >
-          Overview
+          Обзор
         </button>
         <button
           style={tabButtonStyle(activeTab === 'programs')}
           onClick={() => setActiveTab('programs')}
         >
-          Programs ({programs.length})
+          Программы ({programs.length})
         </button>
         <button
           style={tabButtonStyle(activeTab === 'enrollments')}
           onClick={() => setActiveTab('enrollments')}
         >
-          Applications {enrollmentsData ? `(${enrollmentsData.meta.total})` : '(0)'}
+          Заявки {enrollmentsData ? `(${enrollmentsData.meta.total})` : '(0)'}
         </button>
       </div>
 
@@ -220,43 +220,43 @@ export default function UniversityDetailPage() {
         <div style={containerStyle}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)' }}>
             <div style={{ fontSize: 'var(--text-base)', fontWeight: 'var(--font-semibold)' }}>
-              Programs
+              Программы
             </div>
             <button style={buttonStyle('primary')} onClick={handleCreateProgram} disabled={createProgram.isPending}>
-              + Add Program
+              + Добавить программу
             </button>
           </div>
 
           {programs.length === 0 ? (
             <div style={{ textAlign: 'center', color: 'var(--color-text-secondary)', padding: 'var(--space-6)' }}>
-              No programs yet. Click &quot;Add Program&quot; to create one.
+              Пока нет программ. Нажмите «Добавить программу», чтобы создать.
             </div>
           ) : (
             <div style={programsGridStyle}>
               {programs.map((program) => (
                 <div key={program.id} style={programCardStyle}>
                   <div style={programNameStyle}>{program.name}</div>
-                  {program.degree_level && <div style={programDetailStyle}>Degree: {program.degree_level}</div>}
-                  {program.field && <div style={programDetailStyle}>Field: {program.field}</div>}
+                  {program.degree_level && <div style={programDetailStyle}>Степень: {program.degree_level}</div>}
+                  {program.field && <div style={programDetailStyle}>Направление: {program.field}</div>}
                   {program.tuition_usd !== null && program.tuition_usd !== undefined && (
-                    <div style={programDetailStyle}>Tuition: ${program.tuition_usd.toLocaleString()}</div>
+                    <div style={programDetailStyle}>Стоимость: ${program.tuition_usd.toLocaleString()}</div>
                   )}
                   {program.min_gpa !== null && program.min_gpa !== undefined && (
-                    <div style={programDetailStyle}>Min GPA: {program.min_gpa}</div>
+                    <div style={programDetailStyle}>Мин. GPA: {program.min_gpa}</div>
                   )}
                   {program.min_ielts !== null && program.min_ielts !== undefined && (
-                    <div style={programDetailStyle}>Min IELTS: {program.min_ielts}</div>
+                    <div style={programDetailStyle}>Мин. IELTS: {program.min_ielts}</div>
                   )}
                   <div style={{ display: 'flex', gap: 'var(--space-2)', marginTop: 'var(--space-2)' }}>
                     <button style={buttonStyle()} disabled={deleteProgram.isPending}>
-                      Edit
+                      Изменить
                     </button>
                     <button
                       style={buttonStyle()}
                       onClick={() => handleDeleteProgram(program.id)}
                       disabled={deleteProgram.isPending}
                     >
-                      Delete
+                      Удалить
                     </button>
                   </div>
                 </div>

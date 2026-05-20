@@ -123,10 +123,10 @@ export function UniversityFilters({ params, onParamsChange }: UniversityFiltersP
   return (
     <div style={sidebarStyle}>
       <div style={filterGroupStyle}>
-        <label style={labelStyle}>Search</label>
+        <label style={labelStyle}>Поиск</label>
         <input
           type="text"
-          placeholder="University name..."
+          placeholder="Название университета..."
           style={inputStyle}
           value={params.search || ''}
           onChange={handleSearchChange}
@@ -134,10 +134,10 @@ export function UniversityFilters({ params, onParamsChange }: UniversityFiltersP
       </div>
 
       <div style={filterGroupStyle}>
-        <label style={labelStyle}>Country</label>
+        <label style={labelStyle}>Страна</label>
         <input
           type="text"
-          placeholder="e.g. USA, UK..."
+          placeholder="напр. США, Великобритания..."
           style={inputStyle}
           value={params.country || ''}
           onChange={handleCountryChange}
@@ -145,10 +145,10 @@ export function UniversityFilters({ params, onParamsChange }: UniversityFiltersP
       </div>
 
       <div style={filterGroupStyle}>
-        <label style={labelStyle}>Field of Study</label>
+        <label style={labelStyle}>Направление</label>
         <input
           type="text"
-          placeholder="e.g. Computer Science..."
+          placeholder="напр. Информатика..."
           style={inputStyle}
           value={params.field || ''}
           onChange={handleFieldChange}
@@ -156,10 +156,10 @@ export function UniversityFilters({ params, onParamsChange }: UniversityFiltersP
       </div>
 
       <div style={filterGroupStyle}>
-        <label style={labelStyle}>Min GPA</label>
+        <label style={labelStyle}>Мин. GPA</label>
         <input
           type="number"
-          placeholder="e.g. 3.0"
+          placeholder="напр. 3.0"
           step="0.1"
           min="0"
           max="4.0"
@@ -170,10 +170,10 @@ export function UniversityFilters({ params, onParamsChange }: UniversityFiltersP
       </div>
 
       <div style={filterGroupStyle}>
-        <label style={labelStyle}>Max Tuition (USD)</label>
+        <label style={labelStyle}>Макс. стоимость (USD)</label>
         <input
           type="number"
-          placeholder="e.g. 50000"
+          placeholder="напр. 50000"
           min="0"
           style={inputStyle}
           value={params.max_tuition || ''}
@@ -182,9 +182,9 @@ export function UniversityFilters({ params, onParamsChange }: UniversityFiltersP
       </div>
 
       <div style={filterGroupStyle}>
-        <label style={labelStyle}>Degree Level</label>
+        <label style={labelStyle}>Уровень обучения</label>
         <select style={selectStyle} value={params.degree_level || ''} onChange={handleDegreeLevelChange}>
-          <option value="">All Levels</option>
+          <option value="">Все уровни</option>
           {degreeLevels.map((level) => (
             <option key={level} value={level}>
               {level}
@@ -202,13 +202,13 @@ export function UniversityFilters({ params, onParamsChange }: UniversityFiltersP
           style={{ cursor: 'pointer', width: '18px', height: '18px' }}
         />
         <label htmlFor="has_scholarship" style={{ ...labelStyle, margin: 0, cursor: 'pointer', fontWeight: 'normal' }}>
-          Has Scholarship
+          Есть стипендия
         </label>
       </div>
 
       {hasActiveFilters && (
         <button style={resetButtonStyle} onClick={handleReset}>
-          Reset Filters
+          Сбросить фильтры
         </button>
       )}
     </div>

@@ -51,7 +51,7 @@ export function useCreateAlumni() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.alumni });
-      toast.success('Alumni story created');
+      toast.success('История выпускника создана');
     },
     onError: (err) => {
       toast.error(normalizeError(err).message);
@@ -71,7 +71,7 @@ export function useUpdateAlumni(id: string) {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.alumni });
       qc.invalidateQueries({ queryKey: queryKeys.alumniItem(id) });
-      toast.success('Alumni story updated');
+      toast.success('История выпускника обновлена');
     },
     onError: (err) => {
       toast.error(normalizeError(err).message);
@@ -89,7 +89,7 @@ export function useDeleteAlumni() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.alumni });
-      toast.success('Alumni story deleted');
+      toast.success('История выпускника удалена');
     },
     onError: (err) => {
       toast.error(normalizeError(err).message);
@@ -119,7 +119,7 @@ export function useUploadAlumniPhoto(id: string) {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.alumniItem(id) });
       qc.invalidateQueries({ queryKey: queryKeys.alumni });
-      toast.success('Alumni photo uploaded successfully');
+      toast.success('Фото выпускника загружено');
     },
     onError: (err) => {
       toast.error(normalizeError(err).message);

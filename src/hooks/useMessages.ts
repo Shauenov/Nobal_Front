@@ -137,7 +137,7 @@ export function useSendImageMessage(convoId: string) {
       const res = await apiClient.post<ApiEnvelope<MessageOut>>(
         `/api/v1/messages/conversations/${convoId}/messages/image`,
         form,
-        { headers: { 'Content-Type': 'multipart/form-data' } }
+        { headers: { 'Content-Type': undefined } }
       );
       return res.data.data;
     },
@@ -199,7 +199,7 @@ export function useBroadcastImage() {
       const res = await apiClient.post<ApiEnvelope<BroadcastResult>>(
         '/api/v1/messages/broadcast/image',
         form,
-        { headers: { 'Content-Type': 'multipart/form-data' } }
+        { headers: { 'Content-Type': undefined } }
       );
       return res.data.data;
     },

@@ -12,13 +12,13 @@ import { ApiError } from '@/types/api';
 
 const resetSchema = z
   .object({
-    email: z.string().email('Enter a valid email'),
-    otp: z.string().length(6, 'Enter the 6-digit code'),
-    new_password: z.string().min(8, 'Password must be at least 8 characters'),
-    confirm_password: z.string().min(8, 'Password must be at least 8 characters'),
+    email: z.string().email('Введите корректный email'),
+    otp: z.string().length(6, 'Введите 6-значный код'),
+    new_password: z.string().min(8, 'Пароль должен содержать не менее 8 символов'),
+    confirm_password: z.string().min(8, 'Пароль должен содержать не менее 8 символов'),
   })
   .refine((data) => data.new_password === data.confirm_password, {
-    message: 'Passwords do not match',
+    message: 'Пароли не совпадают',
     path: ['confirm_password'],
   });
 
@@ -115,11 +115,11 @@ export default function ResetPasswordPage() {
       onSubmit={onSubmit}
       style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}
     >
-      <PageHeader title="Set a new password" subtitle="Use the code we emailed you" />
+      <PageHeader title="Новый пароль" subtitle="Используйте код из письма" />
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
         <label style={labelStyle} htmlFor="email">
-          Email
+          Эл. почта
         </label>
         <input
           id="email"
@@ -134,7 +134,7 @@ export default function ResetPasswordPage() {
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
         <label style={labelStyle}>
-          Verification code
+          Код подтверждения
         </label>
         <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
           {otpDigits.map((digit, index) => (
@@ -157,7 +157,7 @@ export default function ResetPasswordPage() {
                 fontSize: 'var(--text-base)',
                 padding: '8px 0',
               }}
-              aria-label={`Digit ${index + 1}`}
+              aria-label={`Цифра ${index + 1}`}
             />
           ))}
         </div>
@@ -167,7 +167,7 @@ export default function ResetPasswordPage() {
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
         <label style={labelStyle} htmlFor="new_password">
-          New password
+          Новый пароль
         </label>
         <div style={{ position: 'relative' }}>
           <input
@@ -191,9 +191,9 @@ export default function ResetPasswordPage() {
               color: 'var(--color-text-secondary)',
               fontSize: 'var(--text-xs)',
             }}
-            aria-label={showNewPassword ? 'Hide password' : 'Show password'}
+            aria-label={showNewPassword ? 'Скрыть пароль' : 'Показать пароль'}
           >
-            {showNewPassword ? 'Hide' : 'Show'}
+            {showNewPassword ? 'Скрыть' : 'Показать'}
           </button>
         </div>
         {errors.new_password && <span style={errorStyle}>{errors.new_password.message}</span>}
@@ -201,7 +201,7 @@ export default function ResetPasswordPage() {
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
         <label style={labelStyle} htmlFor="confirm_password">
-          Confirm password
+          Подтвердите пароль
         </label>
         <div style={{ position: 'relative' }}>
           <input
@@ -225,9 +225,9 @@ export default function ResetPasswordPage() {
               color: 'var(--color-text-secondary)',
               fontSize: 'var(--text-xs)',
             }}
-            aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+            aria-label={showConfirmPassword ? 'Скрыть пароль' : 'Показать пароль'}
           >
-            {showConfirmPassword ? 'Hide' : 'Show'}
+            {showConfirmPassword ? 'Скрыть' : 'Показать'}
           </button>
         </div>
         {errors.confirm_password && (
@@ -265,7 +265,7 @@ export default function ResetPasswordPage() {
           opacity: reset.isPending ? 0.7 : 1,
         }}
       >
-        {reset.isPending ? 'Updating...' : 'Update password'}
+        {reset.isPending ? 'Сохранение...' : 'Сохранить пароль'}
       </button>
 
       <div
@@ -276,9 +276,9 @@ export default function ResetPasswordPage() {
           color: 'var(--color-text-secondary)',
         }}
       >
-        <span>Need to try again?</span>
+        <span>Хотите попробовать снова?</span>
         <Link href="/login" style={{ color: 'var(--color-primary)' }}>
-          Back to login
+          Назад к входу
         </Link>
       </div>
     </form>

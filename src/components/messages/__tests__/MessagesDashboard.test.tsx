@@ -24,6 +24,7 @@ vi.mock('@/hooks/useMessages', () => ({
   useSendMessage: () => ({ mutate: sendMessage, isPending: false }),
   useSendImageMessage: () => ({ mutate: vi.fn(), isPending: false }),
   useMarkRead: () => ({ mutate: markRead }),
+  useGetOrCreateConversation: () => ({ mutateAsync: vi.fn(), isPending: false }),
 }));
 
 vi.mock('@/hooks/useStudents', () => ({

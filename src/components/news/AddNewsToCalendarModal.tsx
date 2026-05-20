@@ -79,9 +79,9 @@ export function AddNewsToCalendarModal({ news, onClose }: Props) {
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-          <h3 style={{ margin: 0 }}>Add to calendar</h3>
+          <h3 style={{ margin: 0 }}>Добавить в календарь</h3>
           <button
-            aria-label="Close"
+            aria-label="Закрыть"
             onClick={handleClose}
             style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: 16 }}
           >

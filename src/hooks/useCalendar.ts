@@ -33,7 +33,7 @@ export function useCreateCalendarEvent() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.calendar() });
-      toast.success('Event created');
+      toast.success('Событие создано');
     },
     onError: (err) => {
       toast.error(normalizeError(err).message);
@@ -55,7 +55,7 @@ export function useUpdateCalendarEvent(id: string) {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.calendar() });
-      toast.success('Event updated');
+      toast.success('Событие обновлено');
     },
     onError: (err) => {
       toast.error(normalizeError(err).message);
@@ -73,7 +73,7 @@ export function useDeleteCalendarEvent() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.calendar() });
-      toast.success('Event deleted');
+      toast.success('Событие удалено');
     },
     onError: (err) => {
       toast.error(normalizeError(err).message);

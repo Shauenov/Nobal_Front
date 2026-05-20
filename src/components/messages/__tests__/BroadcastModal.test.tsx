@@ -29,12 +29,12 @@ describe('BroadcastModal', () => {
   it('renders form fields when isOpen is true', () => {
     render(<BroadcastModal isOpen onClose={() => {}} />);
 
-    expect(screen.getByRole('heading', { name: 'Send Broadcast' })).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('Write your broadcast message here...')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('e.g. D, F')).toBeInTheDocument();
-    expect(screen.getByLabelText(/Only send to students who passed IELTS/)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Send Broadcast' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Рассылка' })).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Напишите текст рассылки...')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Напр. D, F')).toBeInTheDocument();
+    expect(screen.getByLabelText(/Только студенты, сдавшие IELTS/)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Отправить рассылку' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Отмена' })).toBeInTheDocument();
   });
 
   it('sends broadcast with body only (minimal form)', async () => {
@@ -43,10 +43,10 @@ describe('BroadcastModal', () => {
 
     render(<BroadcastModal isOpen onClose={mockOnClose} />);
 
-    const bodyTextarea = screen.getByPlaceholderText('Write your broadcast message here...');
+    const bodyTextarea = screen.getByPlaceholderText('Напишите текст рассылки...');
     await user.type(bodyTextarea, 'Hello students!');
 
-    const sendButton = screen.getByRole('button', { name: 'Send Broadcast' });
+    const sendButton = screen.getByRole('button', { name: 'Отправить рассылку' });
     await user.click(sendButton);
 
     await waitFor(() => {
@@ -65,10 +65,10 @@ describe('BroadcastModal', () => {
 
     render(<BroadcastModal isOpen onClose={mockOnClose} />);
 
-    await user.type(screen.getByPlaceholderText('Write your broadcast message here...'), 'Notice for D group');
-    await user.type(screen.getByPlaceholderText('e.g. D, F'), 'D');
+    await user.type(screen.getByPlaceholderText('Напишите текст рассылки...'), 'Notice for D group');
+    await user.type(screen.getByPlaceholderText('Напр. D, F'), 'D');
 
-    await user.click(screen.getByRole('button', { name: 'Send Broadcast' }));
+    await user.click(screen.getByRole('button', { name: 'Отправить рассылку' }));
 
     await waitFor(() => {
       expect(mockBroadcast).toHaveBeenCalledWith(
@@ -86,11 +86,11 @@ describe('BroadcastModal', () => {
 
     render(<BroadcastModal isOpen onClose={mockOnClose} />);
 
-    await user.type(screen.getByPlaceholderText('Write your broadcast message here...'), 'Congratulations on IELTS');
+    await user.type(screen.getByPlaceholderText('Напишите текст рассылки...'), 'Congratulations on IELTS');
     const ieltCheckbox = screen.getByRole('checkbox');
     await user.click(ieltCheckbox);
 
-    await user.click(screen.getByRole('button', { name: 'Send Broadcast' }));
+    await user.click(screen.getByRole('button', { name: 'Отправить рассылку' }));
 
     await waitFor(() => {
       expect(mockBroadcast).toHaveBeenCalledWith(
@@ -104,7 +104,7 @@ describe('BroadcastModal', () => {
   it('disables send button when body is empty', async () => {
     render(<BroadcastModal isOpen onClose={() => {}} />);
 
-    const sendButton = screen.getByRole('button', { name: 'Send Broadcast' });
+    const sendButton = screen.getByRole('button', { name: 'Отправить рассылку' });
     expect(sendButton).toBeDisabled();
   });
 
@@ -114,8 +114,8 @@ describe('BroadcastModal', () => {
 
     render(<BroadcastModal isOpen onClose={mockOnClose} />);
 
-    await user.type(screen.getByPlaceholderText('Write your broadcast message here...'), 'Some message');
-    await user.click(screen.getByRole('button', { name: 'Cancel' }));
+    await user.type(screen.getByPlaceholderText('Напишите текст рассылки...'), 'Some message');
+    await user.click(screen.getByRole('button', { name: 'Отмена' }));
 
     expect(mockOnClose).toHaveBeenCalled();
   });
@@ -138,9 +138,9 @@ describe('BroadcastModal', () => {
 
     render(<BroadcastModal isOpen onClose={mockOnClose} />);
 
-    await user.type(screen.getByPlaceholderText('Write your broadcast message here...'), '  Hello  ');
+    await user.type(screen.getByPlaceholderText('Напишите текст рассылки...'), '  Hello  ');
 
-    await user.click(screen.getByRole('button', { name: 'Send Broadcast' }));
+    await user.click(screen.getByRole('button', { name: 'Отправить рассылку' }));
 
     await waitFor(() => {
       expect(mockBroadcast).toHaveBeenCalledWith(

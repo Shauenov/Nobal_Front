@@ -26,6 +26,23 @@ vi.mock('@/hooks/useAuth', () => ({
   useChangePassword: () => ({ mutate: mockChangePassword, isPending: false }),
 }));
 
+vi.mock('@/hooks/useProfile', () => ({
+  useNotificationSettings: () => ({
+    data: {
+      push_enabled: true,
+      email_enabled: false,
+      deadline_alerts: true,
+      roadmap_changes: false,
+      new_messages: true,
+      task_updates: true,
+      security_alerts: true,
+      app_updates: false,
+    },
+    isLoading: false,
+  }),
+  useUpdateNotificationSettings: () => ({ mutate: vi.fn(), isPending: false }),
+}));
+
 describe('SettingsPage', () => {
   beforeEach(() => {
     mockUpdateMe.mockReset();

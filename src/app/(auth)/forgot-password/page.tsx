@@ -11,7 +11,7 @@ import { useForgotPassword } from '@/hooks/useAuth';
 import { ApiError } from '@/types/api';
 
 const forgotSchema = z.object({
-  email: z.string().email('Enter a valid email'),
+  email: z.string().email('Введите корректный email'),
 });
 
 type ForgotValues = z.infer<typeof forgotSchema>;
@@ -66,7 +66,7 @@ export default function ForgotPasswordPage() {
       onSubmit={onSubmit}
       style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}
     >
-      <PageHeader title="Reset password" subtitle="We will email you a 6-digit code" />
+      <PageHeader title="Сброс пароля" subtitle="Мы отправим вам код на 6 цифр" />
 
       {submitted ? (
         <div
@@ -79,13 +79,13 @@ export default function ForgotPasswordPage() {
             fontSize: 'var(--text-sm)',
           }}
         >
-          Check your email for the reset code.
+          Проверьте почту — мы отправили код для сброса пароля.
         </div>
       ) : (
         <>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
             <label style={labelStyle} htmlFor="email">
-              Email
+              Эл. почта
             </label>
             <input
               id="email"
@@ -128,7 +128,7 @@ export default function ForgotPasswordPage() {
               opacity: forgot.isPending ? 0.7 : 1,
             }}
           >
-            {forgot.isPending ? 'Sending...' : 'Send reset code'}
+            {forgot.isPending ? 'Отправка...' : 'Отправить код'}
           </button>
         </>
       )}
@@ -141,9 +141,9 @@ export default function ForgotPasswordPage() {
           color: 'var(--color-text-secondary)',
         }}
       >
-        <span>Remember your password?</span>
+        <span>Вспомнили пароль?</span>
         <Link href="/login" style={{ color: 'var(--color-primary)' }}>
-          Back to login
+          Назад к входу
         </Link>
       </div>
     </form>

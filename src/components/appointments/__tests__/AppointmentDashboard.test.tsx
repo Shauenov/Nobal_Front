@@ -70,8 +70,8 @@ describe('AppointmentDashboard', () => {
   it('renders appointment as a session row with Russian status', () => {
     render(<AppointmentDashboard />, { wrapper });
 
-    // Status badge in Russian
-    expect(screen.getByText('Подтверждено')).toBeInTheDocument();
+    // Status badge in Russian — getAllByText because the filter dropdown also contains this text
+    expect(screen.getAllByText('Подтверждено').length).toBeGreaterThan(0);
     // consultation_type mapped to Russian — appears in both the table and the side panel
     expect(screen.getAllByText('Онлайн').length).toBeGreaterThan(0);
   });

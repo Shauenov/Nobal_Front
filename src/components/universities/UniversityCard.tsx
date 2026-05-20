@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import type { CSSProperties } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -37,6 +38,8 @@ function ProgressBar({ pct, color }: { pct: number; color: string }) {
 }
 
 export function UniversityCard({ university }: UniversityCardProps) {
+  const [coverError, setCoverError] = useState(false);
+  const [logoError, setLogoError] = useState(false);
   const location = [university.city, university.country].filter(Boolean).join(', ');
   const acceptancePct = university.acceptance_rate != null ? Math.round(university.acceptance_rate * 100) : null;
   const popularityPct = university.international_pct != null ? Math.round(university.international_pct * 100) : null;
@@ -65,12 +68,14 @@ export function UniversityCard({ university }: UniversityCardProps) {
           flexShrink: 0,
         }}
       >
-        {university.cover_image_url && (
+        {university.cover_image_url && !coverError && (
           <Image
             src={university.cover_image_url}
             alt={university.name}
             fill
+            unoptimized
             style={{ objectFit: 'cover' }}
+            onError={() => setCoverError(true)}
           />
         )}
 
@@ -111,13 +116,15 @@ export function UniversityCard({ university }: UniversityCardProps) {
               boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
             }}
           >
-            {university.logo_url ? (
+            {university.logo_url && !logoError ? (
               <Image
                 src={university.logo_url}
                 alt={university.name}
                 width={42}
                 height={42}
+                unoptimized
                 style={{ objectFit: 'contain' }}
+                onError={() => setLogoError(true)}
               />
             ) : (
               <span style={{ fontSize: '1.2rem' }}>🏫</span>

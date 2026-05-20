@@ -32,8 +32,8 @@ export default function NewUniversityPage() {
   return (
     <div>
       <PageHeader
-        title="Create University"
-        subtitle="Add a new university to the database."
+        title="Добавить университет"
+        subtitle="Создайте новую запись университета в базе данных."
       />
 
       <div style={containerStyle}>

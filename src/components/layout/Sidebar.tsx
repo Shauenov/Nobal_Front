@@ -11,6 +11,10 @@ import {
   Newspaper,
   Settings,
   LogOut,
+  Map,
+  HelpCircle,
+  Award,
+  Bell,
 } from 'lucide-react';
 import { useUIStore } from '@/stores/uiStore';
 import { useUnreadNotificationCount } from '@/hooks/useNotifications';
@@ -29,6 +33,13 @@ const mainNav: NavItem[] = [
   { label: 'Личные сообщения', href: '/messages', icon: MessageSquare },
   { label: 'Записи', href: '/appointments', icon: CalendarDays },
   { label: 'Новости', href: '/news', icon: Newspaper },
+];
+
+const contentNav: NavItem[] = [
+  { label: 'Маршруты', href: '/roadmaps', icon: Map },
+  { label: 'FAQ', href: '/faq', icon: HelpCircle },
+  { label: 'Выпускники', href: '/alumni', icon: Award },
+  { label: 'Уведомления', href: '/notifications', icon: Bell },
 ];
 
 export function Sidebar() {
@@ -59,7 +70,6 @@ export function Sidebar() {
     overflow: 'hidden',
     cursor: 'pointer',
     border: 'none',
-    background2: active ? 'rgba(255,255,255,0.12)' : 'transparent',
   });
 
   return (
@@ -167,6 +177,34 @@ export function Sidebar() {
                 >
                   {Math.min(unreadData.count, 99)}
                 </span>
+              )}
+            </Link>
+          );
+        })}
+
+        {/* Separator */}
+        <div
+          style={{
+            margin: '10px 16px',
+            borderTop: '1px solid rgba(255,255,255,0.07)',
+          }}
+        />
+
+        {contentNav.map((item) => {
+          const active = isActive(item.href);
+          const Icon = item.icon;
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              title={sidebarCollapsed ? item.label : undefined}
+              style={linkStyle(active)}
+            >
+              <span style={{ flexShrink: 0, opacity: active ? 1 : 0.7 }}>
+                <Icon size={18} />
+              </span>
+              {!sidebarCollapsed && (
+                <span style={{ flex: 1 }}>{item.label}</span>
               )}
             </Link>
           );

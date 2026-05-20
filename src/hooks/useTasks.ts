@@ -44,7 +44,7 @@ export function useCreateTask(studentId: string) {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.studentTasks(studentId) });
       qc.invalidateQueries({ queryKey: queryKeys.reportsOverview });
-      toast.success('Task created');
+      toast.success('Задание создано');
     },
     onError: (err) => {
       toast.error(normalizeError(err).message);
@@ -60,7 +60,7 @@ export function useCreatePersonalTask() {
       return res.data.data;
     },
     onSuccess: () => {
-      toast.success('Personal task created');
+      toast.success('Личное задание создано');
     },
     onError: (err) => {
       toast.error(normalizeError(err).message);
@@ -82,7 +82,7 @@ export function useUpdateTask(studentId: string) {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.studentTasks(studentId) });
-      toast.success('Task updated');
+      toast.success('Задание обновлено');
     },
     onError: (err) => {
       toast.error(normalizeError(err).message);
@@ -124,7 +124,7 @@ export function usePatchTaskStatus(studentId: string) {
       if (context?.previous) {
         qc.setQueryData(queryKeys.studentTasks(studentId), context.previous);
       }
-      toast.error('Failed to update task status');
+      toast.error('Не удалось обновить статус задания');
     },
     onSettled: () => {
       qc.invalidateQueries({ queryKey: queryKeys.studentTasks(studentId) });
@@ -173,7 +173,7 @@ export function useDeleteTask(studentId: string) {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.studentTasks(studentId) });
-      toast.success('Task deleted');
+      toast.success('Задание удалено');
     },
     onError: (err) => {
       toast.error(normalizeError(err).message);

@@ -57,7 +57,7 @@ export function MessageThread({ messages, isLoading }: MessageThreadProps) {
   if (isLoading && messages.length === 0) {
     return (
       <div style={{ ...threadContainer, alignItems: 'center', justifyContent: 'center', color: 'var(--color-text-secondary)' }}>
-        Loading messages...
+        Загрузка сообщений...
       </div>
     );
   }
@@ -65,7 +65,7 @@ export function MessageThread({ messages, isLoading }: MessageThreadProps) {
   if (messages.length === 0) {
     return (
       <div style={{ ...threadContainer, alignItems: 'center', justifyContent: 'center', color: 'var(--color-text-secondary)' }}>
-        No messages yet. Send a message to start the conversation.
+        Сообщений пока нет. Напишите первое сообщение.
       </div>
     );
   }

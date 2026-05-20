@@ -65,7 +65,7 @@ export function useCreateSlot() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.slots() });
-      toast.success('Slot(s) created');
+      toast.success('Слот(ы) созданы');
     },
     onError: (err) => {
       toast.error(normalizeError(err).message);
@@ -83,7 +83,7 @@ export function useDeleteSlot() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.slots() });
-      toast.success('Slot deleted');
+      toast.success('Слот удалён');
     },
     onError: (err) => {
       toast.error(normalizeError(err).message);
@@ -106,7 +106,7 @@ export function useBookAppointment() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.appointments });
       qc.invalidateQueries({ queryKey: queryKeys.slots() });
-      toast.success('Appointment booked');
+      toast.success('Запись создана');
     },
     onError: (err) => {
       toast.error(normalizeError(err).message);
@@ -125,7 +125,7 @@ export function useCancelAppointment() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.appointments });
       qc.invalidateQueries({ queryKey: queryKeys.myAppointments });
-      toast.success('Appointment cancelled');
+      toast.success('Запись отменена');
     },
     onError: (err) => {
       toast.error(normalizeError(err).message);
@@ -144,7 +144,7 @@ export function useCompleteAppointment() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.appointments });
       qc.invalidateQueries({ queryKey: queryKeys.myAppointments });
-      toast.success('Appointment completed');
+      toast.success('Запись завершена');
     },
     onError: (err) => {
       toast.error(normalizeError(err).message);

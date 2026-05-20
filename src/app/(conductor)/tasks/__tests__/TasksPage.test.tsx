@@ -4,6 +4,14 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import TasksPage from '../page';
 
+vi.mock('next/navigation', () => ({
+  useSearchParams: () => new URLSearchParams(),
+}));
+
+vi.mock('@/components/tasks/BulkAssignModal', () => ({
+  BulkAssignModal: () => null,
+}));
+
 vi.mock('@/components/layout/PageHeader', () => ({
   PageHeader: ({ title, subtitle, action }: { title: string; subtitle: string; action?: React.ReactNode }) => (
     <div>
@@ -45,6 +53,7 @@ vi.mock('@/hooks/useStudents', () => ({
 vi.mock('@/hooks/useTasks', () => ({
   useStudentTasks: (...args: unknown[]) => mockUseStudentTasks(...args),
   usePatchTaskStatus: () => mockUsePatchTaskStatus(),
+  useStudentTaskStats: () => ({ data: null, isLoading: false }),
 }));
 
 const mockStudents = [

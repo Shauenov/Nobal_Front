@@ -27,7 +27,7 @@ export default function StudentRoadmapsPage() {
     <div style={{ display: 'grid', gap: 'var(--space-4)' }}>
       <div style={cardStyle}>
         {roadmaps.isLoading ? (
-          <div style={{ color: 'var(--color-text-secondary)' }}>Loading roadmaps...</div>
+          <div style={{ color: 'var(--color-text-secondary)' }}>Загрузка маршрутов...</div>
         ) : roadmaps.data?.length ? (
           <div style={{ display: 'grid', gap: 'var(--space-3)' }}>
             {roadmaps.data.map((roadmap) => (
@@ -44,7 +44,7 @@ export default function StudentRoadmapsPage() {
                 <div>
                   <div style={{ fontWeight: 'var(--font-medium)' }}>{roadmap.title}</div>
                   <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-secondary)' }}>
-                    Assigned: {new Date(roadmap.assigned_at).toLocaleDateString()}
+                    Назначен: {new Date(roadmap.assigned_at).toLocaleDateString('ru-RU')}
                   </div>
                 </div>
                 <span
@@ -56,13 +56,13 @@ export default function StudentRoadmapsPage() {
                     color: roadmap.is_active ? 'var(--color-success)' : 'var(--color-text-secondary)',
                   }}
                 >
-                  {roadmap.is_active ? 'Active' : 'Inactive'}
+                  {roadmap.is_active ? 'Активен' : 'Неактивен'}
                 </span>
               </div>
             ))}
           </div>
         ) : (
-          <div style={{ color: 'var(--color-text-secondary)' }}>No roadmaps assigned.</div>
+          <div style={{ color: 'var(--color-text-secondary)' }}>Маршруты не назначены.</div>
         )}
       </div>
     </div>

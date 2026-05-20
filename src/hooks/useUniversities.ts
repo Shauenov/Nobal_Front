@@ -55,7 +55,7 @@ export function useCreateUniversity() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.universities() });
-      toast.success('University created');
+      toast.success('Университет создан');
     },
     onError: (err) => {
       toast.error(normalizeError(err).message);
@@ -75,7 +75,7 @@ export function useUpdateUniversity(id: string) {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.university(id) });
       qc.invalidateQueries({ queryKey: queryKeys.universities() });
-      toast.success('University updated');
+      toast.success('Университет обновлён');
     },
     onError: (err) => {
       toast.error(normalizeError(err).message);
@@ -93,7 +93,7 @@ export function useDeleteUniversity() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.universities() });
-      toast.success('University deleted');
+      toast.success('Университет удалён');
     },
     onError: (err) => {
       toast.error(normalizeError(err).message);
@@ -115,7 +115,7 @@ export function useCreateProgram(universityId: string) {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.university(universityId) });
-      toast.success('Program added');
+      toast.success('Программа добавлена');
     },
     onError: (err) => {
       toast.error(normalizeError(err).message);
@@ -137,7 +137,7 @@ export function useUpdateProgram(universityId: string, programId: string) {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.university(universityId) });
-      toast.success('Program updated');
+      toast.success('Программа обновлена');
     },
     onError: (err) => {
       toast.error(normalizeError(err).message);
@@ -155,7 +155,7 @@ export function useDeleteProgram(universityId: string) {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.university(universityId) });
-      toast.success('Program deleted');
+      toast.success('Программа удалена');
     },
     onError: (err) => {
       toast.error(normalizeError(err).message);
@@ -185,7 +185,7 @@ export function useUploadLogo(universityId: string) {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.university(universityId) });
       qc.invalidateQueries({ queryKey: queryKeys.universities() });
-      toast.success('Logo uploaded successfully');
+      toast.success('Логотип загружен');
     },
     onError: (err) => {
       toast.error(normalizeError(err).message);
@@ -215,7 +215,7 @@ export function useUploadCover(universityId: string) {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.university(universityId) });
       qc.invalidateQueries({ queryKey: queryKeys.universities() });
-      toast.success('Cover uploaded successfully');
+      toast.success('Обложка загружена');
     },
     onError: (err) => {
       toast.error(normalizeError(err).message);

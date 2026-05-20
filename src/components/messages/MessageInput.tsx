@@ -108,7 +108,7 @@ export function MessageInput({ onSend, onSendImage, disabled }: MessageInputProp
         value={text}
         onChange={(e) => setText(e.target.value)}
         onKeyDown={handleKeyDown}
-        placeholder="Type a message... (Enter to send)"
+        placeholder="Напишите сообщение... (Enter для отправки)"
         disabled={disabled}
         rows={text.split('\n').length > 1 ? Math.min(text.split('\n').length, 5) : 1}
       />

@@ -53,8 +53,8 @@ export default function StudentTasksPage() {
   return (
     <div style={{ display: 'grid', gap: 'var(--space-4)' }}>
       <PageHeader
-        title="Tasks"
-        subtitle="Create, manage, and track this student's tasks."
+        title="Задачи"
+        subtitle="Создавайте и отслеживайте задачи студента."
         action={
           <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center' }}>
             <button
@@ -69,7 +69,7 @@ export default function StudentTasksPage() {
                 fontWeight: 'var(--font-semibold)',
               }}
             >
-              New Task
+              Новая задача
             </button>
             <ViewToggle view={view} onChange={setView} />
           </div>
@@ -79,7 +79,7 @@ export default function StudentTasksPage() {
       <div style={pageCardStyle}>
         {tasks.isLoading ? (
           <div style={{ color: 'var(--color-text-secondary)', padding: 'var(--space-4)' }}>
-            Loading tasks...
+            Загрузка задач...
           </div>
         ) : view === 'list' ? (
           <TaskList tasks={items} onTaskClick={handleOpenEdit} />

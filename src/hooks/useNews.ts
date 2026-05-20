@@ -46,7 +46,7 @@ export function useCreateNews() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.news() });
-      toast.success('News article created');
+      toast.success('Новость создана');
     },
     onError: (err) => {
       toast.error(normalizeError(err).message);
@@ -66,7 +66,7 @@ export function useUpdateNews(id: string) {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.newsItem(id) });
       qc.invalidateQueries({ queryKey: queryKeys.news() });
-      toast.success('News article updated');
+      toast.success('Новость обновлена');
     },
     onError: (err) => {
       toast.error(normalizeError(err).message);
@@ -84,7 +84,7 @@ export function useDeleteNews() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.news() });
-      toast.success('News article deleted');
+      toast.success('Новость удалена');
     },
     onError: (err) => {
       toast.error(normalizeError(err).message);
@@ -103,7 +103,7 @@ export function useToggleNewsPublished() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.news() });
-      toast.success('Publish status updated');
+      toast.success('Статус публикации обновлён');
     },
     onError: (err) => {
       toast.error(normalizeError(err).message);
@@ -121,7 +121,7 @@ export function useAddNewsToCalendar(newsId: string) {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.calendar() });
-      toast.success('Added to calendar');
+      toast.success('Добавлено в календарь');
     },
     onError: (err) => {
       toast.error(normalizeError(err).message);
@@ -151,7 +151,7 @@ export function useUploadNewsCover(newsId: string) {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.newsItem(newsId) });
       qc.invalidateQueries({ queryKey: queryKeys.news() });
-      toast.success('News cover uploaded successfully');
+      toast.success('Обложка новости загружена');
     },
     onError: (err) => {
       toast.error(normalizeError(err).message);

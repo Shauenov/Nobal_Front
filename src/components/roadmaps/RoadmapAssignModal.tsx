@@ -160,12 +160,12 @@ export function RoadmapAssignModal({
         <form onSubmit={handleSubmit(handleFormSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
           <div style={fieldStyle}>
             <label style={labelStyle}>
-              Student ID <span style={{ color: 'var(--color-error)' }}>*</span>
+              ID студента <span style={{ color: 'var(--color-error)' }}>*</span>
             </label>
             <input
               {...register('student_id')}
               type="text"
-              placeholder="Enter student ID"
+              placeholder="Введите ID студента"
               style={inputStyle}
             />
             {errors.student_id && <div style={errorStyle}>{errors.student_id.message}</div>}
@@ -193,7 +193,7 @@ export function RoadmapAssignModal({
                         }))
                       }
                       style={inputStyle}
-                      placeholder="Deadline (optional)"
+                      placeholder="Срок (необязательно)"
                     />
                   </div>
                 ))}
@@ -215,7 +215,7 @@ export function RoadmapAssignModal({
               style={buttonStyle('primary', !isValid || isLoading)}
               disabled={!isValid || isLoading}
             >
-              {isLoading ? 'Assigning...' : 'Assign Roadmap'}
+              {isLoading ? 'Назначение...' : 'Назначить маршрут'}
             </button>
           </div>
         </form>

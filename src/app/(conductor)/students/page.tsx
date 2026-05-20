@@ -5,9 +5,8 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Users } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { StudentFilters } from '@/components/students/StudentFilters';
+import { AdvancedFilters, type FilterState } from '@/components/students/AdvancedFilters';
 import { StudentGrid } from '@/components/students/StudentGrid';
-import { InviteModal } from '@/components/students/InviteModal';
 import { useDeleteStudent, useStudents } from '@/hooks/useStudents';
 import { Card } from '@/components/ui/Card';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -32,7 +31,6 @@ export default function StudentsPage() {
   const deleteStudent = useDeleteStudent();
   const t = useTranslations('students');
 
-  const [inviteOpen, setInviteOpen] = useState(false);
   const [searchText, setSearchText] = useState(searchParams.get('search') ?? '');
 
   const groupType = searchParams.get('group_type') ?? '';
@@ -58,7 +56,9 @@ export default function StudentsPage() {
 
   const queryParams = useMemo(
     () => ({
-      group_type: groupType === 'D' || groupType === 'F' ? (groupType as 'D' | 'F') : undefined,
+      group_type: (['D', 'D1', 'D2', 'F', 'F1', 'F2', 'F3', 'F4'].includes(groupType))
+        ? (groupType as import('@/types/api').GroupType)
+        : undefined,
       course_year:
         courseYear && (Number(courseYear) === 2 || Number(courseYear) === 3)
           ? (Number(courseYear) as 2 | 3)
@@ -88,6 +88,25 @@ export default function StudentsPage() {
     router.replace(`${pathname}?${params.toString()}`);
   };
 
+  // Batch-clear all filters + search in one router.replace (avoids sequential overwrites)
+  const handleClearAll = () => {
+    const params = new URLSearchParams();
+    params.set('page', '1');
+    setSearchText('');
+    router.replace(`${pathname}?${params.toString()}`);
+  };
+
+  // Apply a saved filter preset atomically in one router.replace
+  const handleLoadFilter = (filters: FilterState) => {
+    const params = new URLSearchParams();
+    if (filters.groupType) params.set('group_type', filters.groupType);
+    if (filters.courseYear) params.set('course_year', filters.courseYear);
+    if (filters.ieltsPassed) params.set('ielts_passed', filters.ieltsPassed);
+    if (filters.satPassed) params.set('sat_passed', filters.satPassed);
+    params.set('page', '1');
+    router.replace(`${pathname}?${params.toString()}`);
+  };
+
   const setPage = (nextPage: number) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set('page', String(nextPage));
@@ -104,7 +123,7 @@ export default function StudentsPage() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-6)' }}>
       <PageHeader title={t('title')} subtitle={t('subtitle')} />
 
-      <StudentFilters
+      <AdvancedFilters
         groupType={groupType}
         courseYear={courseYear}
         ieltsPassed={ieltsPassed}
@@ -112,7 +131,8 @@ export default function StudentsPage() {
         search={searchText}
         onFilterChange={setParam}
         onSearchChange={setSearchText}
-        onInvite={() => setInviteOpen(true)}
+        onClearAll={handleClearAll}
+        onLoadFilter={handleLoadFilter}
       />
 
       <Card padding="md">
@@ -128,8 +148,6 @@ export default function StudentsPage() {
             title={t('empty.title')}
             description={t('empty.description')}
             icon={<Users size={24} />}
-            actionLabel={t('empty.action')}
-            onAction={() => setInviteOpen(true)}
           />
         ) : (
           <StudentGrid students={items} onDelete={handleDelete} />
@@ -182,7 +200,6 @@ export default function StudentsPage() {
         </div>
       </div>
 
-      <InviteModal open={inviteOpen} onClose={() => setInviteOpen(false)} />
     </div>
   );
 }

@@ -1,8 +1,15 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import type { CSSProperties } from 'react';
-import { useConversations, useMessages, useSendMessage, useSendImageMessage, useMarkRead } from '@/hooks/useMessages';
+import {
+  useConversations,
+  useMessages,
+  useSendMessage,
+  useSendImageMessage,
+  useMarkRead,
+  useGetOrCreateConversation,
+} from '@/hooks/useMessages';
 import { useStudents } from '@/hooks/useStudents';
 import { ConversationList } from './ConversationList';
 import { MessageThread } from './MessageThread';
@@ -34,9 +41,10 @@ const mainAreaStyle: CSSProperties = {
 
 interface MessagesDashboardProps {
   initialConvoId?: string;
+  initialStudentId?: string;
 }
 
-export function MessagesDashboard({ initialConvoId }: MessagesDashboardProps) {
+export function MessagesDashboard({ initialConvoId, initialStudentId }: MessagesDashboardProps) {
   const [activeConvoId, setActiveConvoId] = useState<string | undefined>(initialConvoId);
   const [syncedConvoId, setSyncedConvoId] = useState(initialConvoId);
   const [isBroadcastOpen, setIsBroadcastOpen] = useState(false);
@@ -50,13 +58,41 @@ export function MessagesDashboard({ initialConvoId }: MessagesDashboardProps) {
   const { data: convosResponse, isLoading: isLoadingConvos } = useConversations();
   const { data: studentsResponse } = useStudents({ page: 1, page_size: 100 });
   const conversations = useMemo(() => convosResponse ?? [], [convosResponse]);
+  const students = useMemo(() => studentsResponse?.data ?? [], [studentsResponse]);
+
+  // Auto-select conversation by student ID (render-phase derived state)
+  // Uses a sentinel initialised to undefined so the check fires even when data is cached
+  const studentConvoId = useMemo(() => {
+    if (!initialStudentId || !conversations.length) return undefined;
+    return conversations.find((c) => c.student_id === initialStudentId)?.id;
+  }, [initialStudentId, conversations]);
+  const [appliedStudentConvoId, setAppliedStudentConvoId] = useState<string | undefined>(undefined);
+  if (studentConvoId && appliedStudentConvoId !== studentConvoId) {
+    setAppliedStudentConvoId(studentConvoId);
+    setActiveConvoId(studentConvoId);
+  }
+
+  // Auto-create conversation when arriving via ?student= URL and no conversation exists yet.
+  // Uses a ref to ensure we only fire once per initialStudentId value.
+  const autoCreateTriggeredFor = useRef<string | null>(null);
+  const getOrCreateConvo = useGetOrCreateConversation();
+  const { mutate: createConvo } = getOrCreateConvo;
+  useEffect(() => {
+    if (!initialStudentId || isLoadingConvos) return;
+    if (conversations.find((c) => c.student_id === initialStudentId)) return; // already exists
+    if (autoCreateTriggeredFor.current === initialStudentId) return;          // already triggered
+    autoCreateTriggeredFor.current = initialStudentId;
+    createConvo(initialStudentId);                                             // no setState here
+  }, [initialStudentId, conversations, isLoadingConvos, createConvo]);
+
   const studentNameMap = useMemo(() => {
     const map: Record<string, string> = {};
-    for (const student of studentsResponse?.data ?? []) {
+    for (const student of students) {
       map[student.id] = student.full_name;
     }
     return map;
-  }, [studentsResponse]);
+  }, [students]);
+
   const activeConversation = useMemo(
     () => conversations.find((conversation) => conversation.id === activeConvoId),
     [conversations, activeConvoId],
@@ -82,6 +118,15 @@ export function MessagesDashboard({ initialConvoId }: MessagesDashboardProps) {
     }
   }, [activeConversation, markRead]);
 
+  // When clicking a student who doesn't have a conversation yet — create one first
+  const handleSelectStudent = useCallback(async (studentId: string) => {
+    try {
+      const convo = await getOrCreateConvo.mutateAsync(studentId);
+      setActiveConvoId(convo.id);
+    } catch {
+      // error toast is handled by the mutation's onError
+    }
+  }, [getOrCreateConvo]);
 
   const handleSend = (text: string) => {
     if (!activeConvoId) return;
@@ -96,9 +141,9 @@ export function MessagesDashboard({ initialConvoId }: MessagesDashboardProps) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', height: '100%' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <PageHeader 
-          title="Messages" 
-          subtitle="Chat with your students." 
+        <PageHeader
+          title="Сообщения"
+          subtitle="Чат с вашими студентами."
         />
         <button
           style={{
@@ -112,32 +157,39 @@ export function MessagesDashboard({ initialConvoId }: MessagesDashboardProps) {
           }}
           onClick={() => setIsBroadcastOpen(true)}
         >
-          Send Broadcast
+          Рассылка
         </button>
       </div>
 
       <div style={layoutStyle}>
         <div style={sidebarStyle}>
           {isLoadingConvos ? (
-            <div style={{ padding: 'var(--space-4)', color: 'var(--color-text-secondary)' }}>Loading conversations...</div>
+            <div style={{ padding: 'var(--space-4)', color: 'var(--color-text-secondary)' }}>Загрузка...</div>
           ) : (
             <ConversationList
               conversations={conversations}
+              students={students}
               activeConvoId={activeConvoId}
               onSelect={setActiveConvoId}
+              onSelectStudent={handleSelectStudent}
+              isCreating={getOrCreateConvo.isPending}
               studentNameMap={studentNameMap}
             />
           )}
         </div>
         <div style={mainAreaStyle}>
-          {activeConvoId ? (
+          {getOrCreateConvo.isPending ? (
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-text-secondary)' }}>
+              Открываем диалог…
+            </div>
+          ) : activeConvoId ? (
             <>
               <MessageThread messages={messages} isLoading={isLoadingMessages} />
               <MessageInput onSend={handleSend} onSendImage={handleSendImage} disabled={sendMessage.isPending || sendImage.isPending} />
             </>
           ) : (
             <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-text-secondary)' }}>
-              Select a conversation to start messaging
+              Выберите студента для начала переписки
             </div>
           )}
         </div>

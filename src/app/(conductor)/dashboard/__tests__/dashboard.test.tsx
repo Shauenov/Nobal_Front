@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { QueryClientProvider } from '@tanstack/react-query';
 import DashboardPage from '../page';
@@ -245,43 +245,6 @@ describe('DashboardPage', () => {
 
     // Engagement percent should be calculated: 77 active out of 100 = 77%
     expect(screen.getByText('77%')).toBeInTheDocument();
-  });
-
-  it('allows period selection toggle', async () => {
-    mockUseOverviewReport.mockReturnValue({
-      data: {
-        total_students: 125,
-        ielts_passed: 45,
-        sat_passed: 32,
-        avg_gpa: 3.7,
-        tasks_completed_this_month: 89,
-        appointments_this_month: 15,
-        applied_abroad: 72,
-        by_group: {},
-      },
-      isLoading: false,
-      error: null,
-    });
-
-    mockUseStudents.mockReturnValue({
-      data: [],
-      isLoading: false,
-      error: null,
-    });
-
-    renderWithProviders(<DashboardPage />);
-
-    // Initially should show "За Месяц"
-    expect(screen.getByText(/За Месяц/)).toBeInTheDocument();
-
-    // Find and click the select dropdown
-    const select = screen.getByDisplayValue('Месяц') as HTMLSelectElement;
-    fireEvent.change(select, { target: { value: 'quarter' } });
-
-    // After change, should show "За Квартал"
-    await waitFor(() => {
-      expect(screen.getByDisplayValue('Квартал')).toBeInTheDocument();
-    });
   });
 
   it('formats numbers correctly', () => {

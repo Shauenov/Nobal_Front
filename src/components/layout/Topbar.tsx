@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Bell, ChevronRight, LogOut } from 'lucide-react';
 import { useUnreadNotificationCount } from '@/hooks/useNotifications';
@@ -78,15 +79,31 @@ export function Topbar() {
               key={crumb.href}
               style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}
             >
-              <span
-                style={{
-                  fontSize: 'var(--text-sm)',
-                  fontWeight: isLast ? 'var(--font-semibold)' : 'var(--font-medium)',
-                  color: isLast ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
-                }}
-              >
-                {crumb.label}
-              </span>
+              {isLast ? (
+                <span
+                  style={{
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: 'var(--font-semibold)',
+                    color: 'var(--color-text-primary)',
+                  }}
+                >
+                  {crumb.label}
+                </span>
+              ) : (
+                <Link
+                  href={crumb.href}
+                  style={{
+                    fontSize: 'var(--text-sm)',
+                    fontWeight: 'var(--font-medium)',
+                    color: 'var(--color-text-secondary)',
+                    textDecoration: 'none',
+                  }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = 'var(--color-primary)'; }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = 'var(--color-text-secondary)'; }}
+                >
+                  {crumb.label}
+                </Link>
+              )}
               {!isLast && <ChevronRight size={14} color="var(--color-text-disabled)" />}
             </div>
           );

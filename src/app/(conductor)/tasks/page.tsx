@@ -1,12 +1,15 @@
 'use client';
 
 import { useState, type CSSProperties } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { format } from 'date-fns';
 import { useStudents } from '@/hooks/useStudents';
-import { useStudentTasks, usePatchTaskStatus } from '@/hooks/useTasks';
+import { useStudentTasks, usePatchTaskStatus, useStudentTaskStats } from '@/hooks/useTasks';
 import { TaskList } from '@/components/tasks/TaskList';
 import { TaskBoard } from '@/components/tasks/TaskBoard';
 import { ViewToggle } from '@/components/tasks/ViewToggle';
 import { TaskModal } from '@/components/tasks/TaskModal';
+import { BulkAssignModal } from '@/components/tasks/BulkAssignModal';
 import { PageHeader } from '@/components/layout/PageHeader';
 import type { TaskOut, TaskStatus } from '@/types/api';
 
@@ -51,16 +54,22 @@ const btnPrimary: CSSProperties = {
 // ── Component ─────────────────────────────────────────────────
 
 export default function TasksPage() {
+  const searchParams = useSearchParams();
   const { data: studentsData } = useStudents({ page_size: 100 });
   const students = studentsData?.data ?? [];
 
-  const [selectedStudentId, setSelectedStudentId] = useState<string>('');
+  const [selectedStudentId, setSelectedStudentId] = useState<string>(
+    searchParams.get('student') ?? ''
+  );
   const [view, setView] = useState<'list' | 'board'>('board');
   const [taskModalOpen, setTaskModalOpen] = useState(false);
+  const [bulkModalOpen, setBulkModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<TaskOut | null>(null);
 
+  const currentMonth = format(new Date(), 'yyyy-MM');
   const tasks = useStudentTasks(selectedStudentId, { page: 1, page_size: 100 });
   const patchTask = usePatchTaskStatus(selectedStudentId);
+  const taskStats = useStudentTaskStats(selectedStudentId, currentMonth);
 
   const items = tasks.data?.data ?? [];
 
@@ -87,6 +96,12 @@ export default function TasksPage() {
         subtitle="Управление заданиями по студентам"
         action={
           <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center' }}>
+            <button
+              style={{ ...btnPrimary, background: '#7c3aed' }}
+              onClick={() => setBulkModalOpen(true)}
+            >
+              + Массовое назначение
+            </button>
             {selectedStudentId && (
               <>
                 <button style={btnPrimary} onClick={handleOpenCreate}>
@@ -131,6 +146,35 @@ export default function TasksPage() {
           )}
         </div>
       </div>
+
+      {/* Task stats row — visible when a student is selected */}
+      {selectedStudentId && taskStats.data && (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 'var(--space-3)' }}>
+          {[
+            { label: 'Всего', value: taskStats.data.total, color: '#1e293b' },
+            { label: 'Выполнено', value: taskStats.data.completed, color: '#16a34a' },
+            { label: 'Просрочено', value: taskStats.data.overdue, color: '#dc2626' },
+          ].map(({ label, value, color }) => (
+            <div
+              key={label}
+              style={{
+                ...cardStyle,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 4,
+                padding: 'var(--space-4)',
+              }}
+            >
+              <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-secondary)', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                {label}
+              </div>
+              <div style={{ fontSize: 'var(--text-2xl)', fontWeight: 700, color }}>
+                {value}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Task board / list */}
       {!selectedStudentId ? (
@@ -180,6 +224,10 @@ export default function TasksPage() {
           studentId={selectedStudentId}
           initialTask={selectedTask}
         />
+      )}
+
+      {bulkModalOpen && (
+        <BulkAssignModal onClose={() => setBulkModalOpen(false)} />
       )}
     </div>
   );

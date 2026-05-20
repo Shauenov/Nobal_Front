@@ -146,7 +146,7 @@ function SortableFAQItem({
 
         <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap', alignItems: 'center' }}>
           {faq.category && <span style={badgeStyle}>{faq.category}</span>}
-          <span style={badgeStyle}>Order {displayOrder}</span>
+          <span style={badgeStyle}>#{displayOrder}</span>
           <label style={toggleStyle}>
             <input
               type="checkbox"
@@ -154,7 +154,7 @@ function SortableFAQItem({
               onChange={onToggleActive}
               disabled={isMutating}
             />
-            {faq.is_active ? 'Active' : 'Hidden'}
+            {faq.is_active ? 'Активен' : 'Скрыт'}
           </label>
         </div>
       </div>
@@ -162,7 +162,7 @@ function SortableFAQItem({
       <div style={{ display: 'grid', justifyItems: 'end', gap: 'var(--space-2)' }}>
         <div style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center' }}>
           <button type="button" style={inlineButtonStyle} onClick={onEdit} disabled={isMutating}>
-            Edit
+            Изменить
           </button>
           <button
             type="button"
@@ -178,11 +178,11 @@ function SortableFAQItem({
             disabled={isMutating}
           >
             <Trash2 size={14} />
-            Delete
+            Удалить
           </button>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', color: 'var(--color-text-secondary)' }}>
-          <button type="button" style={dragHandleStyle} {...attributes} {...listeners} aria-label="Drag FAQ">
+          <button type="button" style={dragHandleStyle} {...attributes} {...listeners} aria-label="Перетащить">
             <GripVertical size={14} />
           </button>
           <span style={{ fontSize: 'var(--text-xs)' }}>#{displayOrder}</span>
@@ -248,7 +248,7 @@ export default function FAQPage() {
   };
 
   const handleDelete = (faq: FAQOut) => {
-    if (!window.confirm('Delete this FAQ?')) return;
+    if (!window.confirm('Удалить этот вопрос?')) return;
     deleteFAQ.mutate(faq.id, {
       onSuccess: () => {
         setDraftItems((prev) => prev.filter((item) => item.id !== faq.id));
@@ -260,7 +260,7 @@ export default function FAQPage() {
     <div style={{ display: 'grid', gap: 'var(--space-6)' }}>
       <PageHeader
         title="FAQ"
-        subtitle="Drag questions to reorder the FAQ list."
+        subtitle="Перетащите вопросы, чтобы изменить порядок"
         action={
           <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
             <button
@@ -271,7 +271,7 @@ export default function FAQPage() {
                 setModalOpen(true);
               }}
             >
-              New FAQ
+              + Добавить вопрос
             </button>
             <button
               type="button"
@@ -279,7 +279,7 @@ export default function FAQPage() {
               onClick={handleReset}
               disabled={!isDirty || reorder.isPending}
             >
-              Reset order
+              Сбросить
             </button>
             <button
               type="button"
@@ -287,7 +287,7 @@ export default function FAQPage() {
               onClick={handleSave}
               disabled={!isDirty || reorder.isPending}
             >
-              {reorder.isPending ? 'Saving...' : 'Save order'}
+              {reorder.isPending ? 'Сохранение…' : 'Сохранить порядок'}
             </button>
           </div>
         }
@@ -295,11 +295,11 @@ export default function FAQPage() {
 
       <div style={cardStyle}>
         {faqs.isLoading ? (
-          <div style={{ color: 'var(--color-text-secondary)' }}>Loading FAQ items...</div>
+          <div style={{ color: 'var(--color-text-secondary)' }}>Загрузка...</div>
         ) : faqs.isError ? (
-          <div style={{ color: 'var(--color-text-secondary)' }}>Failed to load FAQ items.</div>
+          <div style={{ color: 'var(--color-text-secondary)' }}>Ошибка загрузки</div>
         ) : visibleItems.length === 0 ? (
-          <div style={{ color: 'var(--color-text-secondary)' }}>No FAQ items yet.</div>
+          <div style={{ color: 'var(--color-text-secondary)' }}>Нет вопросов</div>
         ) : (
           <DndContext
             sensors={sensors}

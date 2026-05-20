@@ -37,21 +37,21 @@ export function EventForm({ initial, onDone }: Props) {
 
   return (
     <form onSubmit={handleSubmit} style={formStyle}>
-      <label>Title</label>
+      <label>Название</label>
       <input value={title} onChange={(e) => setTitle(e.target.value)} style={inputStyle} />
 
-      <label>Description</label>
+      <label>Описание</label>
       <textarea value={description} onChange={(e) => setDescription(e.target.value)} style={{ ...inputStyle, minHeight: 100 }} />
 
-      <label>Start</label>
+      <label>Начало</label>
       <input value={start} onChange={(e) => setStart(e.target.value)} type="datetime-local" style={inputStyle} />
 
-      <label>End</label>
+      <label>Конец</label>
       <input value={end} onChange={(e) => setEnd(e.target.value)} type="datetime-local" style={inputStyle} />
 
       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
         <button type="submit" style={{ padding: '8px 12px' }} disabled={create.isPending}>
-          {create.isPending ? 'Saving...' : 'Save'}
+          {create.isPending ? 'Сохранение...' : 'Сохранить'}
         </button>
       </div>
     </form>

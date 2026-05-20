@@ -36,7 +36,7 @@ export function useLogin() {
     onError: (err) => {
       const error = normalizeError(err);
       if (error.status === 401) {
-        toast.error('Invalid email or password');
+        toast.error('Неверный email или пароль');
       } else {
         toast.error(error.message);
       }
@@ -101,7 +101,7 @@ export function useResetPassword() {
       await apiClient.post('/api/v1/auth/reset-password', data);
     },
     onSuccess: () => {
-      toast.success('Password reset successfully');
+      toast.success('Пароль успешно сброшен');
       router.push('/login');
     },
     onError: (err) => {
@@ -117,7 +117,7 @@ export function useChangePassword() {
       await apiClient.post('/api/v1/auth/change-password', data);
     },
     onSuccess: () => {
-      toast.success('Password changed successfully');
+      toast.success('Пароль успешно изменён');
     },
     onError: (err) => {
       toast.error(normalizeError(err).message);
@@ -138,7 +138,7 @@ export function useUpdateMe() {
     onSuccess: (data) => {
       qc.setQueryData(queryKeys.me, data);
       updateUser({ full_name: data.full_name, email: data.email });
-      toast.success('Profile updated');
+      toast.success('Профиль обновлён');
     },
     onError: (err) => {
       toast.error(normalizeError(err).message);
@@ -165,7 +165,7 @@ export function useUploadAvatar() {
     onSuccess: (data) => {
       qc.setQueryData(queryKeys.me, data);
       updateUser({ avatar_url: data.avatar_url });
-      toast.success('Avatar uploaded successfully');
+      toast.success('Аватар загружен');
     },
     onError: (err) => {
       toast.error(normalizeError(err).message);

@@ -42,8 +42,8 @@ describe('StudentRoadmapsPage', () => {
 
     expect(screen.getByText('UK Application Roadmap')).toBeInTheDocument();
     expect(screen.getByText('IELTS Preparation')).toBeInTheDocument();
-    expect(screen.getByText('Active')).toBeInTheDocument();
-    expect(screen.getByText('Inactive')).toBeInTheDocument();
+    expect(screen.getByText('Активен')).toBeInTheDocument();
+    expect(screen.getByText('Неактивен')).toBeInTheDocument();
   });
 
   it('shows empty state when no roadmaps assigned', () => {
@@ -51,7 +51,7 @@ describe('StudentRoadmapsPage', () => {
 
     render(<StudentRoadmapsPage />);
 
-    expect(screen.getByText('No roadmaps assigned.')).toBeInTheDocument();
+    expect(screen.getByText('Маршруты не назначены.')).toBeInTheDocument();
   });
 
   it('shows loading state', () => {
@@ -59,6 +59,6 @@ describe('StudentRoadmapsPage', () => {
 
     render(<StudentRoadmapsPage />);
 
-    expect(screen.getByText('Loading roadmaps...')).toBeInTheDocument();
+    expect(screen.getByText('Загрузка маршрутов...')).toBeInTheDocument();
   });
 });

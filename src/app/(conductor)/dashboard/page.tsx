@@ -1,16 +1,20 @@
 'use client';
 
-import { useState, type CSSProperties } from 'react';
+import { useEffect, type CSSProperties } from 'react';
 import { useTranslations } from 'next-intl';
+import Link from 'next/link';
 import {
   PieChart,
   Pie,
   Cell,
   ResponsiveContainer,
 } from 'recharts';
+import toast from 'react-hot-toast';
+import { Bell } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { useOverviewReport } from '@/hooks/useReports';
 import { useStudents } from '@/hooks/useStudents';
+import { useUnreadNotificationCount } from '@/hooks/useNotifications';
 
 const cardStyle: CSSProperties = {
   background: 'var(--color-surface)',
@@ -63,7 +67,16 @@ export default function DashboardPage() {
   const t = useTranslations('dashboard');
   const overview = useOverviewReport();
   const students = useStudents({ page: 1, page_size: 10 });
-  const [period, setPeriod] = useState('month');
+  const { data: unreadCount } = useUnreadNotificationCount();
+
+  // Error toasts for read queries (mutations already toast via hooks)
+  useEffect(() => {
+    if (overview.isError) toast.error('Не удалось загрузить отчёт');
+  }, [overview.isError]);
+
+  useEffect(() => {
+    if (students.isError) toast.error('Не удалось загрузить список студентов');
+  }, [students.isError]);
 
   const report = overview.data;
 
@@ -123,41 +136,28 @@ export default function DashboardPage() {
       <PageHeader
         title={t('title')}
         subtitle={t('subtitle')}
+        action={
+          typeof unreadCount === 'number' && unreadCount > 0 ? (
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                padding: '8px 14px',
+                background: '#eff6ff',
+                border: '1px solid #bfdbfe',
+                borderRadius: 8,
+                fontSize: '0.85rem',
+                color: '#1d4ed8',
+                fontWeight: 500,
+              }}
+            >
+              <Bell size={15} />
+              {unreadCount} непрочитанных уведомлений
+            </div>
+          ) : undefined
+        }
       />
-
-      {/* Period Filter */}
-      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 'var(--space-2)',
-            padding: 'var(--space-2) var(--space-3)',
-            background: 'var(--color-surface)',
-            border: '1px solid var(--color-border)',
-            borderRadius: 'var(--radius-md)',
-          }}
-        >
-          <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-primary)' }}>
-            {t('forPeriod')} {period === 'month' ? t('month') : t('quarter')}
-          </span>
-          <select
-            value={period}
-            onChange={(e) => setPeriod(e.target.value)}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              color: 'var(--color-text-primary)',
-              cursor: 'pointer',
-              fontSize: 'var(--text-sm)',
-              outline: 'none',
-            }}
-          >
-            <option value="month">{t('month')}</option>
-            <option value="quarter">{t('quarter')}</option>
-          </select>
-        </div>
-      </div>
 
       {/* Key Metrics Section */}
       <section>
@@ -214,7 +214,8 @@ export default function DashboardPage() {
             <h2 style={{ ...sectionTitleStyle, marginBottom: 0 }}>
               {t('bestResultsByOffers')}
             </h2>
-            <button
+            <Link
+              href="/students"
               style={{
                 padding: 'var(--space-2) var(--space-3)',
                 background: 'var(--color-primary)',
@@ -223,10 +224,12 @@ export default function DashboardPage() {
                 borderRadius: 'var(--radius-md)',
                 cursor: 'pointer',
                 fontSize: 'var(--text-sm)',
+                textDecoration: 'none',
+                fontWeight: 500,
               }}
             >
               {t('select')}
-            </button>
+            </Link>
           </div>
 
           {students.isLoading ? (
@@ -331,8 +334,8 @@ export default function DashboardPage() {
           )}
 
           <div style={{ marginTop: 'var(--space-4)' }}>
-            <a
-              href="#"
+            <Link
+              href="/students"
               style={{
                 color: 'var(--color-primary)',
                 textDecoration: 'none',
@@ -341,7 +344,7 @@ export default function DashboardPage() {
               }}
             >
               {t('viewAll')}
-            </a>
+            </Link>
           </div>
         </section>
 

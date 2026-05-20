@@ -53,11 +53,11 @@ function RoadmapDetailContent() {
   const [assignModalOpen, setAssignModalOpen] = useState(false);
 
   if (isLoading) {
-    return <div style={loadingStyle}>Loading roadmap...</div>;
+    return <div style={loadingStyle}>Загрузка маршрута...</div>;
   }
 
   if (!detail) {
-    return <div style={loadingStyle}>Roadmap not found</div>;
+    return <div style={loadingStyle}>Маршрут не найден</div>;
   }
 
   const { roadmap, template_tasks } = detail;
@@ -65,10 +65,10 @@ function RoadmapDetailContent() {
   const handleUpdateRoadmap = async (data: RoadmapUpdate) => {
     try {
       await updateRoadmap.mutateAsync(data);
-      toast.success('Roadmap updated successfully');
+      toast.success('Маршрут обновлён');
       router.push('/roadmaps');
     } catch {
-      toast.error('Failed to update roadmap');
+      toast.error('Не удалось обновить маршрут');
     }
   };
 
@@ -77,7 +77,7 @@ function RoadmapDetailContent() {
       await assignRoadmap.mutateAsync(data);
       setAssignModalOpen(false);
     } catch {
-      toast.error('Failed to assign roadmap');
+      toast.error('Не удалось назначить маршрут');
     }
   };
 
@@ -88,13 +88,13 @@ function RoadmapDetailContent() {
           style={tabStyle(activeTab === 'overview')}
           onClick={() => setActiveTab('overview')}
         >
-          Overview
+          Обзор
         </button>
         <button
           style={tabStyle(activeTab === 'assign')}
           onClick={() => setActiveTab('assign')}
         >
-          Assign
+          Назначить
         </button>
       </div>
 
@@ -113,7 +113,7 @@ function RoadmapDetailContent() {
         <div style={containerStyle}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)' }}>
             <h3 style={{ fontSize: 'var(--text-base)', fontWeight: 'var(--font-semibold)' }}>
-              Assign Roadmap
+              Назначить маршрут
             </h3>
             <button
               style={{
@@ -128,11 +128,11 @@ function RoadmapDetailContent() {
               }}
               onClick={() => setAssignModalOpen(true)}
             >
-              + Assign to Student
+              + Назначить студенту
             </button>
           </div>
           <div style={{ color: 'var(--color-text-secondary)', textAlign: 'center', padding: 'var(--space-4)' }}>
-            No students assigned yet
+            Студентов пока нет
           </div>
         </div>
       )}
@@ -150,9 +150,9 @@ function RoadmapDetailContent() {
 
 export default function RoadmapDetailPage() {
   return (
-    <Suspense fallback={<div style={loadingStyle}>Loading...</div>}>
+    <Suspense fallback={<div style={loadingStyle}>Загрузка...</div>}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-        <PageHeader title="Edit Roadmap" subtitle="Update roadmap details and manage assignments." />
+        <PageHeader title="Редактировать маршрут" subtitle="Обновите детали маршрута и управляйте назначениями." />
         <RoadmapDetailContent />
       </div>
     </Suspense>

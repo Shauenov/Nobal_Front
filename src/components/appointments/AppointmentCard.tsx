@@ -51,10 +51,10 @@ export function AppointmentCard({ appointment, studentName, onComplete, onCancel
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
           <div style={{ fontWeight: 'var(--font-semibold)', fontSize: 'var(--text-sm)' }}>
-            {studentName ?? `Student ${appointment.student_id.slice(0, 8)}…`}
+            {studentName ?? `Студент ${appointment.student_id.slice(0, 8)}…`}
           </div>
           <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-secondary)', marginTop: '2px' }}>
-            Created {createdAt.toLocaleString()}
+            Создано {createdAt.toLocaleString('ru-RU')}
             {appointment.consultation_type ? ` · ${appointment.consultation_type}` : ''}
           </div>
         </div>
@@ -63,19 +63,19 @@ export function AppointmentCard({ appointment, studentName, onComplete, onCancel
 
       {appointment.notes && (
         <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-secondary)', marginTop: 'var(--space-2)' }}>
-          <strong>Notes:</strong> {appointment.notes}
+          <strong>Заметки:</strong> {appointment.notes}
         </div>
       )}
 
       <div style={{ display: 'flex', gap: 'var(--space-2)', marginTop: 'var(--space-2)', justifyContent: 'flex-end' }}>
         {appointment.status === 'confirmed' && onComplete && (
           <button style={buttonStyle('primary')} onClick={() => onComplete(appointment.id)}>
-            Complete
+            Завершить
           </button>
         )}
         {(appointment.status === 'pending' || appointment.status === 'confirmed') && onCancel && (
           <button style={buttonStyle('danger')} onClick={() => onCancel(appointment.id)}>
-            Cancel
+            Отменить
           </button>
         )}
       </div>

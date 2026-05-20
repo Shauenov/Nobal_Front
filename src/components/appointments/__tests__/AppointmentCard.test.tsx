@@ -25,13 +25,13 @@ describe('AppointmentCard', () => {
     render(<AppointmentCard appointment={appointment} onComplete={onComplete} onCancel={onCancel} />);
 
     // studentName not passed → falls back to truncated ID display
-    expect(screen.getByText(/Student student-/)).toBeInTheDocument();
+    expect(screen.getByText(/Студент student-/)).toBeInTheDocument();
     expect(screen.getByText('CONFIRMED')).toBeInTheDocument();
     // consultation_type appears in the subtitle
     expect(screen.getByText(/video/i)).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Complete' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Завершить' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Отменить' }));
 
     expect(onComplete).toHaveBeenCalledWith('app-1');
     expect(onCancel).toHaveBeenCalledWith('app-1');

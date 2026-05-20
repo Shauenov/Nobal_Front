@@ -39,14 +39,14 @@ test('creates roadmap with template tasks', async () => {
   render(<RoadmapForm onSubmit={onSubmit} />);
 
   // Fill title
-  await user.type(screen.getByPlaceholderText('Roadmap title'), 'My Roadmap');
+  await user.type(screen.getByPlaceholderText('Название маршрута'), 'My Roadmap');
 
   // Add a task
-  await user.type(screen.getByPlaceholderText('Task title'), 'First task');
-  await user.click(screen.getByRole('button', { name: /add task/i }));
+  await user.type(screen.getByPlaceholderText('Название задачи'), 'First task');
+  await user.click(screen.getByRole('button', { name: /добавить задачу/i }));
 
   // Submit
-  await user.click(screen.getByRole('button', { name: /create roadmap/i }));
+  await user.click(screen.getByRole('button', { name: /создать маршрут/i }));
 
   await waitFor(() => expect(onSubmit).toHaveBeenCalled());
 

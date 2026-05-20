@@ -110,7 +110,7 @@ export function BroadcastModal({ isOpen, onClose }: BroadcastModalProps) {
       if (!body && !file) {
         // require either body or image
         // simple client-side error
-        alert('Please provide a message body or attach an image.');
+        alert('Введите текст сообщения или прикрепите изображение.');
         return;
       }
 
@@ -132,14 +132,14 @@ export function BroadcastModal({ isOpen, onClose }: BroadcastModalProps) {
     <div style={overlayStyle} onClick={onClose}>
       <div style={modalStyle} onClick={(e) => e.stopPropagation()}>
         <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 'var(--font-semibold)' }}>
-          Send Broadcast
+          Рассылка
         </h2>
 
         <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
           {/* Message Body */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
             <label style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)' }}>
-              Message Body <span style={{ color: 'var(--color-error)' }}>*</span>
+              Текст сообщения <span style={{ color: 'var(--color-error)' }}>*</span>
             </label>
             <textarea
               {...register('body')}
@@ -150,35 +150,35 @@ export function BroadcastModal({ isOpen, onClose }: BroadcastModalProps) {
                 borderColor: errors.body ? 'var(--color-error)' : 'var(--color-border)',
               }}
               maxLength={2000}
-              placeholder="Write your broadcast message here..."
+              placeholder="Напишите текст рассылки..."
             />
             {errors.body && <div style={errorStyle}>{errors.body.message}</div>}
           </div>
 
           {/* Image attachment */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-            <label style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)' }}>Attach Image (optional)</label>
+            <label style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)' }}>Прикрепить изображение (необязательно)</label>
             <input type="file" accept="image/*" onChange={(e) => setFile(e.target.files ? e.target.files[0] : null)} />
-            {file && <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>Selected: {file.name} ({Math.round(file.size / 1024)} KB)</div>}
+            {file && <div style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>Выбрано: {file.name} ({Math.round(file.size / 1024)} KB)</div>}
           </div>
 
           {/* Filter by Group */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
             <label style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)' }}>
-              Filter by Group (Optional)
+              Фильтр по группе (необязательно)
             </label>
             <input
               {...register('filter_group')}
               style={inputStyle}
               type="text"
-              placeholder="e.g. D, F"
+              placeholder="Напр. D, F"
             />
           </div>
 
           {/* IELTS Passed Toggle */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
             <label style={{ fontSize: 'var(--text-sm)', fontWeight: 'var(--font-medium)' }}>
-              Filter Options
+              Доп. фильтры
             </label>
             <div style={checkboxStyle}>
               <input
@@ -188,7 +188,7 @@ export function BroadcastModal({ isOpen, onClose }: BroadcastModalProps) {
                 style={{ cursor: 'pointer', width: '18px', height: '18px' }}
               />
               <label htmlFor="ielts_passed" style={{ fontSize: 'var(--text-sm)', cursor: 'pointer', margin: 0 }}>
-                Only send to students who passed IELTS
+                Только студенты, сдавшие IELTS
               </label>
             </div>
           </div>
@@ -201,14 +201,14 @@ export function BroadcastModal({ isOpen, onClose }: BroadcastModalProps) {
               onClick={onClose}
               disabled={isPending}
             >
-              Cancel
+              Отмена
             </button>
             <button
               type="submit"
               style={buttonStyle('primary', !isSubmittable || isPending)}
               disabled={!isSubmittable || isPending}
             >
-              {isPending ? 'Sending...' : 'Send Broadcast'}
+              {isPending ? 'Отправка...' : 'Отправить рассылку'}
             </button>
           </div>
         </form>

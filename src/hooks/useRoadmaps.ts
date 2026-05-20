@@ -47,7 +47,7 @@ export function useCreateRoadmap() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.roadmaps() });
-      toast.success('Roadmap created');
+      toast.success('Маршрут создан');
     },
     onError: (err) => {
       toast.error(normalizeError(err).message);
@@ -67,7 +67,7 @@ export function useUpdateRoadmap(id: string) {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.roadmap(id) });
       qc.invalidateQueries({ queryKey: queryKeys.roadmaps() });
-      toast.success('Roadmap updated');
+      toast.success('Маршрут обновлён');
     },
     onError: (err) => {
       toast.error(normalizeError(err).message);
@@ -85,7 +85,7 @@ export function useDeleteRoadmap() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.roadmaps() });
-      toast.success('Roadmap deleted');
+      toast.success('Маршрут удалён');
     },
     onError: (err) => {
       toast.error(normalizeError(err).message);
@@ -107,7 +107,7 @@ export function useAssignRoadmap(roadmapId: string) {
     },
     onSuccess: (data) => {
       qc.invalidateQueries({ queryKey: queryKeys.studentRoadmaps(data.student_id) });
-      toast.success('Roadmap assigned');
+      toast.success('Маршрут назначен');
     },
     onError: (err) => {
       toast.error(normalizeError(err).message);

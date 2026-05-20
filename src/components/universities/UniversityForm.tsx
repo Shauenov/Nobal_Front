@@ -13,13 +13,13 @@ interface UniversityFormProps {
 }
 
 const universitySchema = z.object({
-  name: z.string().min(1, 'Name is required').max(200, 'Name too long'),
-  country: z.string().min(1, 'Country is required'),
+  name: z.string().min(1, 'Введите название').max(200, 'Название слишком длинное'),
+  country: z.string().min(1, 'Введите страну'),
   city: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
-  website_url: z.string().url('Invalid URL').optional().nullable(),
-  logo_url: z.string().url('Invalid URL').optional().nullable(),
-  cover_image_url: z.string().url('Invalid URL').optional().nullable(),
+  website_url: z.string().url('Некорректный URL').optional().nullable(),
+  logo_url: z.string().url('Некорректный URL').optional().nullable(),
+  cover_image_url: z.string().url('Некорректный URL').optional().nullable(),
   qs_ranking: z.number().min(1).optional().nullable(),
   the_ranking: z.number().min(1).optional().nullable(),
   acceptance_rate: z.number().min(0).max(1).optional().nullable(),
@@ -130,47 +130,47 @@ export function UniversityForm({ university, onSubmit, isLoading = false }: Univ
       <div style={gridStyle}>
         <div style={fieldStyle}>
           <label style={labelStyle}>
-            Name <span style={{ color: 'var(--color-error)' }}>*</span>
+            Название <span style={{ color: 'var(--color-error)' }}>*</span>
           </label>
-          <input {...register('name')} type="text" placeholder="University name" style={inputStyle} />
+          <input {...register('name')} type="text" placeholder="Название университета" style={inputStyle} />
           {errors.name && <div style={errorStyle}>{errors.name.message}</div>}
         </div>
 
         <div style={fieldStyle}>
           <label style={labelStyle}>
-            Country <span style={{ color: 'var(--color-error)' }}>*</span>
+            Страна <span style={{ color: 'var(--color-error)' }}>*</span>
           </label>
-          <input {...register('country')} type="text" placeholder="Country" style={inputStyle} />
+          <input {...register('country')} type="text" placeholder="Страна" style={inputStyle} />
           {errors.country && <div style={errorStyle}>{errors.country.message}</div>}
         </div>
       </div>
 
       <div style={gridStyle}>
         <div style={fieldStyle}>
-          <label style={labelStyle}>City</label>
-          <input {...register('city')} type="text" placeholder="City (optional)" style={inputStyle} />
+          <label style={labelStyle}>Город</label>
+          <input {...register('city')} type="text" placeholder="Город (необязательно)" style={inputStyle} />
         </div>
 
         <div style={fieldStyle}>
-          <label style={labelStyle}>Language of Instruction</label>
-          <input {...register('language_of_instr')} type="text" placeholder="e.g. English" style={inputStyle} />
+          <label style={labelStyle}>Язык обучения</label>
+          <input {...register('language_of_instr')} type="text" placeholder="напр. Английский" style={inputStyle} />
         </div>
       </div>
 
       <div style={fieldStyle}>
-        <label style={labelStyle}>Description</label>
-        <textarea {...register('description')} placeholder="University description" style={textareaStyle} />
+        <label style={labelStyle}>Описание</label>
+        <textarea {...register('description')} placeholder="Описание университета" style={textareaStyle} />
       </div>
 
       <div style={gridStyle}>
         <div style={fieldStyle}>
-          <label style={labelStyle}>Website URL</label>
+          <label style={labelStyle}>Веб-сайт</label>
           <input {...register('website_url')} type="url" placeholder="https://..." style={inputStyle} />
           {errors.website_url && <div style={errorStyle}>{errors.website_url.message}</div>}
         </div>
 
         <div style={fieldStyle}>
-          <label style={labelStyle}>Logo URL</label>
+          <label style={labelStyle}>URL логотипа</label>
           <input {...register('logo_url')} type="url" placeholder="https://..." style={inputStyle} />
           {errors.logo_url && <div style={errorStyle}>{errors.logo_url.message}</div>}
         </div>
@@ -178,7 +178,7 @@ export function UniversityForm({ university, onSubmit, isLoading = false }: Univ
 
       <div style={gridStyle}>
         <div style={fieldStyle}>
-          <label style={labelStyle}>Cover Image URL</label>
+          <label style={labelStyle}>URL обложки</label>
           <input {...register('cover_image_url')} type="url" placeholder="https://..." style={inputStyle} />
           {errors.cover_image_url && <div style={errorStyle}>{errors.cover_image_url.message}</div>}
         </div>
@@ -188,34 +188,34 @@ export function UniversityForm({ university, onSubmit, isLoading = false }: Univ
 
       <div style={gridStyle}>
         <div style={fieldStyle}>
-          <label style={labelStyle}>QS Ranking</label>
-          <input {...register('qs_ranking', { valueAsNumber: true })} type="number" placeholder="e.g. 1" min="1" style={inputStyle} />
+          <label style={labelStyle}>Рейтинг QS</label>
+          <input {...register('qs_ranking', { valueAsNumber: true })} type="number" placeholder="напр. 1" min="1" style={inputStyle} />
         </div>
 
         <div style={fieldStyle}>
-          <label style={labelStyle}>THE Ranking</label>
-          <input {...register('the_ranking', { valueAsNumber: true })} type="number" placeholder="e.g. 1" min="1" style={inputStyle} />
+          <label style={labelStyle}>Рейтинг THE</label>
+          <input {...register('the_ranking', { valueAsNumber: true })} type="number" placeholder="напр. 1" min="1" style={inputStyle} />
         </div>
       </div>
 
       <div style={gridStyle}>
         <div style={fieldStyle}>
-          <label style={labelStyle}>Acceptance Rate (0-1)</label>
-          <input {...register('acceptance_rate', { valueAsNumber: true })} type="number" placeholder="0.0-1.0" min="0" max="1" step="0.01" style={inputStyle} />
+          <label style={labelStyle}>Процент поступления (0–1)</label>
+          <input {...register('acceptance_rate', { valueAsNumber: true })} type="number" placeholder="0.0–1.0" min="0" max="1" step="0.01" style={inputStyle} />
         </div>
 
         <div style={fieldStyle}>
-          <label style={labelStyle}>Total Students</label>
-          <input {...register('total_students', { valueAsNumber: true })} type="number" placeholder="e.g. 10000" min="0" style={inputStyle} />
+          <label style={labelStyle}>Всего студентов</label>
+          <input {...register('total_students', { valueAsNumber: true })} type="number" placeholder="напр. 10000" min="0" style={inputStyle} />
         </div>
       </div>
 
       <div style={fieldStyle}>
-        <label style={labelStyle}>International Students %</label>
+        <label style={labelStyle}>Иностранные студенты %</label>
         <input
           {...register('international_pct', { valueAsNumber: true })}
           type="number"
-          placeholder="0-100"
+          placeholder="0–100"
           min="0"
           max="100"
           style={inputStyle}
@@ -225,13 +225,13 @@ export function UniversityForm({ university, onSubmit, isLoading = false }: Univ
       <div style={checkboxGroupStyle}>
         <input type="checkbox" id="is_published" {...register('is_published')} style={{ cursor: 'pointer', width: '18px', height: '18px' }} />
         <label htmlFor="is_published" style={{ ...labelStyle, margin: 0, cursor: 'pointer', fontWeight: 'normal' }}>
-          Published
+          Опубликован
         </label>
       </div>
 
       <div style={buttonGroupStyle}>
         <button type="submit" style={buttonStyle('primary', !isValid || isLoading)} disabled={!isValid || isLoading}>
-          {isLoading ? 'Saving...' : university ? 'Update University' : 'Create University'}
+          {isLoading ? 'Сохранение...' : university ? 'Обновить' : 'Создать'}
         </button>
       </div>
     </form>

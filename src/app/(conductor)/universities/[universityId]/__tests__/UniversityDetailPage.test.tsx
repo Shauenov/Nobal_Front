@@ -110,7 +110,7 @@ describe('UniversityDetailPage', () => {
     const user = userEvent.setup();
     render(<UniversityDetailPage />);
 
-    await user.click(screen.getByRole('button', { name: /Programs/ }));
+    await user.click(screen.getByRole('button', { name: /Программы/ }));
 
     expect(screen.getByText('Computer Science')).toBeInTheDocument();
   });
@@ -119,7 +119,7 @@ describe('UniversityDetailPage', () => {
     const user = userEvent.setup();
     render(<UniversityDetailPage />);
 
-    await user.click(screen.getByRole('button', { name: /Applications/ }));
+    await user.click(screen.getByRole('button', { name: /Заявки/ }));
 
     expect(screen.getByText('Нет заявок')).toBeInTheDocument();
   });

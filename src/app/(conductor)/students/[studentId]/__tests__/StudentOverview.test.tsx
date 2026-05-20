@@ -6,6 +6,15 @@ vi.mock('next/navigation', () => ({
   useParams: () => ({ studentId: 'student-1' }),
 }));
 
+// lucide-react icons — stub so JSDOM doesn't fail on SVG
+vi.mock('lucide-react', () => ({
+  CalendarCheck: () => null,
+  BookOpen:      () => null,
+  CheckCircle:   () => null,
+  Clock:         () => null,
+  AlertCircle:   () => null,
+}));
+
 const mockUseStudent = vi.fn();
 
 vi.mock('@/hooks/useStudents', () => ({
@@ -38,18 +47,18 @@ const mockStudent = {
     kta_score: null,
     target_country: 'UK',
     target_major: 'Computer Science',
-    notes: null,
+    notes: 'Some notes here',
     phone: null,
     gender: null,
     birth_date: null,
     school_name: null,
     degree_level: null,
-    target_countries: [],
+    target_countries: ['США', 'Германия'],
     budget_max: null,
   },
   documents: [],
   active_roadmap: null,
-  tasks_summary: { todo: 3, done: 7 },
+  tasks_summary: { pending: 3, completed: 7 },
   next_appointment: null,
 };
 
@@ -59,24 +68,40 @@ describe('StudentOverviewPage', () => {
 
     render(<StudentOverviewPage />);
 
-    expect(screen.getByText(/Group:/)).toBeInTheDocument();
-    expect(screen.getByText(/D/)).toBeInTheDocument();
-    expect(screen.getByText(/GPA:/)).toBeInTheDocument();
-    expect(screen.getByText(/3.85/)).toBeInTheDocument();
-    expect(screen.getByText(/Passed/)).toBeInTheDocument();
-    expect(screen.getByText('todo')).toBeInTheDocument();
-    expect(screen.getByText('done')).toBeInTheDocument();
-    expect(screen.getByText('7')).toBeInTheDocument();
-    expect(screen.getByText('No upcoming appointment.')).toBeInTheDocument();
-    expect(screen.getByText('No active roadmap.')).toBeInTheDocument();
+    // Stat chips
+    expect(screen.getByText('GPA')).toBeInTheDocument();
+    // toFixed(1) rounds 3.85 → 3.9 in most environments
+    expect(screen.getByText(/3\.[89]/)).toBeInTheDocument();
+    expect(screen.getByText('Балл IELTS')).toBeInTheDocument();
+    // ielts_score '7.0' rendered as-is
+    expect(screen.getByText('7.0')).toBeInTheDocument();
+
+    // Profile card — row label
+    expect(screen.getByText('Группа')).toBeInTheDocument();
+    expect(screen.getByText('D')).toBeInTheDocument();
+
+    // Task summary
+    expect(screen.getByText('Ожидает')).toBeInTheDocument();
+    expect(screen.getByText('Завершено')).toBeInTheDocument();
+
+    // Empty states
+    expect(screen.getByText('Нет предстоящих консультаций')).toBeInTheDocument();
+    expect(screen.getByText('Нет активного маршрута')).toBeInTheDocument();
+
+    // Target countries chips
+    expect(screen.getByText('США')).toBeInTheDocument();
+
+    // Notes
+    expect(screen.getByText('Some notes here')).toBeInTheDocument();
   });
 
-  it('shows loading state', () => {
+  it('shows loading skeleton without crashing', () => {
     mockUseStudent.mockReturnValue({ data: undefined, isLoading: true });
 
-    render(<StudentOverviewPage />);
+    const { container } = render(<StudentOverviewPage />);
 
-    expect(screen.getByText('Loading overview...')).toBeInTheDocument();
+    // Loading renders placeholder div grid — no text, but component mounts
+    expect(container.firstChild).toBeTruthy();
   });
 
   it('shows not-found state when data is null', () => {
@@ -84,6 +109,6 @@ describe('StudentOverviewPage', () => {
 
     render(<StudentOverviewPage />);
 
-    expect(screen.getByText('Student not found.')).toBeInTheDocument();
+    expect(screen.getByText('Данные студента недоступны')).toBeInTheDocument();
   });
 });

@@ -10,7 +10,7 @@ export function TaskList({ tasks, onTaskClick }: TaskListProps) {
   if (tasks.length === 0) {
     return (
       <div style={{ color: 'var(--color-text-secondary)', textAlign: 'center', padding: 'var(--space-8)' }}>
-        No tasks yet.
+        Задач пока нет.
       </div>
     );
   }

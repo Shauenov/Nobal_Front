@@ -16,10 +16,10 @@ test('submits assign modal with student id', async () => {
 
   render(<RoadmapAssignModal isOpen={true} onClose={onClose} templateTasks={templateTasks} onSubmit={onSubmit} />);
 
-  await user.type(screen.getByPlaceholderText('Enter student ID'), 'student-123');
+  await user.type(screen.getByPlaceholderText('Введите ID студента'), 'student-123');
 
   // Submit without deadlines
-  await user.click(screen.getByRole('button', { name: /assign roadmap/i }));
+  await user.click(screen.getByRole('button', { name: /назначить маршрут/i }));
 
   await waitFor(() => expect(onSubmit).toHaveBeenCalled());
   expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({ student_id: 'student-123' }));

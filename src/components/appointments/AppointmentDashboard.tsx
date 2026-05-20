@@ -1,15 +1,21 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
-import { Users, CalendarCheck, Star, Plus, Calendar } from 'lucide-react';
+import Link from 'next/link';
+import { Users, CalendarCheck, Star, Calendar, Check, X, ArrowLeft } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { useAppointments } from '@/hooks/useAppointments';
+import {
+  useAppointments,
+  useCompleteAppointment,
+  useCancelAppointment,
+} from '@/hooks/useAppointments';
 import { useStudents } from '@/hooks/useStudents';
 import { useOverviewReport } from '@/hooks/useReports';
 import type { AppointmentOut } from '@/types/api';
+import { SlotManager } from './SlotManager';
 
 /* ─── Status helpers ─────────────────────────────────────── */
 const STATUS_LABEL: Record<string, string> = {
@@ -111,9 +117,14 @@ const tdStyle: CSSProperties = {
 
 /* ─── Main component ─────────────────────────────────────── */
 export function AppointmentDashboard() {
+  const [view, setView] = useState<'overview' | 'slots'>('overview');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+
   const { data: appointments = [], isLoading: apptLoading } = useAppointments();
   const { data: studentsResp } = useStudents({ page: 1, page_size: 200 });
   const { data: report } = useOverviewReport();
+  const completeAppt = useCompleteAppointment();
+  const cancelAppt = useCancelAppointment();
 
   /* Student lookup map */
   const studentMap = useMemo(() => {
@@ -140,11 +151,49 @@ export function AppointmentDashboard() {
     return upcoming[0] ?? null;
   }, [appointments]);
 
-  /* Upcoming sessions (non-cancelled, up to 10) */
+  /* Upcoming sessions (filtered by status, up to 10) */
   const sessions = useMemo(
-    () => appointments.filter((a) => a.status !== 'cancelled').slice(0, 10),
-    [appointments],
+    () =>
+      appointments
+        .filter((a) => a.status !== 'cancelled')
+        .filter((a) => statusFilter === 'all' || a.status === statusFilter)
+        .slice(0, 10),
+    [appointments, statusFilter],
   );
+
+  /* ── Slot-management view ── */
+  if (view === 'slots') {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+        <PageHeader
+          title="Управление слотами"
+          subtitle="Создавайте и удаляйте временные слоты для записей"
+          action={
+            <button
+              onClick={() => setView('overview')}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '9px 18px',
+                borderRadius: 8,
+                border: '1px solid #e2e8f0',
+                background: '#fff',
+                color: '#475569',
+                fontSize: '0.875rem',
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+            >
+              <ArrowLeft size={16} />
+              Назад к записям
+            </button>
+          }
+        />
+        <SlotManager />
+      </div>
+    );
+  }
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
@@ -153,22 +202,23 @@ export function AppointmentDashboard() {
         subtitle="Управляйте расписанием и встречами со студентами"
         action={
           <button
+            onClick={() => setView('slots')}
             style={{
               display: 'flex',
               alignItems: 'center',
               gap: 6,
-              padding: '9px 18px',
+              padding: '9px 16px',
               borderRadius: 8,
-              border: 'none',
-              background: '#2563eb',
-              color: '#fff',
+              border: '1px solid #e2e8f0',
+              background: '#fff',
+              color: '#475569',
               fontSize: '0.875rem',
               fontWeight: 600,
               cursor: 'pointer',
             }}
           >
-            <Plus size={16} />
-            Добавить запись
+            <Calendar size={16} />
+            Управление слотами
           </button>
         }
       />
@@ -233,12 +283,11 @@ export function AppointmentDashboard() {
             <span style={{ fontWeight: 600, fontSize: '0.95rem', color: '#1e293b' }}>
               Ближайшие занятия
             </span>
-            <button
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 5,
-                padding: '6px 14px',
+                padding: '6px 12px',
                 borderRadius: 7,
                 border: '1px solid #e2e8f0',
                 background: '#fff',
@@ -246,11 +295,14 @@ export function AppointmentDashboard() {
                 fontSize: '0.78rem',
                 fontWeight: 500,
                 cursor: 'pointer',
+                outline: 'none',
               }}
             >
-              <Calendar size={13} />
-              Добавить событие
-            </button>
+              <option value="all">Все статусы</option>
+              <option value="confirmed">Подтверждено</option>
+              <option value="pending">В процессе</option>
+              <option value="completed">Завершено</option>
+            </select>
           </div>
 
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -261,13 +313,14 @@ export function AppointmentDashboard() {
                 <th style={{ ...thStyle, width: 130 }}>Статус</th>
                 <th style={{ ...thStyle, width: 130 }}>Время</th>
                 <th style={{ ...thStyle, width: 120 }}>Кабинет</th>
+                <th style={{ ...thStyle, width: 90 }}>Действия</th>
               </tr>
             </thead>
             <tbody>
               {apptLoading ? (
                 [...Array(5)].map((_, i) => (
                   <tr key={i}>
-                    {[...Array(5)].map((__, j) => (
+                    {[...Array(6)].map((__, j) => (
                       <td key={j} style={tdStyle}>
                         <div
                           style={{
@@ -284,7 +337,7 @@ export function AppointmentDashboard() {
               ) : sessions.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={5}
+                    colSpan={6}
                     style={{
                       ...tdStyle,
                       textAlign: 'center',
@@ -297,7 +350,7 @@ export function AppointmentDashboard() {
                 </tr>
               ) : (
                 sessions.map((appt) => {
-                  const student = studentMap[appt.student_id];
+                  const studentName = appt.student_name ?? null;
                   const timeStr = format(
                     new Date(appt.created_at),
                     'dd MMM, HH:mm',
@@ -323,17 +376,17 @@ export function AppointmentDashboard() {
                               flexShrink: 0,
                             }}
                           >
-                            {student ? getInitials(student.name) : '??'}
+                            {studentName ? getInitials(studentName) : '??'}
                           </div>
                           <span style={{ fontWeight: 500 }}>
-                            {student?.name ?? `Студент ${appt.student_id.slice(0, 6)}…`}
+                            {studentName ?? `Студент ${appt.student_id.slice(0, 6)}…`}
                           </span>
                         </div>
                       </td>
 
                       {/* Group */}
                       <td style={{ ...tdStyle, color: '#64748b' }}>
-                        {student?.group || '—'}
+                        {studentMap[appt.student_id]?.group || '—'}
                       </td>
 
                       {/* Status badge */}
@@ -359,6 +412,46 @@ export function AppointmentDashboard() {
                       {/* Type / Cabinet */}
                       <td style={{ ...tdStyle, color: '#64748b', fontSize: '0.8rem' }}>
                         {TYPE_LABEL[appt.consultation_type] ?? appt.consultation_type}
+                      </td>
+
+                      {/* Actions */}
+                      <td style={tdStyle}>
+                        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                          {appt.status === 'confirmed' && (
+                            <button
+                              title="Завершить"
+                              onClick={() => completeAppt.mutate(appt.id)}
+                              disabled={completeAppt.isPending}
+                              style={{
+                                padding: 6,
+                                border: 'none',
+                                background: 'transparent',
+                                cursor: 'pointer',
+                                color: '#16a34a',
+                                borderRadius: 6,
+                              }}
+                            >
+                              <Check size={15} />
+                            </button>
+                          )}
+                          {(appt.status === 'pending' || appt.status === 'confirmed') && (
+                            <button
+                              title="Отменить"
+                              onClick={() => cancelAppt.mutate({ id: appt.id })}
+                              disabled={cancelAppt.isPending}
+                              style={{
+                                padding: 6,
+                                border: 'none',
+                                background: 'transparent',
+                                cursor: 'pointer',
+                                color: '#ef4444',
+                                borderRadius: 6,
+                              }}
+                            >
+                              <X size={15} />
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   );
@@ -412,14 +505,21 @@ export function AppointmentDashboard() {
                   {format(new Date(nextAppointment.created_at), "dd MMM, HH:mm", { locale: ru })}
                 </div>
 
-                {/* Student info */}
-                <div
+                {/* Student info — click to open profile */}
+                <Link
+                  href={`/students/${nextAppointment.student_id}`}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
                     gap: 12,
-                    marginBottom: 16,
+                    marginBottom: 4,
+                    textDecoration: 'none',
+                    borderRadius: 10,
+                    padding: '8px 6px',
+                    transition: 'background 150ms ease',
                   }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.background = '#f8fafc'; }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.background = 'transparent'; }}
                 >
                   <div
                     style={{
@@ -436,13 +536,13 @@ export function AppointmentDashboard() {
                       flexShrink: 0,
                     }}
                   >
-                    {studentMap[nextAppointment.student_id]
-                      ? getInitials(studentMap[nextAppointment.student_id].name)
+                    {nextAppointment.student_name
+                      ? getInitials(nextAppointment.student_name)
                       : '??'}
                   </div>
                   <div>
                     <div style={{ fontWeight: 600, fontSize: '0.875rem', color: '#1e293b' }}>
-                      {studentMap[nextAppointment.student_id]?.name ??
+                      {nextAppointment.student_name ??
                         `Студент ${nextAppointment.student_id.slice(0, 8)}…`}
                     </div>
                     <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: 2 }}>
@@ -452,23 +552,7 @@ export function AppointmentDashboard() {
                         : ''}
                     </div>
                   </div>
-                </div>
-
-                <button
-                  style={{
-                    width: '100%',
-                    padding: '9px 0',
-                    borderRadius: 8,
-                    border: 'none',
-                    background: '#2563eb',
-                    color: '#fff',
-                    fontSize: '0.8rem',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                  }}
-                >
-                  Подготовиться к встрече
-                </button>
+                </Link>
               </>
             ) : (
               <div
@@ -569,8 +653,8 @@ export function AppointmentDashboard() {
                         whiteSpace: 'nowrap',
                       }}
                     >
-                      {studentMap[appt.student_id]?.name
-                        ? `Встреча со студентом ${studentMap[appt.student_id].name}`
+                      {appt.student_name
+                        ? `Встреча со студентом ${appt.student_name}`
                         : `Консультация · ${TYPE_LABEL[appt.consultation_type] ?? appt.consultation_type}`}
                     </span>
                   </div>

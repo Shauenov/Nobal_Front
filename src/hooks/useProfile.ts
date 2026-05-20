@@ -40,7 +40,7 @@ export function useUpdateStudentProfile(studentId: string) {
     onSuccess: (data) => {
       qc.setQueryData(queryKeys.studentProfile(studentId), data);
       qc.invalidateQueries({ queryKey: queryKeys.student(studentId) });
-      toast.success('Profile updated');
+      toast.success('Профиль обновлён');
     },
     onError: (err) => {
       toast.error(normalizeError(err).message);
@@ -67,19 +67,23 @@ export function useUploadDocument(studentId: string) {
   const qc = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ file, docType }: { file: File; docType: string }) => {
+    mutationFn: async ({ file, docType, category }: { file: File; docType: string; category: string }) => {
       const formData = new FormData();
       formData.append('file', file);
+      formData.append('doc_type', docType);
+      formData.append('category', category);
+      // Setting Content-Type to undefined removes the global 'application/json'
+      // default so axios lets the browser set 'multipart/form-data; boundary=...'
       const res = await apiClient.post(
-        `/api/v1/students/${studentId}/documents?doc_type=${docType}`,
+        `/api/v1/students/${studentId}/documents`,
         formData,
-        { headers: { 'Content-Type': 'multipart/form-data' } }
+        { headers: { 'Content-Type': undefined } },
       );
       return res.data.data;
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.studentDocuments(studentId) });
-      toast.success('Document uploaded');
+      toast.success('Документ загружен');
     },
     onError: (err) => {
       toast.error(normalizeError(err).message);
@@ -97,7 +101,7 @@ export function useDeleteDocument(studentId: string) {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.studentDocuments(studentId) });
-      toast.success('Document deleted');
+      toast.success('Документ удалён');
     },
     onError: (err) => {
       toast.error(normalizeError(err).message);
@@ -132,7 +136,7 @@ export function useUpdateNotificationSettings() {
     },
     onSuccess: (data) => {
       qc.setQueryData(queryKeys.notificationSettings, data);
-      toast.success('Notification settings updated');
+      toast.success('Настройки уведомлений сохранены');
     },
     onError: (err) => {
       toast.error(normalizeError(err).message);

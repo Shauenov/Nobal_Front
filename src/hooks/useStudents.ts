@@ -52,7 +52,7 @@ export function useInviteStudent() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.students() });
-      toast.success('Student invited successfully');
+      toast.success('Студент приглашён');
     },
     onError: (err) => {
       toast.error(normalizeError(err).message);
@@ -71,7 +71,7 @@ export function useDeleteStudent() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.students() });
-      toast.success('Student deleted');
+      toast.success('Студент удалён');
     },
     onError: (err) => {
       toast.error(normalizeError(err).message);

@@ -40,10 +40,11 @@ describe('StudentDocumentsPage', () => {
 
     render(<StudentDocumentsPage />);
 
-    expect(screen.getAllByText('passport').length).toBeGreaterThan(0);
+    // DOC_TYPE_LABELS maps 'passport' → 'Паспорт'
+    expect(screen.getAllByText('Паспорт').length).toBeGreaterThan(0);
     expect(screen.getByText(/200 KB/)).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Download' })).toHaveAttribute('href', 'https://storage/passport.pdf');
-    expect(screen.getByRole('button', { name: 'Delete' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Открыть/ })).toHaveAttribute('href', 'https://storage/passport.pdf');
+    expect(screen.getByRole('button', { name: /Удалить/ })).toBeInTheDocument();
   });
 
   it('shows empty state when no documents', () => {
@@ -51,7 +52,7 @@ describe('StudentDocumentsPage', () => {
 
     render(<StudentDocumentsPage />);
 
-    expect(screen.getByText('No documents uploaded.')).toBeInTheDocument();
+    expect(screen.getByText('Нет загруженных документов')).toBeInTheDocument();
   });
 
   it('shows loading state', () => {
@@ -59,7 +60,7 @@ describe('StudentDocumentsPage', () => {
 
     render(<StudentDocumentsPage />);
 
-    expect(screen.getByText('Loading documents...')).toBeInTheDocument();
+    expect(screen.getByText('Загрузка...')).toBeInTheDocument();
   });
 
   it('shows upload form with doc type selector and upload button', () => {
@@ -67,7 +68,9 @@ describe('StudentDocumentsPage', () => {
 
     render(<StudentDocumentsPage />);
 
-    expect(screen.getByText('Upload')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('passport')).toBeInTheDocument();
+    // Upload button renders as "Загрузить"
+    expect(screen.getByRole('button', { name: /Загрузить/ })).toBeInTheDocument();
+    // The select shows 'Паспорт' as the label for the first option (value='passport')
+    expect(screen.getByDisplayValue('Паспорт')).toBeInTheDocument();
   });
 });

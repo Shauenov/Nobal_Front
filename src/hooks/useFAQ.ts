@@ -32,7 +32,7 @@ export function useCreateFAQ() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.faqs });
-      toast.success('FAQ created');
+      toast.success('Вопрос создан');
     },
     onError: (err) => {
       toast.error(normalizeError(err).message);
@@ -51,7 +51,7 @@ export function useUpdateFAQ() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.faqs });
-      toast.success('FAQ updated');
+      toast.success('Вопрос обновлён');
     },
     onError: (err) => {
       toast.error(normalizeError(err).message);
@@ -69,7 +69,7 @@ export function useDeleteFAQ() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: queryKeys.faqs });
-      toast.success('FAQ deleted');
+      toast.success('Вопрос удалён');
     },
     onError: (err) => {
       toast.error(normalizeError(err).message);

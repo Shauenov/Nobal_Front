@@ -184,20 +184,20 @@ export function RoadmapForm({
           <label style={labelStyle}>
             Title <span style={{ color: 'var(--color-error)' }}>*</span>
           </label>
-          <input {...register('title')} type="text" placeholder="Roadmap title" style={inputStyle} />
+          <input {...register('title')} type="text" placeholder="Название маршрута" style={inputStyle} />
           {errors.title && <div style={errorStyle}>{errors.title.message}</div>}
         </div>
       </div>
 
       <div style={fieldStyle}>
         <label style={labelStyle}>Description</label>
-        <textarea {...register('description')} placeholder="Roadmap description" style={textareaStyle} />
+        <textarea {...register('description')} placeholder="Описание маршрута" style={textareaStyle} />
       </div>
 
       <div style={gridStyle}>
         <div style={fieldStyle}>
-          <label style={labelStyle}>Target Type</label>
-          <input {...register('target_type')} type="text" placeholder="e.g. Bachelor, Master" style={inputStyle} />
+          <label style={labelStyle}>Тип цели</label>
+          <input {...register('target_type')} type="text" placeholder="напр. Бакалавр, Магистр" style={inputStyle} />
         </div>
         <div style={fieldStyle} />
       </div>
@@ -205,12 +205,12 @@ export function RoadmapForm({
       <div style={checkboxGroupStyle}>
         <input type="checkbox" id="is_public" {...register('is_public')} style={{ cursor: 'pointer', width: '18px', height: '18px' }} />
         <label htmlFor="is_public" style={{ ...labelStyle, margin: 0, cursor: 'pointer', fontWeight: 'normal' }}>
-          Public
+          Публичный
         </label>
       </div>
 
       <div style={sectionStyle}>
-        <div style={sectionTitleStyle}>Template Tasks</div>
+        <div style={sectionTitleStyle}>Шаблонные задачи</div>
 
         {tasks.length > 0 && (
           <TemplateTaskList
@@ -223,10 +223,10 @@ export function RoadmapForm({
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)', paddingTop: 'var(--space-2)', borderTop: '1px solid var(--color-border)' }}>
           <div style={fieldStyle}>
-            <label style={labelStyle}>Add Task</label>
+            <label style={labelStyle}>Добавить задачу</label>
             <input
               type="text"
-              placeholder="Task title"
+              placeholder="Название задачи"
               value={newTaskTitle}
               onChange={(e) => setNewTaskTitle(e.target.value)}
               style={taskInputStyle}
@@ -236,7 +236,7 @@ export function RoadmapForm({
           <div style={fieldStyle}>
             <input
               type="text"
-              placeholder="Description (optional)"
+              placeholder="Описание (необязательно)"
               value={newTaskDescription}
               onChange={(e) => setNewTaskDescription(e.target.value)}
               style={taskInputStyle}
@@ -246,7 +246,7 @@ export function RoadmapForm({
           <div style={fieldStyle}>
             <input
               type="number"
-              placeholder="Days offset (e.g. 30)"
+              placeholder="Смещение дней (напр. 30)"
               min="0"
               value={newTaskDaysOffset}
               onChange={(e) => setNewTaskDaysOffset(e.target.value)}
@@ -260,14 +260,14 @@ export function RoadmapForm({
             disabled={!newTaskTitle.trim() || isLoading}
             style={buttonStyle('ghost', !newTaskTitle.trim() || isLoading)}
           >
-            + Add Task
+            + Добавить задачу
           </button>
         </div>
       </div>
 
       <div style={buttonGroupStyle}>
         <button type="submit" style={buttonStyle('primary', !isValid || isLoading)} disabled={!isValid || isLoading}>
-          {isLoading ? 'Saving...' : roadmap ? 'Update Roadmap' : 'Create Roadmap'}
+          {isLoading ? 'Сохранение...' : roadmap ? 'Обновить маршрут' : 'Создать маршрут'}
         </button>
       </div>
     </form>

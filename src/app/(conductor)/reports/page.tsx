@@ -2,8 +2,10 @@
 
 import type { CSSProperties } from 'react';
 import { useState } from 'react';
+import { Download } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { useReports } from '@/hooks/useReports';
+import { exportCsv } from '@/lib/exportCsv';
 import type { OverviewReport, StudentProgressItem, UniversityStats } from '@/types/api';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 
@@ -111,9 +113,21 @@ export default function ReportsPage() {
 
       {activeTab === 'overview' && (
         <div style={sectionStyle}>
-          <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: '600', marginBottom: 'var(--space-4)' }}>
-            Общая статистика
-          </h2>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)' }}>
+            <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: '600' }}>Общая статистика</h2>
+            <button
+              type="button"
+              onClick={() => exportCsv([{
+                'Всего студентов': overviewReport.total_students ?? 0,
+                'IELTS сдали': overviewReport.ielts_passed ?? 0,
+                'SAT сдали': overviewReport.sat_passed ?? 0,
+                'Средний GPA': (overviewReport.avg_gpa ?? 0).toFixed(2),
+              }], 'отчёт-обзор')}
+              style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', borderRadius: 8, border: '1px solid #e2e8f0', background: '#fff', color: '#475569', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}
+            >
+              <Download size={13} /> Экспорт CSV
+            </button>
+          </div>
 
           <div style={gridStyle}>
             <div style={cardStyle}>
@@ -169,9 +183,27 @@ export default function ReportsPage() {
 
       {activeTab === 'students' && (
         <div style={sectionStyle}>
-          <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: '600', marginBottom: 'var(--space-4)' }}>
-            Прогресс студентов
-          </h2>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)' }}>
+            <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: '600' }}>Прогресс студентов</h2>
+            <button
+              type="button"
+              disabled={studentsReport.length === 0}
+              onClick={() => exportCsv(studentsReport.map((s) => ({
+                'Имя': s.full_name,
+                'Группа': s.group_type ?? '',
+                'Курс': s.course_year ?? '',
+                'GPA': s.gpa ?? '',
+                'IELTS': s.ielts_passed ? 'Да' : 'Нет',
+                'SAT': s.sat_passed ? 'Да' : 'Нет',
+                'Задания (всего)': s.tasks_total,
+                'Выполнено': s.tasks_done,
+                'Просрочено': s.tasks_overdue,
+              })), 'отчёт-студенты')}
+              style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', borderRadius: 8, border: '1px solid #e2e8f0', background: '#fff', color: '#475569', fontSize: '0.8rem', fontWeight: 600, cursor: studentsReport.length ? 'pointer' : 'not-allowed', opacity: studentsReport.length ? 1 : 0.5 }}
+            >
+              <Download size={13} /> Экспорт CSV
+            </button>
+          </div>
           {studentsReport.length === 0 ? (
             <p style={{ color: 'var(--color-text-secondary)' }}>Нет данных</p>
           ) : (
@@ -243,9 +275,21 @@ export default function ReportsPage() {
 
       {activeTab === 'universities' && (
         <div style={sectionStyle}>
-          <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: '600', marginBottom: 'var(--space-4)' }}>
-            Статистика университетов
-          </h2>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-4)' }}>
+            <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: '600' }}>Статистика университетов</h2>
+            <button
+              type="button"
+              onClick={() => {
+                const byCountry = Object.entries(universitiesReport.by_target_country ?? {}).map(([country, count]) => ({ 'Страна': country, 'Студентов': count }));
+                const byMajor = Object.entries(universitiesReport.by_target_major ?? {}).map(([major, count]) => ({ 'Направление': major, 'Студентов': count }));
+                if (byCountry.length) exportCsv(byCountry, 'отчёт-университеты-страны');
+                if (byMajor.length) exportCsv(byMajor, 'отчёт-университеты-направления');
+              }}
+              style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '7px 14px', borderRadius: 8, border: '1px solid #e2e8f0', background: '#fff', color: '#475569', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer' }}
+            >
+              <Download size={13} /> Экспорт CSV
+            </button>
+          </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-6)' }}>
             {/* By country */}

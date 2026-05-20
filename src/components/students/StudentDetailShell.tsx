@@ -64,14 +64,14 @@ export function StudentDetailShell({ children }: StudentDetailShellProps) {
   }, [isOverview, studentName, setPageTitle]);
 
   const tabs = [
-    { label: 'Overview', href: `/students/${studentId}` },
-    { label: 'Profile', href: `/students/${studentId}/profile` },
-    { label: 'Documents', href: `/students/${studentId}/documents` },
-    { label: 'Tasks', href: `/students/${studentId}/tasks` },
-    { label: 'Roadmaps', href: `/students/${studentId}/roadmaps` },
+    { label: 'Обзор', href: `/students/${studentId}` },
+    { label: 'Профиль', href: `/students/${studentId}/profile` },
+    { label: 'Документы', href: `/students/${studentId}/documents` },
+    { label: 'Задачи', href: `/students/${studentId}/tasks` },
+    { label: 'Маршруты', href: `/students/${studentId}/roadmaps` },
   ];
 
-  const name = student.data?.user.full_name ?? 'Student';
+  const name = student.data?.user.full_name ?? 'Студент';
   const email = student.data?.user.email ?? '—';
   const group = student.data?.profile?.group_type ?? '—';
   const year = student.data?.profile?.course_year ?? '—';
@@ -80,10 +80,10 @@ export function StudentDetailShell({ children }: StudentDetailShellProps) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
       <div style={headerStyle}>
         <div style={{ fontSize: 'var(--text-2xl)', fontWeight: 'var(--font-semibold)' }}>
-          {student.isLoading ? 'Loading student...' : name}
+          {student.isLoading ? 'Загрузка...' : name}
         </div>
         <div style={metaStyle}>
-          {email} · Group {group} · Year {year}
+          {email} · Группа {group} · {year}-й курс
         </div>
       </div>
 

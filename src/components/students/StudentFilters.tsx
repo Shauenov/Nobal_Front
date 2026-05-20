@@ -69,8 +69,18 @@ export function StudentFilters({
         <label style={labelStyle}>{t('filters.group')}</label>
         <select style={selectStyle} value={groupType} onChange={handleChange('group_type')}>
           <option value="">{t('filters.all')}</option>
-          <option value="D">D</option>
-          <option value="F">F</option>
+          <optgroup label="D">
+            <option value="D">D (все)</option>
+            <option value="D1">D1</option>
+            <option value="D2">D2</option>
+          </optgroup>
+          <optgroup label="F">
+            <option value="F">F (все)</option>
+            <option value="F1">F1</option>
+            <option value="F2">F2</option>
+            <option value="F3">F3</option>
+            <option value="F4">F4</option>
+          </optgroup>
         </select>
       </div>
 

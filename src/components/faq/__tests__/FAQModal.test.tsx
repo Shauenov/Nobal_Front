@@ -25,13 +25,13 @@ describe('FAQModal', () => {
 
     render(<FAQModal open onClose={onClose} defaultOrderIndex={4} />);
 
-    await user.type(screen.getByLabelText('Question'), 'How do I reset my password?');
+    await user.type(screen.getByLabelText('Вопрос'), 'How do I reset my password?');
     await user.type(
-      screen.getByLabelText('Answer'),
+      screen.getByLabelText('Ответ'),
       'Use the forgot password flow to receive a reset link.',
     );
-    await user.type(screen.getByLabelText('Category'), 'Auth');
-    await user.click(screen.getByRole('button', { name: 'Create FAQ' }));
+    await user.type(screen.getByLabelText('Категория'), 'Auth');
+    await user.click(screen.getByRole('button', { name: 'Создать FAQ' }));
 
     await waitFor(() => {
       expect(createFAQ).toHaveBeenCalledWith({
@@ -69,11 +69,11 @@ describe('FAQModal', () => {
       />,
     );
 
-    await user.clear(screen.getByLabelText('Question'));
-    await user.type(screen.getByLabelText('Question'), 'New question');
-    await user.clear(screen.getByLabelText('Answer'));
-    await user.type(screen.getByLabelText('Answer'), 'A longer updated answer for the FAQ entry.');
-    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+    await user.clear(screen.getByLabelText('Вопрос'));
+    await user.type(screen.getByLabelText('Вопрос'), 'New question');
+    await user.clear(screen.getByLabelText('Ответ'));
+    await user.type(screen.getByLabelText('Ответ'), 'A longer updated answer for the FAQ entry.');
+    await user.click(screen.getByRole('button', { name: 'Сохранить' }));
 
     await waitFor(() => {
       expect(updateFAQ).toHaveBeenCalledWith({

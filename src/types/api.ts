@@ -3,6 +3,9 @@
 // Source: OpenAPI 3.1.0 — http://localhost:8000/api/openapi.json
 // ============================================================
 
+// ── Group type ────────────────────────────────────────────────
+export type GroupType = 'D' | 'D1' | 'D2' | 'F' | 'F1' | 'F2' | 'F3' | 'F4';
+
 // ── Generic Envelope ──────────────────────────────────────────
 export interface ApiEnvelope<T> {
   success: boolean;
@@ -48,7 +51,7 @@ export interface RegisterRequest {
   email: string;
   full_name: string;
   password: string;
-  group_type: 'D' | 'F';
+  group_type: GroupType;
   course_year: 2 | 3;
   gpa?: number | null;
   ielts_passed?: boolean;
@@ -151,7 +154,7 @@ export type PaginatedStudents = PaginatedEnvelope<StudentListItem>;
 
 // Student filter params
 export interface StudentListParams {
-  group_type?: 'D' | 'F' | null;
+  group_type?: GroupType | null;
   course_year?: 2 | 3 | null;
   ielts_passed?: boolean | null;
   sat_passed?: boolean | null;
@@ -164,7 +167,7 @@ export interface StudentListParams {
 export interface ProfileOut {
   id: string;
   user_id: string;
-  group_type: 'D' | 'F';
+  group_type: GroupType;
   course_year: number;
   gpa?: string | null;
   ielts_passed: boolean;
@@ -188,7 +191,7 @@ export interface ProfileOut {
 }
 
 export interface ProfileUpdate {
-  group_type?: 'D' | 'F' | null;
+  group_type?: GroupType | null;
   course_year?: number | null;
   gpa?: number | null;
   ielts_passed?: boolean | null;
@@ -355,6 +358,8 @@ export interface AppointmentOut {
   cancel_reason: string | null;
   created_at: string;
   updated_at: string;
+  student_name?: string | null;
+  student_avatar_url?: string | null;
 }
 
 export interface BookRequest {

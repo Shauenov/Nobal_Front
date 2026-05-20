@@ -48,7 +48,7 @@ describe('AddNewsToCalendarModal', () => {
     expect(start).toBeTruthy();
     expect(start.value).toMatch(/^2026-05-20T\d{2}:30$/);
 
-    await user.click(screen.getByRole('button', { name: 'Save' }));
+    await user.click(screen.getByRole('button', { name: 'Сохранить' }));
 
     await waitFor(() => {
       expect(createEvent).toHaveBeenCalledTimes(1);

@@ -84,7 +84,7 @@ describe('StudentsPage', () => {
     });
     replace.mockClear();
 
-    fireEvent.change(screen.getByPlaceholderText('searchPlaceholder'), {
+    fireEvent.change(screen.getByPlaceholderText('Поиск по имени...'), {
       target: { value: 'Annabelle' },
     });
 

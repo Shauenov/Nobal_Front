@@ -2,9 +2,11 @@
 
 import type { CSSProperties } from 'react';
 import { useState } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, Trash2 } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { useCalendar } from '@/hooks/useCalendar';
+import { useCalendar, useDeleteCalendarEvent } from '@/hooks/useCalendar';
+import { CalendarEventModal } from '@/components/calendar/CalendarEventModal';
+import type { CalendarEventOut } from '@/types/api';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, getDay } from 'date-fns';
 import { ru } from 'date-fns/locale';
 
@@ -71,6 +73,7 @@ const dayStyle = (isCurrentMonth: boolean, isToday: boolean): CSSProperties => (
   color: isToday ? 'white' : 'var(--color-text-primary)',
   cursor: isCurrentMonth ? 'pointer' : 'default',
   transition: 'all 150ms ease',
+  position: 'relative',
 });
 
 const dayNumberStyle: CSSProperties = {
@@ -85,9 +88,77 @@ const emptyStateStyle: CSSProperties = {
   color: 'var(--color-text-secondary)',
 };
 
+interface EventPopoverProps {
+  event: CalendarEventOut;
+  onClose: () => void;
+}
+
+function EventPopover({ event, onClose }: EventPopoverProps) {
+  const deleteEvent = useDeleteCalendarEvent();
+
+  const handleDelete = () => {
+    if (window.confirm(`Удалить событие «${event.title}»?`)) {
+      deleteEvent.mutate(event.id, { onSuccess: onClose });
+    }
+  };
+
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        top: '100%',
+        left: 0,
+        zIndex: 200,
+        background: '#fff',
+        border: '1px solid #e2e8f0',
+        borderRadius: 10,
+        boxShadow: '0 8px 24px rgba(15,23,42,0.15)',
+        padding: '12px 14px',
+        minWidth: 200,
+        marginTop: 4,
+      }}
+      onClick={(e) => e.stopPropagation()}
+    >
+      <div style={{ fontWeight: 600, fontSize: '0.85rem', color: '#1e293b', marginBottom: 4 }}>
+        {event.title}
+      </div>
+      {event.description && (
+        <div style={{ fontSize: '0.78rem', color: '#64748b', marginBottom: 8 }}>
+          {event.description}
+        </div>
+      )}
+      <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginBottom: 10 }}>
+        {format(new Date(event.start_time), 'HH:mm', { locale: ru })}
+        {event.end_time ? ` — ${format(new Date(event.end_time), 'HH:mm', { locale: ru })}` : ''}
+      </div>
+      <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+        <button
+          type="button"
+          onClick={onClose}
+          style={{ padding: '5px 10px', border: '1px solid #e2e8f0', borderRadius: 6, background: '#fff', fontSize: '0.75rem', cursor: 'pointer', color: '#475569' }}
+        >
+          Закрыть
+        </button>
+        <button
+          type="button"
+          onClick={handleDelete}
+          disabled={deleteEvent.isPending}
+          style={{ padding: '5px 10px', border: '1px solid #fecaca', borderRadius: 6, background: '#fff', fontSize: '0.75rem', cursor: 'pointer', color: '#dc2626', display: 'flex', alignItems: 'center', gap: 4 }}
+        >
+          <Trash2 size={12} />
+          Удалить
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function CalendarPage() {
   const { data: events } = useCalendar();
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [createDefaultDate, setCreateDefaultDate] = useState<string | undefined>();
+  const [openPopoverEventId, setOpenPopoverEventId] = useState<string | null>(null);
 
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(currentDate);
@@ -99,6 +170,11 @@ export default function CalendarPage() {
   const handlePrevMonth = () => setCurrentDate(subMonths(currentDate, 1));
   const handleNextMonth = () => setCurrentDate(addMonths(currentDate, 1));
 
+  const handleDayClick = (date: Date) => {
+    setCreateDefaultDate(format(date, 'yyyy-MM-dd'));
+    setShowCreateModal(true);
+  };
+
   const weekdays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
 
   return (
@@ -106,7 +182,36 @@ export default function CalendarPage() {
       <PageHeader
         title="Календарь"
         subtitle="Просмотрите события и управляйте расписанием"
+        action={
+          <button
+            type="button"
+            onClick={() => { setCreateDefaultDate(undefined); setShowCreateModal(true); }}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              padding: '9px 16px',
+              borderRadius: 8,
+              border: 'none',
+              background: '#2563eb',
+              color: '#fff',
+              fontSize: '0.85rem',
+              fontWeight: 600,
+              cursor: 'pointer',
+            }}
+          >
+            <Plus size={15} />
+            Добавить событие
+          </button>
+        }
       />
+
+      {showCreateModal && (
+        <CalendarEventModal
+          defaultDate={createDefaultDate}
+          onClose={() => setShowCreateModal(false)}
+        />
+      )}
 
       <div style={calendarHeaderStyle}>
         <h2 style={monthYearStyle}>
@@ -141,17 +246,44 @@ export default function CalendarPage() {
           const dayEvents = events?.filter((e) => isSameDay(new Date(e.start_time), date)) || [];
 
           return (
-            <div key={date.toISOString()} style={dayStyle(true, isToday)}>
+            <div
+              key={date.toISOString()}
+              style={dayStyle(true, isToday)}
+              onClick={() => handleDayClick(date)}
+            >
               <div style={dayNumberStyle}>
                 {format(date, 'd')}
               </div>
-              {dayEvents.length > 0 && (
-                <div style={{ fontSize: 'var(--text-xs)', marginTop: 'var(--space-1)' }}>
-                  <div style={{ color: 'var(--color-primary)', fontWeight: '500' }}>
-                    {dayEvents.length} событи{dayEvents.length === 1 ? 'е' : 'й'}
-                  </div>
+              {dayEvents.map((ev) => (
+                <div
+                  key={ev.id}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setOpenPopoverEventId(openPopoverEventId === ev.id ? null : ev.id);
+                  }}
+                  style={{
+                    fontSize: '0.7rem',
+                    background: ev.color || '#2563eb',
+                    color: '#fff',
+                    borderRadius: 4,
+                    padding: '2px 5px',
+                    marginTop: 2,
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    position: 'relative',
+                  }}
+                >
+                  {ev.title}
+                  {openPopoverEventId === ev.id && (
+                    <EventPopover
+                      event={ev}
+                      onClose={() => setOpenPopoverEventId(null)}
+                    />
+                  )}
                 </div>
-              )}
+              ))}
             </div>
           );
         })}

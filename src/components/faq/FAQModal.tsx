@@ -164,10 +164,10 @@ export function FAQModal({ open, onClose, initialValues, defaultOrderIndex }: FA
       <div style={modalStyle}>
         <div style={{ marginBottom: 'var(--space-4)' }}>
           <h2 style={{ margin: 0, fontSize: 'var(--text-xl)' }}>
-            {isEditing ? 'Edit FAQ' : 'Create FAQ'}
+            {isEditing ? 'Редактировать FAQ' : 'Создать FAQ'}
           </h2>
           <p style={{ margin: 'var(--space-2) 0 0', color: 'var(--color-text-secondary)' }}>
-            {isEditing ? 'Update the FAQ content and status.' : 'Add a new FAQ entry to the list.'}
+            {isEditing ? 'Обновите содержимое и статус FAQ.' : 'Добавьте новый вопрос в список.'}
           </p>
         </div>
 
@@ -175,7 +175,7 @@ export function FAQModal({ open, onClose, initialValues, defaultOrderIndex }: FA
           <div style={{ display: 'grid', gap: 'var(--space-3)', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
               <label style={labelStyle} htmlFor="faq-question">
-                Question
+                Вопрос
               </label>
               <input id="faq-question" style={inputStyle} {...register('question')} />
               {errors.question && <span style={errorStyle}>{errors.question.message}</span>}
@@ -183,14 +183,14 @@ export function FAQModal({ open, onClose, initialValues, defaultOrderIndex }: FA
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
               <label style={labelStyle} htmlFor="faq-category">
-                Category
+                Категория
               </label>
               <input id="faq-category" style={inputStyle} {...register('category')} />
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
               <label style={labelStyle} htmlFor="faq-active">
-                Active
+                Активен
               </label>
               <input id="faq-active" type="checkbox" style={{ marginTop: 8 }} {...register('is_active')} />
             </div>
@@ -198,24 +198,24 @@ export function FAQModal({ open, onClose, initialValues, defaultOrderIndex }: FA
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
             <label style={labelStyle} htmlFor="faq-answer">
-              Answer
+              Ответ
             </label>
             <textarea id="faq-answer" rows={6} style={inputStyle} {...register('answer')} />
             {errors.answer && <span style={errorStyle}>{errors.answer.message}</span>}
           </div>
 
           <div style={{ display: 'grid', gap: 'var(--space-2)' }}>
-            <span style={labelStyle}>Preview</span>
+            <span style={labelStyle}>Предпросмотр</span>
             <div style={previewCardStyle}>
               <div style={{ fontWeight: 'var(--font-semibold)' }}>
-                {values.question?.trim() || 'Question preview'}
+                {values.question?.trim() || 'Предпросмотр вопроса'}
               </div>
               <div style={{ color: 'var(--color-text-secondary)', marginTop: 'var(--space-2)' }}>
-                {values.answer?.trim() || 'Answer preview will appear here.'}
+                {values.answer?.trim() || 'Здесь появится предпросмотр ответа.'}
               </div>
               <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap', marginTop: 'var(--space-3)' }}>
                 {values.category?.trim() && <span style={badgeStyle}>{values.category}</span>}
-                <span style={badgeStyle}>{values.is_active ? 'Active' : 'Hidden'}</span>
+                <span style={badgeStyle}>{values.is_active ? 'Активен' : 'Скрыт'}</span>
               </div>
             </div>
           </div>
@@ -232,7 +232,7 @@ export function FAQModal({ open, onClose, initialValues, defaultOrderIndex }: FA
                 color: 'var(--color-text-secondary)',
               }}
             >
-              Cancel
+              Отмена
             </button>
             <button
               type="submit"
@@ -247,7 +247,7 @@ export function FAQModal({ open, onClose, initialValues, defaultOrderIndex }: FA
                 opacity: isPending ? 0.7 : 1,
               }}
             >
-              {isPending ? 'Saving...' : isEditing ? 'Save changes' : 'Create FAQ'}
+              {isPending ? 'Сохранение...' : isEditing ? 'Сохранить' : 'Создать FAQ'}
             </button>
           </div>
         </form>

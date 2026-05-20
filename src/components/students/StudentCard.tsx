@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import type { CSSProperties } from 'react';
+import { Trash2 } from 'lucide-react';
 import type { StudentListItem } from '@/types/api';
 
 interface StudentCardProps {
@@ -48,7 +49,7 @@ function TaskDots({ done, total, overdue }: { done: number; total: number; overd
   );
 }
 
-export function StudentCard({ student }: StudentCardProps) {
+export function StudentCard({ student, onDelete }: StudentCardProps) {
   const router = useRouter();
 
   const progress =
@@ -279,6 +280,35 @@ export function StudentCard({ student }: StudentCardProps) {
         >
           ＋ Назначить задание
         </Link>
+        {onDelete && (
+          <button
+            type="button"
+            aria-label="Удалить студента"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(student.id);
+            }}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 6,
+              padding: '7px 12px',
+              borderRadius: 8,
+              border: '1px solid #fecaca',
+              background: '#fff',
+              color: '#dc2626',
+              fontSize: '0.78rem',
+              fontWeight: 500,
+              cursor: 'pointer',
+              transition: 'all 150ms ease',
+              width: '100%',
+            }}
+          >
+            <Trash2 size={13} />
+            Удалить
+          </button>
+        )}
       </div>
     </div>
   );

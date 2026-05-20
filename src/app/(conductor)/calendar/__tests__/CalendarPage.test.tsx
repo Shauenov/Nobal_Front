@@ -11,6 +11,11 @@ const mockUseCalendar = vi.fn();
 
 vi.mock('@/hooks/useCalendar', () => ({
   useCalendar: (...args: unknown[]) => mockUseCalendar(...args),
+  useDeleteCalendarEvent: () => ({ mutate: vi.fn(), isPending: false }),
+}));
+
+vi.mock('@/components/calendar/CalendarEventModal', () => ({
+  CalendarEventModal: () => <div>CalendarEventModal</div>,
 }));
 
 describe('CalendarPage', () => {
@@ -36,7 +41,7 @@ describe('CalendarPage', () => {
     expect(screen.getByText('Нет событий')).toBeInTheDocument();
   });
 
-  it('shows event count on the correct day', () => {
+  it('shows event chip on the correct day', () => {
     const today = new Date();
     const todayIso = today.toISOString();
 
@@ -62,7 +67,7 @@ describe('CalendarPage', () => {
 
     render(<CalendarPage />);
 
-    expect(screen.getByText('1 событие')).toBeInTheDocument();
+    expect(screen.getByText('Meeting')).toBeInTheDocument();
   });
 
   it('navigates to next and previous months', async () => {

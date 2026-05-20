@@ -87,12 +87,12 @@ export function SlotManager() {
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
         <h3 style={{ fontSize: 'var(--text-md)', fontWeight: 'var(--font-semibold)', marginTop: 'var(--space-2)' }}>
-          Available Slots
+          Доступные слоты
         </h3>
         {slots.isLoading ? (
-          <div style={{ color: 'var(--color-text-secondary)' }}>Loading slots...</div>
+          <div style={{ color: 'var(--color-text-secondary)' }}>Загрузка слотов...</div>
         ) : activeSlots.length === 0 ? (
-          <div style={{ color: 'var(--color-text-secondary)' }}>No slots available.</div>
+          <div style={{ color: 'var(--color-text-secondary)' }}>Нет доступных слотов.</div>
         ) : (
           activeSlots.map((slot) => (
             <div key={slot.id} style={slotItemStyle}>
@@ -115,7 +115,7 @@ export function SlotManager() {
                 onClick={() => deleteSlot.mutate(slot.id)}
                 disabled={deleteSlot.isPending}
               >
-                Delete
+                Удалить
               </button>
             </div>
           ))

@@ -11,8 +11,8 @@ import { useLogin } from '@/hooks/useAuth';
 import { ApiError } from '@/types/api';
 
 const loginSchema = z.object({
-  email: z.string().email('Enter a valid email'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
+  email: z.string().email('Введите корректный email'),
+  password: z.string().min(8, 'Пароль должен содержать не менее 8 символов'),
 });
 
 type LoginValues = z.infer<typeof loginSchema>;
@@ -58,7 +58,7 @@ export default function LoginPage() {
     } catch (err) {
       const apiError = err as ApiError;
       if (apiError.status === 401) {
-        setAuthError('Invalid email or password');
+        setAuthError('Неверный email или пароль');
       } else {
         setAuthError(apiError.message);
       }
@@ -70,11 +70,11 @@ export default function LoginPage() {
       onSubmit={onSubmit}
       style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}
     >
-      <PageHeader title="Welcome back" subtitle="Sign in to continue" />
+      <PageHeader title="С возвращением" subtitle="Войдите, чтобы продолжить" />
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
         <label style={labelStyle} htmlFor="email">
-          Email
+          Эл. почта
         </label>
         <input
           id="email"
@@ -89,7 +89,7 @@ export default function LoginPage() {
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
         <label style={labelStyle} htmlFor="password">
-          Password
+          Пароль
         </label>
         <div style={{ position: 'relative' }}>
           <input
@@ -113,9 +113,9 @@ export default function LoginPage() {
               color: 'var(--color-text-secondary)',
               fontSize: 'var(--text-xs)',
             }}
-            aria-label={showPassword ? 'Hide password' : 'Show password'}
+            aria-label={showPassword ? 'Скрыть пароль' : 'Показать пароль'}
           >
-            {showPassword ? 'Hide' : 'Show'}
+            {showPassword ? 'Скрыть' : 'Показать'}
           </button>
         </div>
         {errors.password && <span style={errorStyle}>{errors.password.message}</span>}
@@ -151,7 +151,7 @@ export default function LoginPage() {
           opacity: login.isPending ? 0.7 : 1,
         }}
       >
-        {login.isPending ? 'Signing in...' : 'Sign in'}
+        {login.isPending ? 'Вход...' : 'Войти'}
       </button>
 
       <div
@@ -162,9 +162,9 @@ export default function LoginPage() {
           color: 'var(--color-text-secondary)',
         }}
       >
-        <span>Need help signing in?</span>
+        <span>Нужна помощь со входом?</span>
         <Link href="/forgot-password" style={{ color: 'var(--color-primary)' }}>
-          Forgot password
+          Забыли пароль?
         </Link>
       </div>
     </form>

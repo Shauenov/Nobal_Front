@@ -222,7 +222,7 @@ export default function AlumniPage() {
                 <input
                   style={inputStyle}
                   value={form.scholarship_type ?? ''}
-                  placeholder="Full scholarship, Partial..."
+                  placeholder="Полная стипендия, Частичная..."
                   onChange={(e) => setForm({ ...form, scholarship_type: e.target.value })}
                 />
               </label>

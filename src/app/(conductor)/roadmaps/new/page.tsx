@@ -22,16 +22,16 @@ export default function NewRoadmapPage() {
   const handleSubmit = async (data: RoadmapCreate) => {
     try {
       await createRoadmap.mutateAsync(data);
-      toast.success('Roadmap created successfully');
+      toast.success('Маршрут создан');
       router.push('/roadmaps');
     } catch {
-      toast.error('Failed to create roadmap');
+      toast.error('Не удалось создать маршрут');
     }
   };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-      <PageHeader title="Create Roadmap" subtitle="Add a new roadmap template." />
+      <PageHeader title="Создать маршрут" subtitle="Добавьте новый шаблон маршрута." />
 
       <div style={containerStyle}>
         <RoadmapForm onSubmit={handleSubmit} isLoading={createRoadmap.isPending} />
