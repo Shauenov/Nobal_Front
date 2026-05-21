@@ -45,7 +45,7 @@ export function useInviteStudent() {
   return useMutation({
     mutationFn: async (data: InviteStudentRequest) => {
       const res = await apiClient.post<ApiEnvelope<UserOut>>(
-        '/api/v1/conductor/students/invite',
+        '/api/v1/adviser/students/invite',
         data
       );
       return res.data.data;

@@ -16,6 +16,7 @@ describe('NewsForm', () => {
           body: 'Initial body',
           category: 'general',
           is_published: false,
+          allow_calendar: false,
           views_count: 0,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),

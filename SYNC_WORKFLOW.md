@@ -1,4 +1,4 @@
-# Frontend ↔ Backend Sync Workflow
+﻿# Frontend ↔ Backend Sync Workflow
 
 Source of truth: `openapi.json` (both at repo root and `Frontend/openapi.json`). Hand-written types live in `src/types/api.ts`; generated types in `src/types/api.generated.ts` serve as a drift oracle only.
 
@@ -38,7 +38,7 @@ Apply for each Figma screen iteration.
 | 1 | Login | `POST /api/v1/auth/login`, `POST /api/v1/auth/refresh` | useAuth |
 | 2 | Forgot / Reset password | `POST /api/v1/auth/forgot-password`, `POST /api/v1/auth/reset-password` | useAuth |
 | 3 | Dashboard (Панель управления) | `GET /api/v1/reports/overview`, `GET /api/v1/notifications/unread-count`, `GET /api/v1/appointments` | useReports, useNotifications, useAppointments |
-| 4 | Students grid (Студенты) ⭐ | `GET /api/v1/students`, `POST /api/v1/conductor/students/invite`, `DELETE /api/v1/students/{id}` | useStudents |
+| 4 | Students grid (Студенты) ⭐ | `GET /api/v1/students`, `POST /api/v1/ADVISER/students/invite`, `DELETE /api/v1/students/{id}` | useStudents |
 | 5 | Student profile | `GET /api/v1/students/{id}`, `GET /api/v1/students/{id}/tasks`, `GET /api/v1/students/{id}/enrollments` | useStudents, useTasks, useEnrollments |
 | 6 | Student documents | `GET/POST/DELETE /api/v1/students/{id}/documents` | useStudents |
 | 7 | Student roadmaps | `GET /api/v1/students/{id}/roadmaps`, `POST /api/v1/roadmaps/{id}/assign` | useRoadmaps |
@@ -77,7 +77,7 @@ Steps:
    - src/types/api.ts (hand-written)
    - src/hooks/useX.ts
    - src/components/<feature>/*
-   - src/app/(conductor)/<feature>/page.tsx (or (auth) for auth screens)
+   - src/app/(ADVISER)/<feature>/page.tsx (or (auth) for auth screens)
 4. Walk the per-screen checklist (1-9 above).
 5. Add/update one MSW + RTL test for the happy path.
 6. Output: files changed, drift items closed, any remaining backend gaps.

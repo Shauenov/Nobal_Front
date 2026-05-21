@@ -13,7 +13,7 @@ describe('ConversationList', () => {
       {
         id: 'convo-1',
         student_id: 'student-1',
-        conductor_id: 'conductor-1',
+        adviser_id: 'adviser-1',
         last_message_at: null,
         created_at: '2026-05-09T00:00:00.000Z',
       },

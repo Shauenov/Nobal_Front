@@ -36,7 +36,7 @@ const mockAppointments: AppointmentOut[] = [
     id: 'app-1',
     slot_id: 'slot-1',
     student_id: 'student-1',
-    conductor_id: 'conductor-1',
+    adviser_id: 'adviser-1',
     status: 'confirmed',
     consultation_type: 'video',
     notes: null,

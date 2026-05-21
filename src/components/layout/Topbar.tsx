@@ -190,7 +190,7 @@ export function Topbar() {
               whiteSpace: 'nowrap',
             }}
           >
-            {user?.full_name ?? 'Conductor'}
+            {user?.full_name ?? 'Adviser'}
           </span>
         </div>
 

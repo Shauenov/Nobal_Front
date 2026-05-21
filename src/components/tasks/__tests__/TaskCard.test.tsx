@@ -6,7 +6,7 @@ import { TaskCard } from '../TaskCard';
 const task: TaskOut = {
   id: 'task-1',
   student_id: 'student-1',
-  created_by: 'conductor-1',
+  created_by: 'ADVISER-1',
   title: 'Prepare IELTS documents',
   description: 'Collect all supporting files and submit them before the deadline.',
   status: 'todo',
@@ -18,7 +18,7 @@ const task: TaskOut = {
   location: null,
   reminder_minutes: null,
   completed_at: null,
-  is_conductor_task: true,
+  is_adviser_task: true,
   student_roadmap_id: null,
   created_at: '2026-05-08T00:00:00.000Z',
   updated_at: '2026-05-08T00:00:00.000Z',

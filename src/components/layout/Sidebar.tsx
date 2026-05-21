@@ -8,6 +8,7 @@ import {
   GraduationCap,
   MessageSquare,
   CalendarDays,
+  Calendar,
   Newspaper,
   Settings,
   LogOut,
@@ -32,6 +33,7 @@ const mainNav: NavItem[] = [
   { label: 'Каталог вузов', href: '/universities', icon: GraduationCap },
   { label: 'Личные сообщения', href: '/messages', icon: MessageSquare },
   { label: 'Записи', href: '/appointments', icon: CalendarDays },
+  { label: 'Календарь', href: '/calendar', icon: Calendar },
   { label: 'Новости', href: '/news', icon: Newspaper },
 ];
 

@@ -23,6 +23,7 @@ export const queryClient = new QueryClient({
 export const queryKeys = {
   // Auth
   me: ['me'] as const,
+  sessions: ['sessions'] as const,
 
   // Students
   students: (params?: Record<string, unknown>) =>

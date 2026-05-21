@@ -26,7 +26,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
       return;
     }
 
-    if (user && user.role !== 'conductor') {
+    if (user && user.role !== 'adviser') {
       router.replace('/login?reason=unauthorized');
     }
   }, [hasHydrated, isAuthenticated, user, router, pathname]);
@@ -44,7 +44,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   }
 
   // Hydrated but not authenticated — redirecting (show spinner while navigating)
-  if (!isAuthenticated || (user && user.role !== 'conductor')) {
+  if (!isAuthenticated || (user && user.role !== 'adviser')) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="flex flex-col items-center gap-4">

@@ -37,6 +37,8 @@ export function useLogin() {
       const error = normalizeError(err);
       if (error.status === 401) {
         toast.error('Неверный email или пароль');
+      } else if (error.status === 429) {
+        toast.error('Слишком много попыток. Подождите минуту и попробуйте снова.');
       } else {
         toast.error(error.message);
       }

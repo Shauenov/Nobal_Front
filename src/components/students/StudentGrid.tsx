@@ -11,7 +11,7 @@ interface StudentGridProps {
 
 const gridStyle: CSSProperties = {
   display: 'grid',
-  gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
+  gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
   gap: 'var(--space-4)',
 };
 

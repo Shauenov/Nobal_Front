@@ -6,6 +6,7 @@ import { useParams, usePathname } from 'next/navigation';
 import type { CSSProperties } from 'react';
 import { useStudent } from '@/hooks/useStudents';
 import { useUIStore } from '@/stores/uiStore';
+import { formatGroup, formatCourseYear } from '@/lib/formatGroup';
 
 interface StudentDetailShellProps {
   children: React.ReactNode;
@@ -71,10 +72,11 @@ export function StudentDetailShell({ children }: StudentDetailShellProps) {
     { label: 'Маршруты', href: `/students/${studentId}/roadmaps` },
   ];
 
-  const name = student.data?.user.full_name ?? 'Студент';
-  const email = student.data?.user.email ?? '—';
-  const group = student.data?.profile?.group_type ?? '—';
-  const year = student.data?.profile?.course_year ?? '—';
+  const name   = student.data?.user.full_name ?? 'Студент';
+  const email  = student.data?.user.email ?? '—';
+  const profile = student.data?.profile;
+  const groupLabel = formatGroup(profile?.group_type, profile?.course_year);
+  const yearLabel  = formatCourseYear(profile?.course_year);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
@@ -83,7 +85,9 @@ export function StudentDetailShell({ children }: StudentDetailShellProps) {
           {student.isLoading ? 'Загрузка...' : name}
         </div>
         <div style={metaStyle}>
-          {email} · Группа {group} · {year}-й курс
+          {email}
+          {groupLabel && <> · Группа <strong style={{ color: 'var(--color-text-primary)' }}>{groupLabel}</strong></>}
+          {yearLabel  && <> · {yearLabel}</>}
         </div>
       </div>
 

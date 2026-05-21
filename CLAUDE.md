@@ -1,4 +1,4 @@
-# Nobal Education Frontend — Technical Guide
+﻿# Nobal Education Frontend — Technical Guide
 
 ## 📁 Project Structure
 
@@ -13,7 +13,7 @@ Frontend/src/
 │   │   └── register/
 │   │       └── page.tsx       # /auth/register
 │   │
-│   ├── (conductor)/           # protected routes (wrapped with ProtectedLayout)
+│   ├── (ADVISER)/           # protected routes (wrapped with ProtectedLayout)
 │   │   ├── layout.tsx         # auth check, sidebar, header
 │   │   ├── page.tsx           # /dashboard
 │   │   ├── appointments/
@@ -251,14 +251,14 @@ export function useUploadAvatar() {
 ## 🛡️ Protected Routes
 
 ```typescript
-// src/app/(conductor)/layout.tsx
+// src/app/(ADVISER)/layout.tsx
 'use client';
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 
-export default function ConductorLayout({ children }: { children: React.ReactNode }) {
+export default function ADVISERLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { isAuthenticated } = useAuthStore();
   

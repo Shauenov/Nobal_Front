@@ -52,27 +52,33 @@ export const useAuthStore = create<AuthState>()(
  * Use this to avoid redirect loops caused by the initial un-hydrated state.
  */
 export function useHasHydrated() {
-  // Lazy initializer: immediately true if Zustand already hydrated before this mount
   // Always start false so the server and the first client render agree
   // ("Verifying session..."). useEffect only runs on the client, so it
   // won't fire during SSR and won't cause a hydration mismatch.
   const [hasHydrated, setHasHydrated] = useState(false);
 
   useEffect(() => {
-    // Subscribe first so we don't miss the event if hydration finishes
-    // between the subscription and our microtask check.
+    // 1) Synchronous check — localStorage is synchronous, so by the time this
+    //    effect runs the store has almost always already hydrated. This is the
+    //    common case and resolves immediately.
+    if (useAuthStore.persist?.hasHydrated?.()) {
+      setHasHydrated(true);
+      return;
+    }
+
+    // 2) Otherwise subscribe to the finish-hydration event.
     const unsub = useAuthStore.persist?.onFinishHydration(() => {
       setHasHydrated(true);
     });
 
-    // If persist already finished (localStorage is synchronous, so this is
-    // the common case), flip on the next microtask to satisfy the
-    // react-hooks/set-state-in-effect lint rule.
-    queueMicrotask(() => {
-      if (useAuthStore.persist?.hasHydrated()) setHasHydrated(true);
-    });
+    // 3) Safety fallback: never let the "Verifying session..." spinner hang
+    //    forever if the hydration event was missed for any reason.
+    const fallback = setTimeout(() => setHasHydrated(true), 1000);
 
-    return unsub;
+    return () => {
+      unsub?.();
+      clearTimeout(fallback);
+    };
   }, []);
 
   return hasHydrated;

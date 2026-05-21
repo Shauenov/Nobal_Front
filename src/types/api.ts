@@ -1,5 +1,5 @@
 // ============================================================
-// Nobal EduConductor — API Types
+// Nobal eduadviser — API Types
 // Source: OpenAPI 3.1.0 — http://localhost:8000/api/openapi.json
 // ============================================================
 
@@ -138,6 +138,8 @@ export interface StudentListItem {
   avatar_url?: string | null;
   tasks_total: number;
   tasks_done: number;
+  tasks_overdue: number;
+  tasks_in_progress: number;
   unread_messages: number;
 }
 
@@ -159,6 +161,7 @@ export interface StudentListParams {
   ielts_passed?: boolean | null;
   sat_passed?: boolean | null;
   search?: string | null;
+  sort_by?: 'gpa' | 'full_name' | null;
   page?: number;
   page_size?: number;
 }
@@ -271,7 +274,7 @@ export interface TaskOut {
   location: string | null;
   reminder_minutes: number | null;
   completed_at: string | null;
-  is_conductor_task: boolean;
+  is_adviser_task: boolean;
   student_roadmap_id: string | null;
   created_at: string;
   updated_at: string;
@@ -318,7 +321,7 @@ export type PaginatedTasks = PaginatedEnvelope<TaskOut>;
 
 export interface TaskListParams {
   status?: TaskStatus | null;
-  is_conductor_task?: boolean | null;
+  is_adviser_task?: boolean | null;
   page?: number;
   page_size?: number;
 }
@@ -329,7 +332,7 @@ export type ConsultationType = 'video' | 'audio' | 'chat';
 
 export interface SlotOut {
   id: string;
-  conductor_id: string;
+  adviser_id: string;
   start_time: string;
   end_time: string;
   duration_min: number;
@@ -350,7 +353,7 @@ export interface AppointmentOut {
   id: string;
   slot_id: string | null;
   student_id: string;
-  conductor_id: string;
+  adviser_id: string;
   status: AppointmentStatus;
   consultation_type: ConsultationType;
   notes: string | null;
@@ -360,6 +363,8 @@ export interface AppointmentOut {
   updated_at: string;
   student_name?: string | null;
   student_avatar_url?: string | null;
+  slot_start_time?: string | null;
+  slot_end_time?: string | null;
 }
 
 export interface BookRequest {
@@ -376,7 +381,7 @@ export interface CancelRequest {
 export interface ConversationOut {
   id: string;
   student_id: string;
-  conductor_id: string;
+  adviser_id: string;
   last_message_at?: string | null;
   created_at: string;
 }
@@ -433,6 +438,21 @@ export interface UniversityOut {
   language_of_instr?: string | null;
   is_published: boolean;
   last_verified_at?: string | null;
+  // Dormitory
+  dorm_available?: boolean;
+  dorm_cost_per_month?: number | null;
+  dorm_cost_currency?: string | null;
+  dorm_guaranteed_for?: string | null;
+  dorm_room_types?: string | null;
+  dorm_image_url?: string | null;
+  // Campus amenities
+  dining_spots_total?: number | null;
+  cafes_count?: string | null;
+  shops_count?: string | null;
+  parking_count?: number | null;
+  has_medical_center?: boolean;
+  has_library?: boolean;
+  campus_extra?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -453,6 +473,21 @@ export interface UniversityCreate {
   language_of_instr?: string | null;
   is_published?: boolean;
   last_verified_at?: string | null;
+  // Dormitory
+  dorm_available?: boolean;
+  dorm_cost_per_month?: number | null;
+  dorm_cost_currency?: string | null;
+  dorm_guaranteed_for?: string | null;
+  dorm_room_types?: string | null;
+  dorm_image_url?: string | null;
+  // Campus amenities
+  dining_spots_total?: number | null;
+  cafes_count?: string | null;
+  shops_count?: string | null;
+  parking_count?: number | null;
+  has_medical_center?: boolean;
+  has_library?: boolean;
+  campus_extra?: string | null;
 }
 
 export type UniversityUpdate = Partial<UniversityCreate>;
@@ -508,6 +543,7 @@ export type PaginatedUniversities = PaginatedEnvelope<UniversityOut>;
 
 export interface UniversityListParams {
   country?: string | null;
+  is_abroad?: boolean | null;
   field?: string | null;
   min_gpa?: number | null;
   max_tuition?: number | null;
@@ -525,6 +561,7 @@ export interface RoadmapOut {
   description: string | null;
   target_type: string | null;
   is_public: boolean;
+  university_id: string | null;
   created_by: string;
   created_at: string;
   updated_at: string;
@@ -552,6 +589,7 @@ export interface RoadmapCreate {
   description?: string | null;
   target_type?: string | null;
   is_public?: boolean;
+  university_id?: string | null;
   template_tasks?: RoadmapTemplateTaskCreate[];
 }
 
@@ -560,6 +598,7 @@ export interface RoadmapUpdate {
   description?: string | null;
   target_type?: string | null;
   is_public?: boolean | null;
+  university_id?: string | null;
 }
 
 export interface RoadmapDetail {
@@ -610,6 +649,7 @@ export interface NewsOut {
   event_date?: string | null;
   external_url?: string | null;
   is_published: boolean;
+  allow_calendar: boolean;
   views_count: number;
   created_at: string;
   updated_at: string;
@@ -623,6 +663,7 @@ export interface NewsCreate {
   event_date?: string | null;
   external_url?: string | null;
   is_published?: boolean;
+  allow_calendar?: boolean;
 }
 
 export type NewsUpdate = Partial<NewsCreate>;
@@ -857,6 +898,9 @@ export interface StudentBriefForEnrollment {
   id: string;
   full_name: string;
   avatar_url: string | null;
+  is_active: boolean;
+  group_type: string | null;
+  course_year: number | null;
 }
 
 export interface EnrollmentWithStudentOut {
@@ -873,4 +917,14 @@ export interface EnrollmentWithStudentOut {
 export interface EnrollmentUpdateRequest {
   status?: EnrollmentStatus | null;
   progress?: number | null;
+}
+
+// ── Sessions ──────────────────────────────────────────────
+export interface SessionOut {
+  id: string;
+  device_name: string | null;
+  ip_address: string | null;
+  last_used_at: string;
+  created_at: string;
+  expires_at: string;
 }

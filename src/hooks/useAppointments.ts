@@ -39,7 +39,7 @@ export function useAppointments(enabled = true) {
 }
 
 // ── List slots ────────────────────────────────────────────────
-export function useSlots(params?: { conductor_id?: string; from_time?: string }) {
+export function useSlots(params?: { adviser_id?: string; from_time?: string }) {
   return useQuery({
     queryKey: queryKeys.slots(params as Record<string, unknown>),
     queryFn: async () => {

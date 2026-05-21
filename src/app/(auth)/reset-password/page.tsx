@@ -1,21 +1,19 @@
 'use client';
 
-import Link from 'next/link';
-import { useMemo, useRef, useState } from 'react';
+import { Suspense, useRef, useState } from 'react';
 import type { ClipboardEvent, CSSProperties, KeyboardEvent } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { PageHeader } from '@/components/layout/PageHeader';
+import { useSearchParams } from 'next/navigation';
 import { useResetPassword } from '@/hooks/useAuth';
-import { ApiError } from '@/types/api';
+import { LoadingOverlay } from '@/components/ui/LoadingOverlay';
 
 const resetSchema = z
   .object({
-    email: z.string().email('Введите корректный email'),
     otp: z.string().length(6, 'Введите 6-значный код'),
-    new_password: z.string().min(8, 'Пароль должен содержать не менее 8 символов'),
-    confirm_password: z.string().min(8, 'Пароль должен содержать не менее 8 символов'),
+    new_password: z.string().min(8, 'Не менее 8 символов'),
+    confirm_password: z.string().min(8, 'Не менее 8 символов'),
   })
   .refine((data) => data.new_password === data.confirm_password, {
     message: 'Пароли не совпадают',
@@ -26,18 +24,12 @@ type ResetValues = z.infer<typeof resetSchema>;
 
 const inputStyle: CSSProperties = {
   width: '100%',
-  borderRadius: 'var(--radius-md)',
+  borderRadius: 'var(--radius-lg)',
   border: '1px solid var(--color-border)',
   background: 'var(--color-surface-hover)',
-  padding: '10px 12px',
+  padding: '14px 44px 14px 16px',
   color: 'var(--color-text-primary)',
   fontSize: 'var(--text-sm)',
-};
-
-const labelStyle: CSSProperties = {
-  fontSize: 'var(--text-sm)',
-  fontWeight: 'var(--font-medium)',
-  color: 'var(--color-text-secondary)',
 };
 
 const errorStyle: CSSProperties = {
@@ -45,27 +37,42 @@ const errorStyle: CSSProperties = {
   fontSize: 'var(--text-xs)',
 };
 
-export default function ResetPasswordPage() {
+function EyeIcon({ off }: { off?: boolean }) {
+  if (off) {
+    return (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
+        <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" />
+        <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" />
+        <path d="m2 2 20 20" />
+      </svg>
+    );
+  }
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  );
+}
+
+function ResetPasswordForm() {
+  const searchParams = useSearchParams();
+  const email = searchParams.get('email') ?? '';
   const reset = useResetPassword();
+
   const [apiError, setApiError] = useState<string | null>(null);
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showNew, setShowNew] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [otpDigits, setOtpDigits] = useState<string[]>(Array(6).fill(''));
   const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
 
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    formState: { errors },
-  } = useForm<ResetValues>({
+  const { register, handleSubmit, setValue, formState: { errors } } = useForm<ResetValues>({
     resolver: zodResolver(resetSchema),
     defaultValues: { otp: '' },
   });
 
-  const otpValue = useMemo(() => otpDigits.join(''), [otpDigits]);
-
-  const updateOtpValue = (next: string[]) => {
+  const updateOtp = (next: string[]) => {
     setOtpDigits(next);
     setValue('otp', next.join(''), { shouldValidate: true });
   };
@@ -74,178 +81,129 @@ export default function ResetPasswordPage() {
     const digit = value.replace(/\D/g, '').slice(-1);
     const next = [...otpDigits];
     next[index] = digit;
-    updateOtpValue(next);
-    if (digit && index < inputRefs.current.length - 1) {
-      inputRefs.current[index + 1]?.focus();
-    }
+    updateOtp(next);
+    if (digit && index < 5) inputRefs.current[index + 1]?.focus();
   };
 
-  const handleOtpKeyDown = (index: number, event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Backspace' && !otpDigits[index] && index > 0) {
+  const handleOtpKeyDown = (index: number, e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Backspace' && !otpDigits[index] && index > 0) {
       inputRefs.current[index - 1]?.focus();
     }
   };
 
-  const handleOtpPaste = (event: ClipboardEvent<HTMLInputElement>) => {
-    const text = event.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
+  const handleOtpPaste = (e: ClipboardEvent<HTMLInputElement>) => {
+    const text = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
     if (!text) return;
-    event.preventDefault();
-    const next = text.padEnd(6, ' ').split('').map((char) => (char === ' ' ? '' : char));
-    updateOtpValue(next);
-    const nextIndex = Math.min(text.length, 5);
-    inputRefs.current[nextIndex]?.focus();
+    e.preventDefault();
+    const next = Array(6).fill('').map((_, i) => text[i] ?? '');
+    updateOtp(next);
+    inputRefs.current[Math.min(text.length, 5)]?.focus();
   };
 
   const onSubmit = handleSubmit(async (values) => {
     setApiError(null);
     try {
-      await reset.mutateAsync({
-        email: values.email,
-        otp: values.otp,
-        new_password: values.new_password,
-      });
-    } catch (err) {
-      const apiErr = err as ApiError;
-      setApiError(apiErr.message);
+      await reset.mutateAsync({ email, otp: values.otp, new_password: values.new_password });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Произошла ошибка';
+      setApiError(message);
     }
   });
 
   return (
-    <form
-      onSubmit={onSubmit}
-      style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}
-    >
-      <PageHeader title="Новый пароль" subtitle="Используйте код из письма" />
+    <>
+    <LoadingOverlay visible={reset.isPending} />
+    <form onSubmit={onSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-        <label style={labelStyle} htmlFor="email">
-          Эл. почта
-        </label>
-        <input
-          id="email"
-          type="email"
-          autoComplete="email"
-          placeholder="you@example.com"
-          style={inputStyle}
-          {...register('email')}
-        />
-        {errors.email && <span style={errorStyle}>{errors.email.message}</span>}
+      {/* Header */}
+      <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+        <h1 style={{ fontSize: 'var(--text-2xl)', fontWeight: 'var(--font-bold)', color: 'var(--color-text-primary)', margin: 0 }}>
+          Новый пароль
+        </h1>
+        <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)', margin: 0 }}>
+          Код отправлен на <strong>{email}</strong>
+        </p>
       </div>
 
+      {/* OTP boxes */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-        <label style={labelStyle}>
+        <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)' }}>
           Код подтверждения
-        </label>
-        <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+        </span>
+        <div style={{ display: 'flex', gap: 8 }}>
           {otpDigits.map((digit, index) => (
             <input
-              key={`otp-${index}`}
-              ref={(el) => {
-                inputRefs.current[index] = el;
-              }}
+              key={index}
+              ref={(el) => { inputRefs.current[index] = el; }}
               value={digit}
-              onChange={(event) => handleOtpChange(index, event.target.value)}
-              onKeyDown={(event) => handleOtpKeyDown(index, event)}
+              onChange={(e) => handleOtpChange(index, e.target.value)}
+              onKeyDown={(e) => handleOtpKeyDown(index, e)}
               onPaste={handleOtpPaste}
               inputMode="numeric"
               pattern="[0-9]*"
               maxLength={1}
               style={{
-                ...inputStyle,
-                width: 44,
+                width: '100%',
+                aspectRatio: '1',
+                borderRadius: 'var(--radius-lg)',
+                border: '1px solid var(--color-border)',
+                background: 'var(--color-surface-hover)',
                 textAlign: 'center',
-                fontSize: 'var(--text-base)',
-                padding: '8px 0',
+                fontSize: 'var(--text-lg)',
+                fontWeight: 'var(--font-semibold)',
+                color: 'var(--color-text-primary)',
+                padding: 0,
               }}
               aria-label={`Цифра ${index + 1}`}
             />
           ))}
         </div>
-        <input type="hidden" value={otpValue} {...register('otp')} />
+        <input type="hidden" {...register('otp')} />
         {errors.otp && <span style={errorStyle}>{errors.otp.message}</span>}
       </div>
 
+      {/* New password */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-        <label style={labelStyle} htmlFor="new_password">
-          Новый пароль
-        </label>
-        <div style={{ position: 'relative' }}>
+        <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
           <input
             id="new_password"
-            type={showNewPassword ? 'text' : 'password'}
+            type={showNew ? 'text' : 'password'}
             autoComplete="new-password"
-            placeholder="••••••••"
-            style={{ ...inputStyle, paddingRight: 64 }}
+            placeholder="Новый пароль"
+            style={inputStyle}
             {...register('new_password')}
           />
-          <button
-            type="button"
-            onClick={() => setShowNewPassword((value) => !value)}
-            style={{
-              position: 'absolute',
-              right: 10,
-              top: '50%',
-              transform: 'translateY(-50%)',
-              background: 'transparent',
-              border: 'none',
-              color: 'var(--color-text-secondary)',
-              fontSize: 'var(--text-xs)',
-            }}
-            aria-label={showNewPassword ? 'Скрыть пароль' : 'Показать пароль'}
-          >
-            {showNewPassword ? 'Скрыть' : 'Показать'}
+          <button type="button" onClick={() => setShowNew(v => !v)}
+            style={{ position: 'absolute', right: 14, background: 'transparent', border: 'none', color: 'var(--color-text-secondary)', display: 'flex' }}
+            aria-label="Показать/скрыть пароль">
+            <EyeIcon off={!showNew} />
           </button>
         </div>
         {errors.new_password && <span style={errorStyle}>{errors.new_password.message}</span>}
       </div>
 
+      {/* Confirm password */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-        <label style={labelStyle} htmlFor="confirm_password">
-          Подтвердите пароль
-        </label>
-        <div style={{ position: 'relative' }}>
+        <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
           <input
             id="confirm_password"
-            type={showConfirmPassword ? 'text' : 'password'}
+            type={showConfirm ? 'text' : 'password'}
             autoComplete="new-password"
-            placeholder="••••••••"
-            style={{ ...inputStyle, paddingRight: 64 }}
+            placeholder="Повторите пароль"
+            style={inputStyle}
             {...register('confirm_password')}
           />
-          <button
-            type="button"
-            onClick={() => setShowConfirmPassword((value) => !value)}
-            style={{
-              position: 'absolute',
-              right: 10,
-              top: '50%',
-              transform: 'translateY(-50%)',
-              background: 'transparent',
-              border: 'none',
-              color: 'var(--color-text-secondary)',
-              fontSize: 'var(--text-xs)',
-            }}
-            aria-label={showConfirmPassword ? 'Скрыть пароль' : 'Показать пароль'}
-          >
-            {showConfirmPassword ? 'Скрыть' : 'Показать'}
+          <button type="button" onClick={() => setShowConfirm(v => !v)}
+            style={{ position: 'absolute', right: 14, background: 'transparent', border: 'none', color: 'var(--color-text-secondary)', display: 'flex' }}
+            aria-label="Показать/скрыть пароль">
+            <EyeIcon off={!showConfirm} />
           </button>
         </div>
-        {errors.confirm_password && (
-          <span style={errorStyle}>{errors.confirm_password.message}</span>
-        )}
+        {errors.confirm_password && <span style={errorStyle}>{errors.confirm_password.message}</span>}
       </div>
 
       {apiError && (
-        <div
-          style={{
-            border: '1px solid var(--color-error)',
-            background: 'var(--color-error-bg)',
-            color: 'var(--color-error)',
-            padding: '10px 12px',
-            borderRadius: 'var(--radius-md)',
-            fontSize: 'var(--text-sm)',
-          }}
-        >
+        <div style={{ border: '1px solid var(--color-error)', background: 'var(--color-error-bg)', color: 'var(--color-error)', padding: '10px 12px', borderRadius: 'var(--radius-md)', fontSize: 'var(--text-sm)' }}>
           {apiError}
         </div>
       )}
@@ -253,34 +211,25 @@ export default function ResetPasswordPage() {
       <button
         type="submit"
         disabled={reset.isPending}
-        style={{
-          width: '100%',
-          borderRadius: 'var(--radius-md)',
-          border: '1px solid transparent',
-          padding: '12px 16px',
-          fontSize: 'var(--text-sm)',
-          fontWeight: 'var(--font-semibold)',
-          color: '#fff',
-          background: 'var(--color-primary)',
-          opacity: reset.isPending ? 0.7 : 1,
-        }}
+        style={{ width: '100%', borderRadius: 'var(--radius-lg)', border: 'none', padding: '14px 16px', fontSize: 'var(--text-base)', fontWeight: 'var(--font-semibold)', color: '#fff', background: 'var(--color-primary)', opacity: reset.isPending ? 0.7 : 1 }}
       >
         {reset.isPending ? 'Сохранение...' : 'Сохранить пароль'}
       </button>
 
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          fontSize: 'var(--text-xs)',
-          color: 'var(--color-text-secondary)',
-        }}
-      >
-        <span>Хотите попробовать снова?</span>
-        <Link href="/login" style={{ color: 'var(--color-primary)' }}>
-          Назад к входу
-        </Link>
+      <div style={{ textAlign: 'center', fontSize: 'var(--text-sm)', color: 'var(--color-text-secondary)' }}>
+        <a href="/forgot-password" style={{ color: 'var(--color-primary)', fontWeight: 'var(--font-medium)' }}>
+          Отправить код повторно
+        </a>
       </div>
     </form>
+    </>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<LoadingOverlay visible />}>
+      <ResetPasswordForm />
+    </Suspense>
   );
 }

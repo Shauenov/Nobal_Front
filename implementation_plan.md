@@ -1,4 +1,4 @@
-# Nobal EduConductor — Frontend Implementation Plan
+﻿# Nobal eduadviser — Frontend Implementation Plan
 
 **Stack:** Next.js 14 (App Router) · TypeScript · Tailwind CSS · TanStack Query v5 · Zustand · React Hook Form + Zod  
 **Backend:** `http://localhost:8000` · OpenAPI 3.1.0 (107 KB spec, полностью изучен)  
@@ -171,12 +171,12 @@ Root layout: шрифты (Google Fonts), Providers (QueryClient, Theme, Locale)
 #### [NEW] `src/app/(auth)/layout.tsx`
 Центрированный layout для страниц логина.
 
-#### [NEW] `src/app/(conductor)/layout.tsx`
+#### [NEW] `src/app/(ADVISER)/layout.tsx`
 Protected layout: ProtectedRoute guard + Sidebar + Topbar.
 
 #### [NEW] `src/components/layout/ProtectedRoute.tsx`
 - Проверяет `isAuthenticated`
-- Проверяет `user.role === "conductor"`
+- Проверяет `user.role === "ADVISER"`
 - Спиннер при валидации сессии
 - Redirect `/login?next=<path>`
 
@@ -259,7 +259,7 @@ Protected layout: ProtectedRoute guard + Sidebar + Topbar.
 **[NEW] `src/components/students/`:**
 - `StudentTable` — сортируемая таблица с аватаром, email, GPA (цвет), IELTS/SAT badges, task progress bar, unread badge, actions
 - `StudentFilters` — toggle D/F/All, year 2/3/All, IELTS yes/no/all, SAT yes/no/all, SearchInput с debounce 300ms
-- `InviteModal` — form: email, full_name, password → `POST /api/v1/conductor/students/invite`
+- `InviteModal` — form: email, full_name, password → `POST /api/v1/ADVISER/students/invite`
 - `StudentDetailTabs` — 5 вкладок: Overview / Profile / Documents / Tasks / Roadmaps
 - `ProfileForm` — все поля ProfileUpdate с Zod-валидацией, DatePicker, Toggle
 - `DocumentsGrid` — карточки документов + react-dropzone upload area
@@ -299,7 +299,7 @@ Protected layout: ProtectedRoute guard + Sidebar + Topbar.
 
 **[NEW] `src/components/messages/`:**
 - `ConversationList` — список conversations, student name (cache), last_message_at, unread indicator
-- `MessageThread` — chat bubbles (conductor right, student left), auto-scroll
+- `MessageThread` — chat bubbles (ADVISER right, student left), auto-scroll
 - `MessageInput` — textarea + send button + Enter key
 - `BroadcastModal` — body (max 2000), filter_group, ielts_passed → `POST /api/v1/messages/broadcast` → "Sent to N students"
 
@@ -448,7 +448,7 @@ npx playwright test    # E2E: 5 critical flows
 2. Invite student → appears in student list
 3. Create task → drag to In Progress → drag to Done → API calls verified
 4. Send message → appears in conversation thread
-5. Create slot → student books → conductor completes
+5. Create slot → student books → ADVISER completes
 
 ### Manual
 - Открыть все 14 разделов sidebar, проверить empty states

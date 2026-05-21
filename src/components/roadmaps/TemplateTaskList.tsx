@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import type { CSSProperties } from 'react';
 import {
   DndContext,
@@ -151,7 +151,8 @@ export function TemplateTaskList({
   isEditable = false,
   isLoading = false,
 }: TemplateTaskListProps) {
-  const [localTasks, setLocalTasks] = useState(tasks);
+  // Do NOT copy tasks into local state — that would freeze at the initial value
+  // and ignore subsequent additions from the parent. Drive everything from props.
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -162,7 +163,7 @@ export function TemplateTaskList({
     })
   );
 
-  const taskIds = useMemo(() => localTasks.map((_, i) => i.toString()), [localTasks]);
+  const taskIds = useMemo(() => tasks.map((_, i) => i.toString()), [tasks]);
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -171,31 +172,29 @@ export function TemplateTaskList({
       const oldIndex = parseInt(active.id as string);
       const newIndex = parseInt(over.id as string);
 
-      const newTasks = arrayMove(localTasks, oldIndex, newIndex);
+      const newTasks = arrayMove(tasks, oldIndex, newIndex);
       // Update order_index for all tasks
       const updatedTasks = newTasks.map((task, idx) => ({
         ...task,
         order_index: idx,
       }));
 
-      setLocalTasks(updatedTasks);
       onTasksChange(updatedTasks);
     }
   };
 
   const handleDeleteTask = (index: number) => {
-    const newTasks = localTasks
+    const newTasks = tasks
       .filter((_, i) => i !== index)
       .map((task, idx) => ({
         ...task,
         order_index: idx,
       }));
 
-    setLocalTasks(newTasks);
     onTasksChange(newTasks);
   };
 
-  if (localTasks.length === 0) {
+  if (tasks.length === 0) {
     return (
       <div style={{ textAlign: 'center', padding: 'var(--space-4)', color: 'var(--color-text-secondary)' }}>
         No template tasks yet
@@ -211,7 +210,7 @@ export function TemplateTaskList({
     >
       <SortableContext items={taskIds} strategy={verticalListSortingStrategy}>
         <div style={listStyle}>
-          {localTasks.map((task, index) => (
+          {tasks.map((task, index) => (
             <SortableTaskItem
               key={index}
               task={task}

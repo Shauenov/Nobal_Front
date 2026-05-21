@@ -229,7 +229,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/conductor/students/invite": {
+    "/api/v1/adviser/students/invite": {
         parameters: {
             query?: never;
             header?: never;
@@ -239,7 +239,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Invite Student */
-        post: operations["invite_student_api_v1_conductor_students_invite_post"];
+        post: operations["invite_student_api_v1_adviser_students_invite_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -310,8 +310,8 @@ export interface paths {
         /** List Student Tasks */
         get: operations["list_student_tasks_api_v1_students__student_id__tasks_get"];
         put?: never;
-        /** Create Conductor Task */
-        post: operations["create_conductor_task_api_v1_students__student_id__tasks_post"];
+        /** Create adviser task */
+        post: operations["create_adviser_task_api_v1_students__student_id__tasks_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1373,10 +1373,10 @@ export interface components {
              */
             student_id: string;
             /**
-             * Conductor Id
+             * adviser id
              * Format: uuid
              */
-            conductor_id: string;
+            adviser_id: string;
             /** Status */
             status: string;
             /** Consultation Type */
@@ -1689,10 +1689,10 @@ export interface components {
              */
             student_id: string;
             /**
-             * Conductor Id
+             * adviser id
              * Format: uuid
              */
-            conductor_id: string;
+            adviser_id: string;
             /** Last Message At */
             last_message_at?: string | null;
             /**
@@ -2729,10 +2729,10 @@ export interface components {
              */
             id: string;
             /**
-             * Conductor Id
+             * adviser id
              * Format: uuid
              */
-            conductor_id: string;
+            adviser_id: string;
             /**
              * Start Time
              * Format: date-time
@@ -3045,8 +3045,8 @@ export interface components {
             reminder_minutes: number | null;
             /** Completed At */
             completed_at: string | null;
-            /** Is Conductor Task */
-            is_conductor_task: boolean;
+            /** Is adviser task */
+            is_adviser_task: boolean;
             /** Student Roadmap Id */
             student_roadmap_id: string | null;
             /**
@@ -4036,7 +4036,7 @@ export interface operations {
             };
         };
     };
-    invite_student_api_v1_conductor_students_invite_post: {
+    invite_student_api_v1_adviser_students_invite_post: {
         parameters: {
             query?: never;
             header?: never;
@@ -4269,7 +4269,7 @@ export interface operations {
         parameters: {
             query?: {
                 status?: string | null;
-                is_conductor_task?: boolean | null;
+                is_adviser_task?: boolean | null;
                 page?: number;
                 page_size?: number;
             };
@@ -4301,7 +4301,7 @@ export interface operations {
             };
         };
     };
-    create_conductor_task_api_v1_students__student_id__tasks_post: {
+    create_adviser_task_api_v1_students__student_id__tasks_post: {
         parameters: {
             query?: never;
             header?: never;
@@ -4915,7 +4915,7 @@ export interface operations {
     list_slots_api_v1_appointments_slots_get: {
         parameters: {
             query?: {
-                conductor_id?: string | null;
+                adviser_id?: string | null;
                 from_time?: string | null;
             };
             header?: never;

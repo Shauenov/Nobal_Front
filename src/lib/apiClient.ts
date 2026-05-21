@@ -158,6 +158,20 @@ apiClient.interceptors.response.use(
 
 // ── Error normalizer ──────────────────────────────────────────
 export function normalizeError(error: unknown): ApiError {
+  // Idempotent: the response interceptor already rejects with a normalized
+  // ApiError. Hooks call normalizeError again in their onError — without this
+  // guard the already-normalized object (a plain object, not an Error) would
+  // fall through to the "Unknown error" branch and mask the real message.
+  if (
+    error &&
+    typeof error === 'object' &&
+    !axios.isAxiosError(error) &&
+    typeof (error as ApiError).status === 'number' &&
+    typeof (error as ApiError).message === 'string'
+  ) {
+    return error as ApiError;
+  }
+
   if (axios.isAxiosError(error)) {
     const status = error.response?.status ?? 0;
     const responseData = error.response?.data;

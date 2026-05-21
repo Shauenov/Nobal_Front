@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import type { CSSProperties } from 'react';
-import { Send } from 'lucide-react';
+import { Send, Paperclip } from 'lucide-react';
 
 interface MessageInputProps {
   onSend: (text: string) => void;
@@ -113,8 +113,23 @@ export function MessageInput({ onSend, onSendImage, disabled }: MessageInputProp
         rows={text.split('\n').length > 1 ? Math.min(text.split('\n').length, 5) : 1}
       />
       <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'center' }}>
-        <label htmlFor="message-image-input" style={{ cursor: 'pointer', color: 'var(--color-text-secondary)', fontSize: '12px' }}>
-          Attach
+        <label
+          htmlFor="message-image-input"
+          title="Прикрепить изображение"
+          style={{
+            cursor: 'pointer',
+            color: file ? 'var(--color-primary)' : 'var(--color-text-secondary)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: 36,
+            height: 36,
+            borderRadius: 8,
+            background: file ? 'var(--color-primary-light, #eff6ff)' : 'transparent',
+            transition: 'all 120ms ease',
+          }}
+        >
+          <Paperclip size={18} />
         </label>
         {previewUrl && (
           <>

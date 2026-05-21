@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import type { RoadmapOut, RoadmapCreate, RoadmapTemplateTaskCreate } from '@/types/api';
+import { useUniversities } from '@/hooks/useUniversities';
 import { TemplateTaskList } from './TemplateTaskList';
 
 interface RoadmapFormProps {
@@ -27,6 +28,7 @@ const roadmapSchema = z.object({
   description: z.string().optional().nullable(),
   target_type: z.string().optional().nullable(),
   is_public: z.boolean().optional(),
+  university_id: z.string().optional().nullable(),
   template_tasks: z.array(templateTaskSchema).optional(),
 });
 
@@ -135,6 +137,9 @@ export function RoadmapForm({
   const [newTaskDescription, setNewTaskDescription] = useState('');
   const [newTaskDaysOffset, setNewTaskDaysOffset] = useState('');
 
+  const { data: universitiesResp } = useUniversities({ page: 1, page_size: 200 });
+  const allUniversities = universitiesResp?.data ?? [];
+
   const {
     register,
     handleSubmit,
@@ -147,6 +152,7 @@ export function RoadmapForm({
       description: roadmap?.description || '',
       target_type: roadmap?.target_type || '',
       is_public: roadmap?.is_public || false,
+      university_id: roadmap?.university_id || null,
     },
   });
 
@@ -199,7 +205,22 @@ export function RoadmapForm({
           <label style={labelStyle}>Тип цели</label>
           <input {...register('target_type')} type="text" placeholder="напр. Бакалавр, Магистр" style={inputStyle} />
         </div>
-        <div style={fieldStyle} />
+        <div style={fieldStyle}>
+          <label style={labelStyle}>
+            Целевой университет
+            <span style={{ fontSize: '0.7rem', color: '#94a3b8', marginLeft: 6, fontWeight: 400 }}>
+              (назначение роудмапа = заявка в университет)
+            </span>
+          </label>
+          <select {...register('university_id')} style={{ ...inputStyle, cursor: 'pointer' }}>
+            <option value="">— Не привязан —</option>
+            {allUniversities.map((u) => (
+              <option key={u.id} value={u.id}>
+                {u.name}{u.city ? ` · ${u.city}` : ''}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       <div style={checkboxGroupStyle}>

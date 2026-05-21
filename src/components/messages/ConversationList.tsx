@@ -74,6 +74,13 @@ export function ConversationList({
   isCreating = false,
   studentNameMap = {},
 }: ConversationListProps) {
+  // Sort conversations: most recently active first
+  const sortedConversations = [...conversations].sort((a, b) => {
+    const ta = a.last_message_at ? new Date(a.last_message_at).getTime() : 0;
+    const tb = b.last_message_at ? new Date(b.last_message_at).getTime() : 0;
+    return tb - ta;
+  });
+
   // Build a set of student IDs that already have conversations
   const convoByStudentId = new Map(conversations.map((c) => [c.student_id, c]));
 
@@ -92,8 +99,8 @@ export function ConversationList({
 
   return (
     <div style={listContainer}>
-      {/* ── Existing conversations ── */}
-      {conversations.map((convo) => {
+      {/* ── Existing conversations (sorted by latest message) ── */}
+      {sortedConversations.map((convo) => {
         const isActive = convo.id === activeConvoId;
         const unreadCount = getUnreadCount(convo);
         const hasUnread = unreadCount > 0;

@@ -11,11 +11,11 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: 'Nobal EduConductor',
-    template: '%s | Nobal EduConductor',
+    default: 'Nobal eduadviser',
+    template: '%s | Nobal eduadviser',
   },
   description:
-    'Conductor dashboard for managing student admissions, tasks, and university roadmaps.',
+    'ADVISER dashboard for managing student admissions, tasks, and university roadmaps.',
   robots: { index: false, follow: false },
 };
 
