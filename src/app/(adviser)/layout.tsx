@@ -1,14 +1,16 @@
 import { ProtectedRoute } from '@/components/layout/ProtectedRoute';
-import { ADVISERShell } from '@/components/layout/AdviserShell';
+import { AdviserShell } from '@/components/layout/AdviserShell';
 
-interface ADVISERLayoutProps {
+interface AdviserLayoutProps {
   children: React.ReactNode;
 }
 
-export default function ADVISERLayout({ children }: ADVISERLayoutProps) {
+export default function AdviserLayout({ children }: AdviserLayoutProps) {
+  // Admin is also permitted here so admins can follow drill-down links
+  // (e.g. /students/[id]) into detail pages. Adviser behaviour is unchanged.
   return (
-    <ProtectedRoute>
-      <ADVISERShell>{children}</ADVISERShell>
+    <ProtectedRoute roles={['adviser', 'admin']}>
+      <AdviserShell>{children}</AdviserShell>
     </ProtectedRoute>
   );
 }

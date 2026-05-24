@@ -31,7 +31,7 @@ export function useLogin() {
       tokenStorage.setTokens(data.access_token, data.refresh_token);
       setSession(data.user, data.access_token, data.refresh_token);
       queryClient.invalidateQueries();
-      router.replace('/dashboard');
+      router.replace(data.user.role === 'admin' ? '/admin' : '/dashboard');
     },
     onError: (err) => {
       const error = normalizeError(err);

@@ -1,35 +1,24 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { usePathname } from 'next/navigation';
-import { Sidebar } from './Sidebar';
+import { AdminSidebar } from './AdminSidebar';
 import { Topbar } from './Topbar';
 import { NotificationDrawer } from './NotificationDrawer';
-import { LoadingOverlay } from '@/components/ui/LoadingOverlay';
 import { useUIStore } from '@/stores/uiStore';
 
-interface AdviserShellProps {
+interface AdminShellProps {
   children: React.ReactNode;
 }
 
-export function AdviserShell({ children }: AdviserShellProps) {
+export function AdminShell({ children }: AdminShellProps) {
   const { sidebarCollapsed } = useUIStore();
-  const pathname = usePathname();
-  const [navigating, setNavigating] = useState(false);
 
-  useEffect(() => {
-    setNavigating(true);
-    const t = setTimeout(() => setNavigating(false), 400);
-    return () => clearTimeout(t);
-  }, [pathname]);
   const sidebarWidth = sidebarCollapsed
     ? 'var(--sidebar-collapsed)'
     : 'var(--sidebar-width)';
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--color-bg)' }}>
-      <LoadingOverlay visible={navigating} />
-      <Sidebar />
+      <AdminSidebar />
       <div
         style={{
           marginLeft: sidebarWidth,
@@ -47,3 +36,5 @@ export function AdviserShell({ children }: AdviserShellProps) {
     </div>
   );
 }
+
+export default AdminShell;

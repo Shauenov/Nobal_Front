@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     template: '%s | Nobal eduadviser',
   },
   description:
-    'ADVISER dashboard for managing student admissions, tasks, and university roadmaps.',
+    'Adviser dashboard for managing student admissions, tasks, and university roadmaps.',
   robots: { index: false, follow: false },
 };
 

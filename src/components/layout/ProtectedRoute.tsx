@@ -6,13 +6,20 @@ import { useAuthStore, useHasHydrated } from '@/stores/authStore';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
+  /**
+   * Roles allowed to access this subtree. Defaults to ['adviser'] to preserve
+   * the original adviser-only behaviour. The (admin) group passes ['admin'].
+   */
+  roles?: string[];
 }
 
-export function ProtectedRoute({ children }: ProtectedRouteProps) {
+export function ProtectedRoute({ children, roles = ['adviser'] }: ProtectedRouteProps) {
   const { isAuthenticated, user } = useAuthStore();
   const hasHydrated = useHasHydrated();
   const router = useRouter();
   const pathname = usePathname();
+
+  const roleAllowed = (role?: string) => !!role && roles.includes(role);
 
   useEffect(() => {
     // Don't redirect until Zustand has finished reading from localStorage.
@@ -26,7 +33,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
       return;
     }
 
-    if (user && user.role !== 'adviser') {
+    if (user && !roleAllowed(user.role)) {
       router.replace('/login?reason=unauthorized');
     }
   }, [hasHydrated, isAuthenticated, user, router, pathname]);
@@ -44,7 +51,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   }
 
   // Hydrated but not authenticated — redirecting (show spinner while navigating)
-  if (!isAuthenticated || (user && user.role !== 'adviser')) {
+  if (!isAuthenticated || (user && !roleAllowed(user.role))) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="flex flex-col items-center gap-4">
