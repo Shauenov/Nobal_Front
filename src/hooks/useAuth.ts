@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import apiClient, { normalizeError, tokenStorage } from '@/lib/apiClient';
+import { goToAdminHome } from '@/lib/adminUrl';
 import { queryClient, queryKeys } from '@/lib/queryClient';
 import { useAuthStore } from '@/stores/authStore';
 import {
@@ -31,7 +32,11 @@ export function useLogin() {
       tokenStorage.setTokens(data.access_token, data.refresh_token);
       setSession(data.user, data.access_token, data.refresh_token);
       queryClient.invalidateQueries();
-      router.replace(data.user.role === 'admin' ? '/admin' : '/dashboard');
+      if (data.user.role === 'admin') {
+        goToAdminHome((p) => router.replace(p));
+      } else {
+        router.replace('/dashboard');
+      }
     },
     onError: (err) => {
       const error = normalizeError(err);

@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore, useHasHydrated } from '@/stores/authStore';
+import { goToAdminHome } from '@/lib/adminUrl';
 
 export default function Home() {
   const router = useRouter();
@@ -15,7 +16,11 @@ export default function Home() {
       router.replace('/login');
       return;
     }
-    router.replace(user?.role === 'admin' ? '/admin' : '/dashboard');
+    if (user?.role === 'admin') {
+      goToAdminHome((p) => router.replace(p));
+    } else {
+      router.replace('/dashboard');
+    }
   }, [hasHydrated, isAuthenticated, user, router]);
 
   return (
