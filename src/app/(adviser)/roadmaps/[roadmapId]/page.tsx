@@ -7,6 +7,7 @@ import { useRoadmap, useUpdateRoadmap, useAssignRoadmap } from '@/hooks/useRoadm
 import { PageHeader } from '@/components/layout/PageHeader';
 import { RoadmapForm } from '@/components/roadmaps/RoadmapForm';
 import { RoadmapAssignModal } from '@/components/roadmaps/RoadmapAssignModal';
+import { useRoutePrefix } from '@/hooks/useRoutePrefix';
 import type { AssignRequest, RoadmapUpdate } from '@/types/api';
 import { toast } from 'react-hot-toast';
 import { useState } from 'react';
@@ -44,6 +45,7 @@ const loadingStyle: CSSProperties = {
 
 function RoadmapDetailContent() {
   const router = useRouter();
+  const prefix = useRoutePrefix();
   const params = useParams();
   const roadmapId = params.roadmapId as string;
   const { data: detail, isLoading } = useRoadmap(roadmapId);
@@ -66,7 +68,7 @@ function RoadmapDetailContent() {
     try {
       await updateRoadmap.mutateAsync(data);
       toast.success('Маршрут обновлён');
-      router.push('/roadmaps');
+      router.push(`${prefix}/roadmaps`);
     } catch {
       toast.error('Не удалось обновить маршрут');
     }

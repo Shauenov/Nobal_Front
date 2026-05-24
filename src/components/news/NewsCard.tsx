@@ -7,6 +7,7 @@ import Link from 'next/link';
 import type { NewsOut } from '@/types/api';
 import { format } from 'date-fns';
 import { useUploadNewsCover } from '@/hooks/useNews';
+import { useRoutePrefix } from '@/hooks/useRoutePrefix';
 
 interface NewsCardProps {
   news: NewsOut;
@@ -133,6 +134,7 @@ const publishedButtonStyle: CSSProperties = {
 };
 
 export function NewsCard({ news, onTogglePublish, onAddToCalendar }: NewsCardProps) {
+  const prefix = useRoutePrefix();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const uploadCover = useUploadNewsCover(news.id);
 
@@ -206,7 +208,7 @@ export function NewsCard({ news, onTogglePublish, onAddToCalendar }: NewsCardPro
         <div style={headerStyle}>
           <h3 style={titleStyle}>
             <Link
-              href={`/news/${news.id}`}
+              href={`${prefix}/news/${news.id}`}
               style={{ color: 'inherit', textDecoration: 'none' }}
             >
               {news.title}

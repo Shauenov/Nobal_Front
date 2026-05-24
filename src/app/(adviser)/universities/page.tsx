@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useUniversities, useDeleteUniversity } from '@/hooks/useUniversities';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { UniversityCard } from '@/components/universities/UniversityCard';
+import { useRoutePrefix } from '@/hooks/useRoutePrefix';
 
 type TabId = 'kz' | 'abroad';
 
@@ -15,6 +16,7 @@ const TABS: { id: TabId; label: string }[] = [
 ];
 
 export default function UniversitiesPage() {
+  const prefix = useRoutePrefix();
   const [activeTab, setActiveTab] = useState<TabId>('kz');
   const [page, setPage] = useState(1);
 
@@ -79,7 +81,7 @@ export default function UniversitiesPage() {
         title="Каталог вузов"
         subtitle="Управление и редактирование каталога университетов."
         action={
-          <Link href="/universities/new" style={{ textDecoration: 'none' }}>
+          <Link href={`${prefix}/universities/new`} style={{ textDecoration: 'none' }}>
             <button
               style={{
                 padding: '9px 18px',

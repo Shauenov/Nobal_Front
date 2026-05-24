@@ -6,6 +6,7 @@ import type { RoadmapCreate } from '@/types/api';
 import { useCreateRoadmap } from '@/hooks/useRoadmaps';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { RoadmapForm } from '@/components/roadmaps/RoadmapForm';
+import { useRoutePrefix } from '@/hooks/useRoutePrefix';
 import { toast } from 'react-hot-toast';
 
 const containerStyle: CSSProperties = {
@@ -17,13 +18,14 @@ const containerStyle: CSSProperties = {
 
 export default function NewRoadmapPage() {
   const router = useRouter();
+  const prefix = useRoutePrefix();
   const createRoadmap = useCreateRoadmap();
 
   const handleSubmit = async (data: RoadmapCreate) => {
     try {
       await createRoadmap.mutateAsync(data);
       toast.success('Маршрут создан');
-      router.push('/roadmaps');
+      router.push(`${prefix}/roadmaps`);
     } catch {
       toast.error('Не удалось создать маршрут');
     }

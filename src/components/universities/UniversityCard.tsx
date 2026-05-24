@@ -5,6 +5,7 @@ import type { CSSProperties } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import type { UniversityOut } from '@/types/api';
+import { useRoutePrefix } from '@/hooks/useRoutePrefix';
 
 interface UniversityCardProps {
   university: UniversityOut;
@@ -46,6 +47,7 @@ function PencilIcon() {
 }
 
 export function UniversityCard({ university }: UniversityCardProps) {
+  const prefix = useRoutePrefix();
   const [coverError, setCoverError] = useState(false);
   const [logoError, setLogoError] = useState(false);
 
@@ -97,7 +99,7 @@ export function UniversityCard({ university }: UniversityCardProps) {
 
         {/* Edit button — top right */}
         <Link
-          href={`/universities/${university.id}/edit`}
+          href={`${prefix}/universities/${university.id}/edit`}
           style={{
             position: 'absolute',
             top: 10,
@@ -286,7 +288,7 @@ export function UniversityCard({ university }: UniversityCardProps) {
       >
         {/* Список заявок — outlined */}
         <Link
-          href={`/universities/${university.id}/applications`}
+          href={`${prefix}/universities/${university.id}/applications`}
           style={{
             padding: '10px 0',
             borderRadius: 10,
@@ -304,7 +306,7 @@ export function UniversityCard({ university }: UniversityCardProps) {
 
         {/* Управлять — dark filled */}
         <Link
-          href={`/universities/${university.id}`}
+          href={`${prefix}/universities/${university.id}`}
           style={{
             padding: '10px 0',
             borderRadius: 10,

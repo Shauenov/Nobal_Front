@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import type { CSSProperties } from 'react';
 import type { StudentListItem } from '@/types/api';
 import { formatGroup } from '@/lib/formatGroup';
+import { useRoutePrefix } from '@/hooks/useRoutePrefix';
 
 interface StudentCardProps {
   student: StudentListItem;
@@ -93,6 +94,7 @@ function ThreeDotMenu({
   studentId: string;
   onDelete: (id: string) => void;
 }) {
+  const prefix = useRoutePrefix();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -156,21 +158,21 @@ function ThreeDotMenu({
           />
           <div style={menuStyle}>
             <Link
-              href={`/students/${studentId}`}
+              href={`${prefix}/students/${studentId}`}
               style={{ ...itemStyle, textDecoration: 'none' }}
               onClick={() => setOpen(false)}
             >
               👤 Профиль студента
             </Link>
             <Link
-              href={`/messages?student=${studentId}`}
+              href={`${prefix}/messages?student=${studentId}`}
               style={{ ...itemStyle, textDecoration: 'none' }}
               onClick={() => setOpen(false)}
             >
               💬 Написать сообщение
             </Link>
             <Link
-              href={`/tasks?student=${studentId}`}
+              href={`${prefix}/tasks?student=${studentId}`}
               style={{ ...itemStyle, textDecoration: 'none' }}
               onClick={() => setOpen(false)}
             >
@@ -196,6 +198,7 @@ function ThreeDotMenu({
 
 export function StudentCard({ student, onDelete }: StudentCardProps) {
   const router = useRouter();
+  const prefix = useRoutePrefix();
 
   const progress =
     student.tasks_total > 0
@@ -218,10 +221,10 @@ export function StudentCard({ student, onDelete }: StudentCardProps) {
         transition: 'box-shadow 150ms ease, transform 150ms ease',
         cursor: 'pointer',
       }}
-      onClick={() => router.push(`/students/${student.id}`)}
+      onClick={() => router.push(`${prefix}/students/${student.id}`)}
       role="button"
       tabIndex={0}
-      onKeyDown={(e) => e.key === 'Enter' && router.push(`/students/${student.id}`)}
+      onKeyDown={(e) => e.key === 'Enter' && router.push(`${prefix}/students/${student.id}`)}
     >
       {/* ── Header: avatar + name + menu ── */}
       <div
@@ -382,7 +385,7 @@ export function StudentCard({ student, onDelete }: StudentCardProps) {
       >
         {/* Написать сообщение */}
         <Link
-          href={`/messages?student=${student.id}`}
+          href={`${prefix}/messages?student=${student.id}`}
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -403,7 +406,7 @@ export function StudentCard({ student, onDelete }: StudentCardProps) {
 
         {/* Назначить задание */}
         <Link
-          href={`/tasks?student=${student.id}`}
+          href={`${prefix}/tasks?student=${student.id}`}
           style={{
             display: 'flex',
             alignItems: 'center',

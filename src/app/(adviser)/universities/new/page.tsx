@@ -5,6 +5,7 @@ import type { CSSProperties } from 'react';
 import { useCreateUniversity } from '@/hooks/useUniversities';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { UniversityForm } from '@/components/universities/UniversityForm';
+import { useRoutePrefix } from '@/hooks/useRoutePrefix';
 import type { UniversityCreate } from '@/types/api';
 
 const containerStyle: CSSProperties = {
@@ -18,12 +19,13 @@ const containerStyle: CSSProperties = {
 
 export default function NewUniversityPage() {
   const router = useRouter();
+  const prefix = useRoutePrefix();
   const createUniversity = useCreateUniversity();
 
   const handleSubmit = async (data: UniversityCreate) => {
     try {
       await createUniversity.mutateAsync(data);
-      router.push('/universities');
+      router.push(`${prefix}/universities`);
     } catch (error) {
       console.error(error);
     }

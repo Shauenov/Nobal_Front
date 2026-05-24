@@ -54,22 +54,25 @@ export function StudentDetailShell({ children }: StudentDetailShellProps) {
   const student = useStudent(studentId);
   const { setPageTitle } = useUIStore();
 
+  // Keep nav inside the current shell (adviser vs admin).
+  const prefix = pathname?.startsWith('/admin') ? '/admin' : '';
+
   const studentName = student.data?.user.full_name ?? null;
   // Only override the breadcrumb on the overview tab where the UUID is the
   // last crumb. Sub-pages (profile, documents, …) already have a readable
   // segment as the last crumb so we leave pageTitle null for them.
-  const isOverview = pathname === `/students/${studentId}`;
+  const isOverview = pathname === `${prefix}/students/${studentId}`;
   useEffect(() => {
     if (isOverview && studentName) setPageTitle(studentName);
     return () => setPageTitle(null);
   }, [isOverview, studentName, setPageTitle]);
 
   const tabs = [
-    { label: 'Обзор', href: `/students/${studentId}` },
-    { label: 'Профиль', href: `/students/${studentId}/profile` },
-    { label: 'Документы', href: `/students/${studentId}/documents` },
-    { label: 'Задачи', href: `/students/${studentId}/tasks` },
-    { label: 'Маршруты', href: `/students/${studentId}/roadmaps` },
+    { label: 'Обзор', href: `${prefix}/students/${studentId}` },
+    { label: 'Профиль', href: `${prefix}/students/${studentId}/profile` },
+    { label: 'Документы', href: `${prefix}/students/${studentId}/documents` },
+    { label: 'Задачи', href: `${prefix}/students/${studentId}/tasks` },
+    { label: 'Маршруты', href: `${prefix}/students/${studentId}/roadmaps` },
   ];
 
   const name   = student.data?.user.full_name ?? 'Студент';

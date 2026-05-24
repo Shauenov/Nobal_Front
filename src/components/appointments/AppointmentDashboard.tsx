@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { Users, CalendarCheck, CheckCircle2, Calendar, ArrowLeft } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { formatGroup } from '@/lib/formatGroup';
+import { useRoutePrefix } from '@/hooks/useRoutePrefix';
 import {
   useAppointments,
   useCompleteAppointment,
@@ -121,6 +122,7 @@ const tdStyle: CSSProperties = {
 
 /* ─── Main component ─────────────────────────────────────────── */
 export function AppointmentDashboard() {
+  const prefix = useRoutePrefix();
   const [view, setView] = useState<'overview' | 'slots'>('overview');
   const [period, setPeriod] = useState<'week' | 'month' | 'year'>('month');
 
@@ -398,7 +400,7 @@ export function AppointmentDashboard() {
                       {/* Student */}
                       <td style={tdStyle}>
                         <Link
-                          href={`/students/${appt.student_id}`}
+                          href={`${prefix}/students/${appt.student_id}`}
                           style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', color: 'inherit' }}
                         >
                           {appt.student_avatar_url ? (
@@ -509,7 +511,7 @@ export function AppointmentDashboard() {
 
                 {/* CTA button */}
                 <Link
-                  href={`/students/${nextAppointment.student_id}`}
+                  href={`${prefix}/students/${nextAppointment.student_id}`}
                   style={{
                     display: 'block',
                     width: '100%',

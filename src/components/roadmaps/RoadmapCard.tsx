@@ -3,6 +3,7 @@
 import type { CSSProperties } from 'react';
 import Link from 'next/link';
 import type { RoadmapOut } from '@/types/api';
+import { useRoutePrefix } from '@/hooks/useRoutePrefix';
 
 interface RoadmapCardProps {
   roadmap: RoadmapOut;
@@ -89,6 +90,7 @@ export function RoadmapCard({
   onDelete,
   isLoading = false,
 }: RoadmapCardProps) {
+  const prefix = useRoutePrefix();
   const createdDate = new Date(roadmap.created_at);
   const dateStr = createdDate.toLocaleDateString('en-US', {
     month: 'short',
@@ -141,7 +143,7 @@ export function RoadmapCard({
               Delete
             </button>
           )}
-          <Link href={`/roadmaps/${roadmap.id}`} style={{ textDecoration: 'none' }}>
+          <Link href={`${prefix}/roadmaps/${roadmap.id}`} style={{ textDecoration: 'none' }}>
             <button style={buttonStyle('primary', isLoading)}>
               Edit
             </button>

@@ -8,6 +8,7 @@ import { useUniversity } from '@/hooks/useUniversities';
 import { useUniversityEnrollments, useUpdateEnrollment } from '@/hooks/useEnrollments';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { formatGroup } from '@/lib/formatGroup';
+import { useRoutePrefix } from '@/hooks/useRoutePrefix';
 import type { EnrollmentStatus, EnrollmentWithStudentOut } from '@/types/api';
 
 /* ── Enrollment status labels ── */
@@ -26,6 +27,7 @@ function getInitials(name: string) {
 
 export default function ApplicationsPage() {
   const params = useParams();
+  const prefix = useRoutePrefix();
   const universityId = params.universityId as string;
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [page, setPage] = useState(1);
@@ -72,7 +74,7 @@ export default function ApplicationsPage() {
         subtitle="Отслеживайте прогресс и успеваемость студентов 2–3 курсов."
         action={
           <Link
-            href={`/universities/${universityId}`}
+            href={`${prefix}/universities/${universityId}`}
             style={{
               padding: '8px 16px', borderRadius: 8, border: '1.5px solid #e2e8f0',
               fontSize: '0.875rem', fontWeight: 500, color: '#475569',
@@ -198,7 +200,7 @@ export default function ApplicationsPage() {
                     {/* Student name */}
                     <td style={tdStyle}>
                       <Link
-                        href={`/students/${enr.student_id}`}
+                        href={`${prefix}/students/${enr.student_id}`}
                         style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none', color: 'inherit' }}
                       >
                         {enr.student.avatar_url ? (
