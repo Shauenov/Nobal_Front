@@ -1,7 +1,7 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Star, BookOpen, MessageSquare, Mail, Clock } from 'lucide-react';
+import { ArrowLeft, Star, BookOpen, MessageSquare, Clock } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -67,6 +67,7 @@ export default function AdminAdviserDetailPage() {
               }}
             >
               {profile.avatar_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
                 <img src={profile.avatar_url} alt={profile.full_name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               ) : (
                 initials(profile.full_name)

@@ -23,11 +23,12 @@ export function AdviserCard({ adviser, index = 0 }: { adviser: AdminAdviserOut; 
         <div style={{ ...cardStyle, display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
             {adviser.avatar_url ? (
-              <img
+              // eslint-disable-next-line @next/next/no-img-element
+              (<img
                 src={adviser.avatar_url}
                 alt={adviser.full_name}
                 style={{ width: 48, height: 48, borderRadius: 'var(--radius-full)', objectFit: 'cover', flexShrink: 0 }}
-              />
+              />)
             ) : (
               <span
                 style={{

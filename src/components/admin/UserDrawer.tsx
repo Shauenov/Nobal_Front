@@ -9,7 +9,7 @@ import type { AdminUser, Role } from '@/types/admin';
 import { RoleBadge } from './RoleBadge';
 import { StatusPill } from './StatusPill';
 import { ADMIN_ACCENT, inputStyle, labelStyle } from './adminTheme';
-import { useSetUserActive, useUpdateUserRole, useDeleteAdminUser } from '@/hooks/admin/useAdminUsers';
+import { useSetUserActive, useUpdateUserRole, useDeleteAdminUser, useResetUserPassword } from '@/hooks/admin/useAdminUsers';
 
 interface Props {
   user: AdminUser | null;
@@ -24,6 +24,7 @@ export function UserDrawer({ user, onClose }: Props) {
   const updateRole = useUpdateUserRole();
   const setActive = useSetUserActive();
   const remove = useDeleteAdminUser();
+  const resetPwd = useResetUserPassword();
 
   return (
     <AnimatePresence>
@@ -110,8 +111,19 @@ export function UserDrawer({ user, onClose }: Props) {
 
             {/* footer actions */}
             <div style={{ padding: 'var(--space-5) var(--space-6)', borderTop: '1px solid var(--color-border)', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-              <button style={actionBtn} onClick={() => toast.success('Ссылка для сброса пароля отправлена (демо)')}>
-                <KeyRound size={16} /> Сбросить пароль
+              <button
+                style={actionBtn}
+                disabled={resetPwd.isPending}
+                onClick={() => {
+                  const pwd = window.prompt('Новый пароль (мин. 8 символов):');
+                  if (pwd && pwd.length >= 8) {
+                    resetPwd.mutate({ id: user.id, new_password: pwd });
+                  } else if (pwd) {
+                    toast.error('Пароль должен быть не короче 8 символов');
+                  }
+                }}
+              >
+                <KeyRound size={16} /> {resetPwd.isPending ? 'Сохранение…' : 'Сбросить пароль'}
               </button>
               <button
                 style={actionBtn}
