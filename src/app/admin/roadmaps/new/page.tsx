@@ -1,2 +1,4 @@
 import AdviserRoadmapNewPage from '@/app/(adviser)/roadmaps/new/page';
-export default AdviserRoadmapNewPage;
+export default function AdminPage() {
+  return <AdviserRoadmapNewPage />;
+}

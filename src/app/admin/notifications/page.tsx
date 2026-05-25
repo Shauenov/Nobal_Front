@@ -1,3 +1,5 @@
 import AdviserNotificationsPage from '@/app/(adviser)/notifications/page';
 
-export default AdviserNotificationsPage;
+export default function AdminPage() {
+  return <AdviserNotificationsPage />;
+}

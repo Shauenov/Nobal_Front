@@ -1,2 +1,4 @@
 import AdviserStudentTasksPage from '@/app/(adviser)/students/[studentId]/tasks/page';
-export default AdviserStudentTasksPage;
+export default function AdminPage() {
+  return <AdviserStudentTasksPage />;
+}

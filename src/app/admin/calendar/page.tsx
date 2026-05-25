@@ -1,3 +1,5 @@
 import AdviserCalendarPage from '@/app/(adviser)/calendar/page';
 
-export default AdviserCalendarPage;
+export default function AdminPage() {
+  return <AdviserCalendarPage />;
+}

@@ -1,3 +1,5 @@
 import AdviserMessagesPage from '@/app/(adviser)/messages/page';
 
-export default AdviserMessagesPage;
+export default function AdminPage() {
+  return <AdviserMessagesPage />;
+}

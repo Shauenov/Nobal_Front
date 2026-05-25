@@ -1,2 +1,4 @@
 import AdviserStudentRoadmapsPage from '@/app/(adviser)/students/[studentId]/roadmaps/page';
-export default AdviserStudentRoadmapsPage;
+export default function AdminPage() {
+  return <AdviserStudentRoadmapsPage />;
+}

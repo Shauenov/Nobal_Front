@@ -1,3 +1,5 @@
 import AdviserAlumniPage from '@/app/(adviser)/alumni/page';
 
-export default AdviserAlumniPage;
+export default function AdminPage() {
+  return <AdviserAlumniPage />;
+}

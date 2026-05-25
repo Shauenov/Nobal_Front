@@ -2,4 +2,6 @@
 // AdminShell. Drill-down links open detail pages in the adviser route group.
 import AdviserStudentsPage from '@/app/(adviser)/students/page';
 
-export default AdviserStudentsPage;
+export default function AdminPage() {
+  return <AdviserStudentsPage />;
+}

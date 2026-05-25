@@ -1,2 +1,4 @@
 import AdviserUniversityDetailPage from '@/app/(adviser)/universities/[universityId]/page';
-export default AdviserUniversityDetailPage;
+export default function AdminPage() {
+  return <AdviserUniversityDetailPage />;
+}

@@ -1,2 +1,4 @@
 import AdviserTasksPage from '@/app/(adviser)/tasks/page';
-export default AdviserTasksPage;
+export default function AdminPage() {
+  return <AdviserTasksPage />;
+}
