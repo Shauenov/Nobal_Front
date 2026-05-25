@@ -94,7 +94,11 @@ export function NewsForm({ initial, onSubmit, isLoading = false }: NewsFormProps
   const handleFormSubmit = async (data: NewsFormData) => {
     const payload: NewsCreate = {
       ...data,
-      cover_url:      initial?.cover_url ?? null,
+      // Reflect the current cover state, not always the original:
+      //  • new file selected  → keep original here; the /cover upload overwrites it after save
+      //  • cover removed (X)   → coverPreview is null → send null so the backend clears it
+      //  • untouched           → coverPreview holds the original URL → keep it
+      cover_url:      coverFile ? (initial?.cover_url ?? null) : coverPreview,
       external_url:   data.external_url || null,
       event_date:     data.event_date   || null,
       allow_calendar: data.allow_calendar ?? false,
