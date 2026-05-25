@@ -1,4 +1,7 @@
-import AdviserConversationPage from '@/app/(adviser)/messages/[convoId]/page';
-export default function AdminPage() {
-  return <AdviserConversationPage />;
+'use client';
+
+import MessageConvoView from '@/views/messages/MessageConvoView';
+
+export default function AdminMessageConvoPage() {
+  return <MessageConvoView />;
 }

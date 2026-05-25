@@ -1,5 +1,7 @@
-import { AppointmentDashboard } from '@/components/appointments/AppointmentDashboard';
+'use client';
 
-export default function AppointmentsPage() {
-  return <AppointmentDashboard />;
+import AppointmentsView from '@/views/appointments/AppointmentsView';
+
+export default function AdviserAppointmentsPage() {
+  return <AppointmentsView />;
 }

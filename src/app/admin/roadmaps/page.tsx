@@ -1,5 +1,7 @@
-import AdviserRoadmapsPage from '@/app/(adviser)/roadmaps/page';
+'use client';
 
-export default function AdminPage() {
-  return <AdviserRoadmapsPage />;
+import RoadmapsListView from '@/views/roadmaps/RoadmapsListView';
+
+export default function AdminRoadmapsPage() {
+  return <RoadmapsListView />;
 }

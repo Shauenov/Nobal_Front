@@ -1,5 +1,7 @@
-import AdviserAlumniPage from '@/app/(adviser)/alumni/page';
+'use client';
 
-export default function AdminPage() {
-  return <AdviserAlumniPage />;
+import AlumniView from '@/views/alumni/AlumniView';
+
+export default function AdminAlumniPage() {
+  return <AlumniView />;
 }

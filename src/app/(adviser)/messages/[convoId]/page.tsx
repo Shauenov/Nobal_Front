@@ -1,11 +1,7 @@
-import { MessagesDashboard } from '@/components/messages/MessagesDashboard';
+'use client';
 
-interface MessagesConversationPageProps {
-  params: Promise<{ convoId: string }>;
-}
+import MessageConvoView from '@/views/messages/MessageConvoView';
 
-export default async function MessagesConversationPage({ params }: MessagesConversationPageProps) {
-  const { convoId } = await params;
-
-  return <MessagesDashboard initialConvoId={convoId} />;
+export default function AdviserMessageConvoPage() {
+  return <MessageConvoView />;
 }

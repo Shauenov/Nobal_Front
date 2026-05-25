@@ -1,5 +1,7 @@
-import AdviserFaqPage from '@/app/(adviser)/faq/page';
+'use client';
 
-export default function AdminPage() {
-  return <AdviserFaqPage />;
+import FaqView from '@/views/faq/FaqView';
+
+export default function AdminFaqPage() {
+  return <FaqView />;
 }

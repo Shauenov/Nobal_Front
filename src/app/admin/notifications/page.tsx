@@ -1,5 +1,7 @@
-import AdviserNotificationsPage from '@/app/(adviser)/notifications/page';
+'use client';
 
-export default function AdminPage() {
-  return <AdviserNotificationsPage />;
+import NotificationsView from '@/views/notifications/NotificationsView';
+
+export default function AdminNotificationsPage() {
+  return <NotificationsView />;
 }

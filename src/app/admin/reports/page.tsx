@@ -1,5 +1,7 @@
-import AdviserReportsPage from '@/app/(adviser)/reports/page';
+'use client';
 
-export default function AdminPage() {
-  return <AdviserReportsPage />;
+import ReportsView from '@/views/reports/ReportsView';
+
+export default function AdminReportsPage() {
+  return <ReportsView />;
 }

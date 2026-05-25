@@ -1,5 +1,7 @@
-import AdviserAppointmentsPage from '@/app/(adviser)/appointments/page';
+'use client';
 
-export default function AdminPage() {
-  return <AdviserAppointmentsPage />;
+import AppointmentsView from '@/views/appointments/AppointmentsView';
+
+export default function AdminAppointmentsPage() {
+  return <AppointmentsView />;
 }

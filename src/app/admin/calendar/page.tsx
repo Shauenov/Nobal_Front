@@ -1,5 +1,7 @@
-import AdviserCalendarPage from '@/app/(adviser)/calendar/page';
+'use client';
 
-export default function AdminPage() {
-  return <AdviserCalendarPage />;
+import CalendarView from '@/views/calendar/CalendarView';
+
+export default function AdminCalendarPage() {
+  return <CalendarView />;
 }

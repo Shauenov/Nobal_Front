@@ -1,4 +1,7 @@
-import AdviserStudentRoadmapsPage from '@/app/(adviser)/students/[studentId]/roadmaps/page';
-export default function AdminPage() {
-  return <AdviserStudentRoadmapsPage />;
+'use client';
+
+import StudentRoadmapsView from '@/views/students/StudentRoadmapsView';
+
+export default function AdminStudentRoadmapsPage() {
+  return <StudentRoadmapsView />;
 }

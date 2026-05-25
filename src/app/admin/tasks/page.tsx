@@ -1,4 +1,7 @@
-import AdviserTasksPage from '@/app/(adviser)/tasks/page';
-export default function AdminPage() {
-  return <AdviserTasksPage />;
+'use client';
+
+import TasksView from '@/views/tasks/TasksView';
+
+export default function AdminTasksPage() {
+  return <TasksView />;
 }

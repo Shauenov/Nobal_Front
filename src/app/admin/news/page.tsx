@@ -1,5 +1,7 @@
-import AdviserNewsPage from '@/app/(adviser)/news/page';
+'use client';
 
-export default function AdminPage() {
-  return <AdviserNewsPage />;
+import NewsView from '@/views/news/NewsView';
+
+export default function AdminNewsPage() {
+  return <NewsView />;
 }

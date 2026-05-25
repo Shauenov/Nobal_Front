@@ -1,4 +1,7 @@
-import AdviserStudentTasksPage from '@/app/(adviser)/students/[studentId]/tasks/page';
-export default function AdminPage() {
-  return <AdviserStudentTasksPage />;
+'use client';
+
+import StudentTasksView from '@/views/students/StudentTasksView';
+
+export default function AdminStudentTasksPage() {
+  return <StudentTasksView />;
 }

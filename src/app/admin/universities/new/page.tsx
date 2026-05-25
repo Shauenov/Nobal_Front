@@ -1,4 +1,7 @@
-import AdviserUniversityNewPage from '@/app/(adviser)/universities/new/page';
-export default function AdminPage() {
-  return <AdviserUniversityNewPage />;
+'use client';
+
+import UniversityNewView from '@/views/universities/UniversityNewView';
+
+export default function AdminUniversityNewPage() {
+  return <UniversityNewView />;
 }

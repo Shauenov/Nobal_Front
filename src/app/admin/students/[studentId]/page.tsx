@@ -1,4 +1,7 @@
-import AdviserStudentOverviewPage from '@/app/(adviser)/students/[studentId]/page';
-export default function AdminPage() {
-  return <AdviserStudentOverviewPage />;
+'use client';
+
+import StudentDetailView from '@/views/students/StudentDetailView';
+
+export default function AdminStudentDetailPage() {
+  return <StudentDetailView />;
 }

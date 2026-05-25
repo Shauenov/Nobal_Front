@@ -1,4 +1,7 @@
-import AdviserRoadmapDetailPage from '@/app/(adviser)/roadmaps/[roadmapId]/page';
-export default function AdminPage() {
-  return <AdviserRoadmapDetailPage />;
+'use client';
+
+import RoadmapDetailView from '@/views/roadmaps/RoadmapDetailView';
+
+export default function AdminRoadmapDetailPage() {
+  return <RoadmapDetailView />;
 }

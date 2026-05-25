@@ -1,4 +1,7 @@
-import AdviserUniversityDetailPage from '@/app/(adviser)/universities/[universityId]/page';
-export default function AdminPage() {
-  return <AdviserUniversityDetailPage />;
+'use client';
+
+import UniversityDetailView from '@/views/universities/UniversityDetailView';
+
+export default function AdminUniversityDetailPage() {
+  return <UniversityDetailView />;
 }

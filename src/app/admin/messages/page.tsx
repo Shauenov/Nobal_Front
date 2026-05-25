@@ -1,5 +1,7 @@
-import AdviserMessagesPage from '@/app/(adviser)/messages/page';
+'use client';
 
-export default function AdminPage() {
-  return <AdviserMessagesPage />;
+import MessagesListView from '@/views/messages/MessagesListView';
+
+export default function AdminMessagesPage() {
+  return <MessagesListView />;
 }
